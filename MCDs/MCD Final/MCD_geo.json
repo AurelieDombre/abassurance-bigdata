@@ -1,0 +1,31 @@
+{
+  "width": 390,
+  "height": 696,
+  "cx": [
+    [ "SOUSCRIRE", 67 ],
+    [ "CLIENT", 195 ],
+    [ "CONTRAT", 67 ],
+    [ "REGLER", 195 ],
+    [ "PAIEMENT", 320 ],
+    [ "DECLARER", 67 ],
+    [ "SINISTRE", 195 ]
+  ],
+  "cy": [
+    [ "SOUSCRIRE", 128 ],
+    [ "CLIENT", 128 ],
+    [ "CONTRAT", 391 ],
+    [ "REGLER", 391 ],
+    [ "PAIEMENT", 391 ],
+    [ "DECLARER", 611 ],
+    [ "SINISTRE", 611 ]
+  ],
+  "shift": [
+    [ "SOUSCRIRE,CONTRAT,0", 0 ],
+    [ "SOUSCRIRE,CLIENT,0", 0 ],
+    [ "REGLER,PAIEMENT,0", 0 ],
+    [ "REGLER,CONTRAT,0", 0 ],
+    [ "DECLARER,SINISTRE,0", 0 ],
+    [ "DECLARER,CONTRAT,0", 0 ]
+  ],
+  "ratio": []
+}

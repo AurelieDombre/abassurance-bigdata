@@ -1,0 +1,14 @@
+AB_CLIENT: ab_client_id, ab_nom, ab_prenom, ab_date_naissance, ab_email, ab_telephone, ab_adresse, ab_code_postal, ab_num_fiscal, ab_date_creation, ab_statut_client
+SOUSCRIRE, 11 AB_CONTRAT, 0N AB_CLIENT
+AB_CONTRAT: ab_policy_number, ab_type_assurance, ab_date_debut, ab_date_fin, ab_prime_annuelle, ab_statut_contrat, ab_agence_id
+REGLER, 11 AB_PAIEMENT, 0N AB_CONTRAT
+
+:
+:
+DECLARER, 11 AB_SINISTRE, 0N AB_CONTRAT
+AB_PAIEMENT: ab_payment_id, ab_date_paiement, ab_montant, ab_mode_paiement,ab_policy_number
+
+:
+:
+AB_SINISTRE: ab_claim_id, ab_date_sinistre, ab_montant_estime, ab_statut_sinistre, ab_description, ab_policy_number
+:

@@ -1,0 +1,16 @@
+%%mocodo
+:::
+CLIENT: client_id, nom, prenom, date_naissance, email, telephone, adresse, code_postal, num_fiscal, date_creation, statut_client, loyalty_score
+:::
+
+
+:
+CONTRAT: contrat_id, type_assurance, code_produit, date_debut, date_fin, prime_annuelle, prime_mensuelle, statut_contrat, etat_contrat, agence_id, code_courtier, client_id 1, #client_id 2 > CLIENT > client_id
+:::
+PAIEMENT: paiement_id, date_paiement, montant, mode_paiement, statut_transaction, contrat_id 1, #contrat_id 2 > CONTRAT > contrat_id
+:
+
+
+:::
+SINISTRE: sinistre_id, date_sinistre, montant_estime, statut_sinistre, description, fraud_score, contrat_id 1, #contrat_id 2 > CONTRAT > contrat_id
+:::

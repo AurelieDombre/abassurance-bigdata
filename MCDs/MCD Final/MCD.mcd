@@ -1,0 +1,11 @@
+SOUSCRIRE, 11 CONTRAT, 0N CLIENT
+CLIENT: client_id, nom, prenom, date_naissance, email, telephone, adresse, code_postal, num_fiscal, date_creation, statut_client, loyalty_score
+:
+
+CONTRAT: contrat_id, type_assurance, code_produit, date_debut, date_fin, prime_annuelle, prime_mensuelle, statut_contrat, etat_contrat, agence_id, code_courtier, client_id
+REGLER, 11 PAIEMENT, 0N CONTRAT
+PAIEMENT: paiement_id, date_paiement, montant, mode_paiement, statut_transaction, contrat_id
+
+DECLARER, 11 SINISTRE, 0N CONTRAT
+SINISTRE: sinistre_id, date_sinistre, montant_estime, statut_sinistre, description, fraud_score, contrat_id
+:

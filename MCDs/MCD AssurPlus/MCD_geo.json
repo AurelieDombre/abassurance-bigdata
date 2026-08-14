@@ -1,0 +1,31 @@
+{
+  "width": 508,
+  "height": 594,
+  "cx": [
+    [ "AP_USERS", 99 ],
+    [ "SOUSCRIRE", 261 ],
+    [ "REGLER", 99 ],
+    [ "AP_CONTRACTS", 261 ],
+    [ "AP_PAYMENTS", 99 ],
+    [ "DECLARER", 261 ],
+    [ "AP_CLAIMS", 416 ]
+  ],
+  "cy": [
+    [ "AP_USERS", 111 ],
+    [ "SOUSCRIRE", 111 ],
+    [ "REGLER", 323 ],
+    [ "AP_CONTRACTS", 323 ],
+    [ "AP_PAYMENTS", 509 ],
+    [ "DECLARER", 509 ],
+    [ "AP_CLAIMS", 509 ]
+  ],
+  "shift": [
+    [ "SOUSCRIRE,AP_CONTRACTS,0", 0 ],
+    [ "SOUSCRIRE,AP_USERS,0", 0 ],
+    [ "REGLER,AP_PAYMENTS,0", 0 ],
+    [ "REGLER,AP_CONTRACTS,0", 0 ],
+    [ "DECLARER,AP_CLAIMS,0", 0 ],
+    [ "DECLARER,AP_CONTRACTS,0", 0 ]
+  ],
+  "ratio": []
+}
