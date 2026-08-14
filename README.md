@@ -27,3 +27,47 @@ Règles :
 * main contient uniquement du code validé et stable.
 
 
+## Environnement
+
+Création de l'environnement python avec la commande ```python -m venv .venv``` sur le powerShell
+Mise à jour de pip : ```python -m pip install --upgrade pip```
+Activation de l'environnement : ```.\.venv\Scripts\Activate.ps1```
+Fichier requirements.txt généré : ````pip freeze > requirements.txt````
+
+### Choix du framework Python
+
+Le projet utilise PySpark comme framework Python principal.
+
+PySpark a été choisi car il permet d'utiliser Apache Spark
+depuis Python pour effectuer des traitements distribués sur
+de grands volumes de données.
+
+Il est particulièrement adapté à l'architecture du projet,
+qui repose sur Hadoop pour le stockage et Spark pour le
+traitement des données.
+
+La version de python 3.14 est supporté par PySpark 4.2.0 et donc Apache Spark.
+
+Installation de la version 4.2.0 de pySpark : ````pip install pyspark==4.2.0````
+
+## Installation & exécution de pyspark 
+Test de pySpark dans un container Docker afin de vérifier son installation et son exécution.
+
+### Prérequis
+- Docker Desktop
+
+### Lancer le projet
+A partir du dossier Docker
+
+```bash
+docker build -t abassurance-pyspark .
+docker run --rm abassurance-pyspark
+```
+
+### Développement local (optionnel)
+```bash
+python -m venv .venv
+.venv\Scripts\activate
+pip install -r requirements.txt
+python essaie-pyspark.py
+```
