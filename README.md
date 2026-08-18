@@ -75,7 +75,7 @@ python essaie-pyspark.py
 ### Les modèles conceptuels de données (MCD) de AssurPlus et AbAssurance
 
 #### AbAssurance 
-![MCD.png](MCD%20AbAssurance/MCD.png)
+![MCD.png](MCDs/MCD%20AbAssurance/MCD.png)
 
 >AB_CLIENT ( ab_client_id, ab_nom, ab_prenom, ab_date_naissance, ab_email, ab_telephone, ab_adresse, ab_code_postal, ab_num_fiscal, ab_date_creation, ab_statut_client )
 Le champ ab_client_id constitue la clé primaire de la table. C'était déjà un identifiant de l'entité AB_CLIENT.
@@ -97,7 +97,7 @@ Les champs ab_date_sinistre, ab_montant_estime, ab_statut_sinistre, ab_descripti
 Le champ ab_policy_number 2 est une clé étrangère. Il a migré par l'association de dépendance fonctionnelle DECLARER à partir de l'entité AB_CONTRAT en perdant son caractère identifiant.
 
 #### AssurPlus
-![MCD.png](MCD%20AssurPlus/MCD.png)
+![MCD.png](MCDs/MCD%20AssurPlus/MCD.png)
 
 >AP_CLAIMS ( AP_SINISTRE_NUM, AP_INCIDENT_DATE, AP_ESTIMATED_AMOUNT, AP_CLAIM_STATUS, AP_CLAIM_COMMENT, AP_FRAUD_SCORE, AP_CONTRACT_REF 1, #AP_CONTRACT_REF 2 )
 Le champ AP_SINISTRE_NUM constitue la clé primaire de la table. C'était déjà un identifiant de l'entité AP_CLAIMS.
