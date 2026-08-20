@@ -181,3 +181,33 @@ CONTRAT — DECLARER — SINISTRE : relation 1:N. Un contrat peut être associé
 CONTRAT — REGLER — PAIEMENT : relation 1:N. Un contrat peut être associé à plusieurs paiements, tandis qu'un paiement est rattaché à un seul contrat.
 
 
+### Intallation des outils
+
+#### Talend (Talaxie)
+
+Talend Open Studio ayant été discontinué par Qlik le 31/01/2024 (plus de distribution officielle gratuite), le projet utilise Talaxie, fork communautaire open source (licence Apache 2.0) assurant la continuité fonctionnelle de l'outil, avec pleine compatibilité des jobs Talend existants.
+
+Installation :
+
+Téléchargement de la version Windows : Talaxie DI (Data Integration) — pour les intégrations classiques par lots (batch), lecture/écriture de fichiers, bases de données, transformations.
+Extraire le package dans un dossier dont le chemin ne contien pas de caractère spéciale.
+
+Prérequis : Java 17 ou 21
+
+Configuration :
+
+1. Ouvrir l'executable TOS-DIc
+2. Créer un workspace
+3. Créer un projet
+4. Dans job : créer un job nommé "test"
+5. Dans l'onglet palette rechercher le modèle "tJava" le faire glissé dans la fenêtre job test
+6. Double-clic sur l'encart tJava et modifier le code pour tester l'execution. Par exemple :```` System.out.println("Talaxie OK - environnement fonctionnel");````
+7. Executer le job :
+
+![Talend_test_installation.jpg](images_readme/Talend_test_installation.jpg)
+
+Si aucun message d'erreur apparaît, c'est un succès !
+
+
+#### Kafka
+
