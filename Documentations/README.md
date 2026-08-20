@@ -209,5 +209,92 @@ Configuration :
 Si aucun message d'erreur apparaît, c'est un succès !
 
 
-#### Kafka
+#### Kafka et Hadoop
 
+##### Hadoop
+
+Afin de faciliter l'installation, je mets en place un container Docker.
+
+1. Création du fichier docker-compose.yaml avec les images de Kafka et hadoop
+2. Montage du container `docker compose up -d`
+3. Vérification des container `docker compose ps` :
+   
+![DockerDesktop-capture-container-up.png](images_readme/DockerDesktop-capture-container-up.png)
+
+4. Vérifier que Hadoop est fonctionnel :
+http://localhost:9870
+
+![hadoop_test-fonctionnel.png](images_readme/hadoop_test-fonctionnel.png)
+
+Le dossier nommé abassurance créer via la commande `docker exec -it namenode hdfs dfs -mkdir -p /abassurance/test` est bien visible.
+
+##### Kafka
+
+Je vais créer un topic via docker dans un dossier test-abassurance :
+
+`docker exec -it kafka /opt/kafka/bin/kafka-topics.sh --create --topic test-abassurance --bootstrap-server localhost:9092`
+
+Puis lister les serveurs :
+
+`docker exec -it kafka /opt/kafka/bin/kafka-topics.sh --list --bootstrap-server localhost:9092`
+
+
+Produire/consommer un message (preuve que le flux de données circule)
+
+```shell
+
+#Terminal 1
+
+(.venv) PS C:\xampp\htdocs\Projets\abassurance-bigdata\Docker> docker exec -it kafka /opt/kafka/bin/kafka-console-producer.sh --topic test-abassurance --bootstrap-server localhost:9092                
+>test_sinistre_001
+>test_sinistre_002
+
+
+#Terminal 2
+(.venv) PS C:\xampp\htdocs\Projets\abassurance-bigdata> docker exec -it kafka /opt/kafka/bin/kafka-console-consumer.sh --topic test-abassurance --bootstrap-server localhost:9092 --from-beginning
+The consumer rebalance protocol (KIP-848) is production-ready! Set group.protocol=consumer to try it out. See https://kafka.apache.org/documentation/#consumer_rebalance_protocol
+test_sinistre_001
+test_sinistre_002
+
+```
+
+##### Test Spark ↔ Hadoop
+
+Création d'un script pour tester la connextion Spark <=> Hadoop :
+
+* Il définit l'adresse de l'entrepôt HDFS (hdfs://namenode:9000) — comme une adresse postale que Spark va utiliser pour trouver le service Hadoop sur le réseau Docker.
+* Il démarre Spark en lui disant "par défaut, va stocker/chercher tes fichiers sur cet entrepôt HDFS" (la ligne spark.hadoop.fs.defaultFS).
+* Il écrit un petit tableau de données factices (2 clients) au format Parquet sur HDFS.
+* Il relit ce même fichier depuis HDFS et l'affiche — si ça marche, ça prouve que Spark et Hadoop communiquent bien dans les deux sens.
+
+Lancement du script : `docker compose run --rm app python test_hadoop_spark.py`
+
+Succès :
+
+```shell
+
+(.venv) PS C:\xampp\htdocs\Projets\abassurance-bigdata\Docker> docker compose run --rm app python test_hadoop_spark.py
+[+]  3/3t 3/33
+ ✔ Container namenode Running                                                                                                                                                                            0.0s
+ ✔ Container kafka    Running                                                                                                                                                                            0.0s
+ ✔ Container datanode Running                                                                                                                                                                            0.0s
+Container docker-app-run-dc0ee55e32a1 Creating 
+Container docker-app-run-dc0ee55e32a1 Created 
+WARNING: Using incubator modules: jdk.incubator.vector
+Using Spark's default log4j profile: org/apache/spark/log4j2-defaults.properties
+Setting default log level to "WARN".
+To adjust logging level use sc.setLogLevel(newLevel). For SparkR, use setLogLevel(newLevel).
+26/08/20 08:02:51 WARN NativeCodeLoader: Unable to load native-hadoop library for your platform... using builtin-java classes where applicable
+>>> Ecriture d'un DataFrame de test sur HDFS...
+>>> Ecriture terminee sur hdfs://namenode:9000/abassurance/test/spark_test.parquet
+>>> Relecture depuis HDFS...
++---+-------------+-------+
+| id|   client_ref| statut|
++---+-------------+-------+
+|  2|AB_CLIENT_002|resilie|
+|  1|AB_CLIENT_001|  actif|
++---+-------------+-------+
+
+>>> TEST SPARK <-> HADOOP REUSSI
+
+```
