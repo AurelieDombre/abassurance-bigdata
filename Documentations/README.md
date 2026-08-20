@@ -181,7 +181,8 @@ CONTRAT — DECLARER — SINISTRE : relation 1:N. Un contrat peut être associé
 CONTRAT — REGLER — PAIEMENT : relation 1:N. Un contrat peut être associé à plusieurs paiements, tandis qu'un paiement est rattaché à un seul contrat.
 
 
-### Installation des outils
+### Ins
+tallation des outils
 
 #### Talend (Talaxie)
 
