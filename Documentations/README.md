@@ -1,6 +1,6 @@
 # abassurance-bigdata
-Récupération de données suite fusion ABAssurance et AssurePlus, création de plateforme data via : Talend + Kafka + Hadoop + Spark + Python/IA
 
+Récupération de données suite fusion ABAssurance et AssurePlus, création de plateforme data via : Talend + Kafka + Hadoop + Spark + Python/IA
 
 ## Convention de nommage des branches
 
@@ -15,7 +15,6 @@ Le projet utilise une convention de nommage inspirée de Git Flow afin de facili
 | Correction urgente | `hotfix/<description>`       | `hotfix/erreur-kafka`           |
 | Version            | `release/<version>`          | `release/1.0.0`                 |
 
-
 Règles :
 
 * Les noms de branches sont écrits en minuscules.
@@ -25,7 +24,6 @@ Règles :
 * Les nouvelles branches sont créées à partir de develop.
 * Les fonctionnalités terminées sont fusionnées dans develop.
 * main contient uniquement du code validé et stable.
-
 
 ## Environnement
 
@@ -51,12 +49,15 @@ La version de python 3.14 est supporté par PySpark 4.2.0 et donc Apache Spark.
 Installation de la version 4.2.0 de pySpark : ````pip install pyspark==4.2.0````
 
 ### Installation & exécution de pyspark (Etape de validation initiale)
+
 Test de pySpark dans un container Docker afin de vérifier son installation et son exécution.
 
 #### Prérequis
-- Docker Desktop
+
+Docker Desktop
 
 #### Lancer le projet
+
 A partir du dossier Docker
 
 ```bash
@@ -65,6 +66,7 @@ docker run --rm abassurance-pyspark
 ```
 
 #### Développement local (optionnel)
+
 ```bash
 python -m venv .venv
 .venv\Scripts\activate
@@ -75,6 +77,7 @@ python essaie-pyspark.py
 ### Les modèles conceptuels de données (MCD) de AssurePlus et AbAssurance
 
 #### AbAssurance 
+
 ![MCD.png](MCDs/MCD%20AbAssurance/MCD.png)
 
 >AB_CLIENT ( ab_client_id, ab_nom, ab_prenom, ab_date_naissance, ab_email, ab_telephone, ab_adresse, ab_code_postal, ab_num_fiscal, ab_date_creation, ab_statut_client )
@@ -97,6 +100,7 @@ Les champs ab_date_sinistre, ab_montant_estime, ab_statut_sinistre, ab_descripti
 Le champ ab_policy_number  est une clé étrangère. Il a migré par l'association de dépendance fonctionnelle DECLARER à partir de l'entité AB_CONTRAT en perdant son caractère identifiant.
 
 #### AssurePlus
+
 ![MCD.png](MCDs/MCD%20AssurePlus/MCD.png)
 
 >AP_CLAIMS ( AP_SINISTRE_NUM, AP_INCIDENT_DATE, AP_ESTIMATED_AMOUNT, AP_CLAIM_STATUS, AP_CLAIM_COMMENT, AP_FRAUD_SCORE, AP_CONTRACT_REF 1, #AP_CONTRACT_REF 2 )
@@ -138,7 +142,6 @@ Exemple de mapping des données :
 | `ab_date_paiement`  | `AP_PAYMENT_DATETIME` | `date_paiement`  |
 | `ab_montant`        | `AP_AMOUNT_PAID`      | `montant`        |
 
-
 ***Justification du modèle cible***
 
 Pour construire le modèle cible, je me suis basé sur les deux modèles de données fournis en annexe, AbAssurance et AssurePlus. Comme les deux bases contiennent des informations qui correspondent aux mêmes éléments métier, j’ai regroupé les entités similaires afin d’obtenir un modèle commun.
@@ -150,7 +153,6 @@ Pour les attributs, j’ai regroupé ceux qui étaient communs aux deux système
 #### MCD final après fusion
 
 ![MCD.png](MCDs/MCD%20Final/MCD.png)
-
 
 >CLIENT ( client_id, nom, prenom, date_naissance, email, telephone, adresse, code_postal, num_fiscal, date_creation, statut_client, loyalty_score )
 Le champ client_id constitue la clé primaire de la table. C'était déjà un identifiant de l'entité CLIENT.
@@ -171,7 +173,6 @@ Le champ sinistre_id constitue la clé primaire de la table. C'était déjà un 
 Les champs date_sinistre, montant_estime, statut_sinistre, description, fraud_score et contrat_id 1 étaient déjà de simples attributs de l'entité SINISTRE.
 Le champ contrat_id 2 est une clé étrangère. Il a migré par l'association de dépendance fonctionnelle DECLARER à partir de l'entité CONTRAT en perdant son caractère identifiant.
 
-
 ***Relations entre les entités***
 
 Le modèle de données final comporte trois relations principales :
@@ -180,9 +181,7 @@ CLIENT — SOUSCRIRE — CONTRAT : relation 1:N. Un client peut souscrire plusie
 CONTRAT — DECLARER — SINISTRE : relation 1:N. Un contrat peut être associé à plusieurs sinistres, tandis qu'un sinistre est rattaché à un seul contrat.
 CONTRAT — REGLER — PAIEMENT : relation 1:N. Un contrat peut être associé à plusieurs paiements, tandis qu'un paiement est rattaché à un seul contrat.
 
-
-### Ins
-tallation des outils
+### Installation des outils
 
 #### Talend (Talaxie)
 
@@ -202,13 +201,12 @@ Configuration :
 3. Créer un projet
 4. Dans job : créer un job nommé "test"
 5. Dans l'onglet palette rechercher le modèle "tJava" le faire glissé dans la fenêtre job test
-6. Double-clic sur l'encart tJava et modifier le code pour tester l'execution. Par exemple :```` System.out.println("Talaxie OK - environnement fonctionnel");````
+6. Double-clic sur l'encart tJava et modifier le code pour tester l'execution. Par exemple :````System.out.println("Talaxie OK - environnement fonctionnel");````
 7. Executer le job :
 
 ![Talend_test_installation.jpg](images_readme/Talend_test_installation.jpg)
 
 Si aucun message d'erreur apparaît, c'est un succès !
-
 
 #### Kafka et Hadoop
 
@@ -219,7 +217,6 @@ Afin de faciliter l'installation, je mets en place un container Docker.
 1. Création du fichier docker-compose.yaml avec les images de Kafka et hadoop
 2. Montage du container `docker compose up -d`
 3. Vérification des container `docker compose ps` :
-   
 ![DockerDesktop-capture-container-up.png](images_readme/DockerDesktop-capture-container-up.png)
 
 4. Vérifier que Hadoop est fonctionnel :
@@ -238,7 +235,6 @@ Je vais créer un topic via docker dans un dossier test-abassurance :
 Puis lister les serveurs :
 
 `docker exec -it kafka /opt/kafka/bin/kafka-topics.sh --list --bootstrap-server localhost:9092`
-
 
 Produire/consommer un message (preuve que le flux de données circule)
 
@@ -300,13 +296,12 @@ To adjust logging level use sc.setLogLevel(newLevel). For SparkR, use setLogLeve
 
 ```
 
-
 ### Tableau des versions installées
 
 ### Versions installées
 
 | Outil | Version | Mode d'installation |
-|---|---|---|
+| --- | --- | --- |
 | Talaxie (fork Talend Open Studio DI) | V8.9.0-SNAPSHOT | Natif Windows, JDK 21 (JDK système 25 non compatible) |
 | Apache Kafka | à compléter avec `kafka-topics.sh --version` | Docker, image `apache/kafka:latest`, mode KRaft (sans Zookeeper) |
 | Apache Hadoop | 3.2.1 | Docker, images `bde2020/hadoop-namenode:2.0.0-hadoop3.2.1-java8` et `bde2020/hadoop-datanode:2.0.0-hadoop3.2.1-java8` |
@@ -315,7 +310,6 @@ To adjust logging level use sc.setLogLevel(newLevel). For SparkR, use setLogLeve
 | Python (conteneur applicatif) | 3.12 | Docker, choisi pour sa compatibilité éprouvée avec PySpark en environnement Linux conteneurisé |
 
 ### Problèmes rencontrés & résolutions
-
 
 Cette section documente les principaux incidents rencontrés lors de la mise en place de l'environnement, la démarche de diagnostic suivie, et la correction apportée — dans une logique d'amélioration continue.
 
@@ -363,3 +357,20 @@ Cette section documente les principaux incidents rencontrés lors de la mise en 
 **Diagnostic** : l'image Docker n'est pas synchronisée en continu avec le système de fichiers local — elle capture un instantané des fichiers uniquement au moment du `docker build` (instruction `COPY . .`). Le fichier avait été ajouté après le dernier build.
 
 **Correction** : rebuild explicite de l'image (`docker compose build app`) après chaque ajout de fichier nécessaire à l'exécution.
+
+TODO: A revoir !
+
+## Création d'un dataset
+
+La création du dataset servira à la fois pour tester ton pipeline et pour illustrer concrètement les bonnes pratiques de data cleaning.
+Pour l'utiliser :
+
+Ajoute Faker à ton requirements.txt :
+
+```shell
+pip install Faker
+pip freeze > requirements.txt
+```
+
+Lancer le script de génération ddes datasets :
+py generate_dataset.py
