@@ -142,6 +142,8 @@ Exemple de mapping des données :
 | `ab_date_paiement`  | `AP_PAYMENT_DATETIME` | `date_paiement`  |
 | `ab_montant`        | `AP_AMOUNT_PAID`      | `montant`        |
 
+Le mapping complet est dans le fichier mapping_donnees
+
 ***Justification du modèle cible***
 
 Pour construire le modèle cible, je me suis basé sur les deux modèles de données fournis en annexe, AbAssurance et AssurePlus. Comme les deux bases contiennent des informations qui correspondent aux mêmes éléments métier, j’ai regroupé les entités similaires afin d’obtenir un modèle commun.
