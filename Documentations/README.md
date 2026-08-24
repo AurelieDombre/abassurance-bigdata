@@ -76,7 +76,7 @@ python essaie-pyspark.py
 
 ### Les modèles conceptuels de données (MCD) de AssurePlus et AbAssurance
 
-#### AbAssurance 
+#### AbAssurance
 
 ![MCD.png](MCDs/MCD%20AbAssurance/MCD.png)
 
@@ -358,8 +358,6 @@ Cette section documente les principaux incidents rencontrés lors de la mise en 
 
 **Correction** : rebuild explicite de l'image (`docker compose build app`) après chaque ajout de fichier nécessaire à l'exécution.
 
-TODO: A revoir !
-
 ## Création d'un dataset
 
 La création du dataset servira à la fois pour tester le pipeline et pour illustrer concrètement les bonnes pratiques de data cleaning.
@@ -374,3 +372,22 @@ pip freeze > requirements.txt
 
 Lancer le script de génération des datasets :
 py generate_dataset.py
+
+##### Inventaire des bases de données
+
+**Structure de tableau proposée** — une ligne par table, groupée par système source :
+
+| Système source | Table | Nb colonnes | Clé primaire | Clés étrangères / relations | Volume réel estimé (prod) | Volume jeu de dev |
+|---|---|---|---|---|---|---|
+| AbAssurance (Oracle) | AB_CLIENT | 10 | AB_CLIENT_ID | — (entité racine) | ~12 M lignes | 200 lignes |
+| AbAssurance (Oracle) | AB_CONTRAT | 7 | AB_POLICY_NUMBER | AB_CLIENT_ID → AB_CLIENT | à estimer (~1,3 contrat/client) | 300 lignes |
+| AbAssurance (Oracle) | AB_SINISTRE | 5 | AB_CLAIM_ID | AB_POLICY_NUMBER → AB_CONTRAT | à estimer | 62 lignes |
+| AbAssurance (Oracle) | AB_PAIEMENT | 5 | AB_PAYMENT_ID | AB_POLICY_NUMBER → AB_CONTRAT | à estimer | 1 051 lignes |
+| AssurePlus (SQL Server) | AP_USERS | 10 | AP_USER_ID | — (entité racine) | ~5 M lignes | 100 lignes |
+| AssurePlus (SQL Server) | AP_CONTRACTS | 8 | AP_CONTRACT_REF | AP_USER_ID → AP_USERS | à estimer | 148 lignes |
+| AssurePlus (SQL Server) | AP_CLAIMS | 7 | AP_SINISTRE_NUM | AP_CONTRACT_REF → AP_CONTRACTS | à estimer | 38 lignes |
+| AssurePlus (SQL Server) | AP_PAYMENTS | 6 | AP_PAYMENT_REF | AP_CONTRACT_REF → AP_CONTRACTS | à estimer | 527 lignes |
+
+Les volumes de production sont estimés à partir de la présentation de l'entreprise. Les tables filles (contrats, sinistres, paiements) sont estimées par un ratio moyen [x contrats/client], en l'absence de données réelles disponibles.
+
+Les relations entre les tables sont définis dans la section : ***Les modèles conceptuels de données (MCD) de AssurePlus et AbAssurance***
