@@ -18,7 +18,9 @@ from datetime import date, datetime, timedelta
 import pandas as pd
 from faker import Faker
 
-# On fixe une "graine" aleatoire pour obtenir TOUJOURS les memes donnees generees afin que le pipeline soit reproductible.
+# seed =>On fixe une "graine" aleatoire. Ca veut dire que si on relances le script
+# plusieurs fois, on obtiendra TOUJOURS les memes donnees generees.
+# Pour que le pipeline soit reproductible.
 random.seed(42)
 Faker.seed(42)
 
@@ -29,14 +31,65 @@ fake = Faker("fr_FR")
 NOMBRE_CLIENTS_AB = 200
 NOMBRE_USERS_AP = 100
 
+# Phrases toutes faites pour decrire un sinistre, organisees par type
+# d'assurance. On pioche une phrase au hasard dans la bonne categorie.
+# {ville} sera remplace automatiquement par une vraie ville generee par Faker.
+DESCRIPTIONS_SINISTRE = {
+    "AUTO": [
+        "Collision avec un autre vehicule sur {ville}, degats importants a l'avant.",
+        "Vehicule vole sur un parking a {ville} dans la nuit.",
+        "Bris de glace suite a un impact de gravillon sur autoroute.",
+        "Accrochage en stationnement, retroviseur casse.",
+        "Vehicule endommage par la grele a {ville}.",
+    ],
+    "HABITATION": [
+        "Degat des eaux suite a une fuite de la machine a laver.",
+        "Cambriolage avec effraction, vol de materiel electronique.",
+        "Incendie d'origine electrique dans la cuisine.",
+        "Tempete ayant arrache une partie de la toiture a {ville}.",
+        "Fuite au niveau de la toiture suite a de fortes pluies.",
+    ],
+    "SANTE": [
+        "Hospitalisation suite a une chute domestique.",
+        "Intervention chirurgicale d'urgence.",
+        "Consultation specialiste suite a un accident sportif.",
+        "Frais medicaux suite a une fracture du poignet.",
+    ],
+    "PROFESSIONNELLE": [
+        "Vol de materiel informatique dans les locaux de l'entreprise a {ville}.",
+        "Degat des eaux dans les bureaux suite a une fuite.",
+        "Incendie ayant endommage une partie de l'entrepot.",
+        "Litige avec un client suite a un defaut de livraison.",
+    ],
+    # Categorie utilisee pour AssurePlus (produits ASSIST_*)
+    "ASSISTANCE": [
+        "Panne du vehicule necessitant un remorquage a {ville}.",
+        "Demande d'assistance suite a une crevaison sur autoroute.",
+        "Vehicule immobilise suite a une panne moteur.",
+        "Assistance rapatriement suite a un accident a l'etranger.",
+    ],
+}
 
+# Génère une description de sinistre aléatoire pour une catégorie donnée
+def generer_description_sinistre(categorie):
+    """
+    Choisit une phrase au hasard dans la liste correspondant a la categorie
+    (AUTO, HABITATION, SANTE, PROFESSIONNELLE ou ASSISTANCE),
+    et remplace {ville} par une vraie ville generee par Faker si besoin.
+    """
+    phrase = random.choice(DESCRIPTIONS_SINISTRE[categorie])
+    if "{ville}" in phrase:
+        phrase = phrase.replace("{ville}", fake.city())
+    return phrase
+
+# Génère une date aléatoire récente (entre aujourd'hui et 'annees_max' années dans le passé)
 def date_aleatoire_recente(annees_max=4):
     """Retourne une date aleatoire entre aujourd'hui et 'annees_max' annees dans le passe."""
     jours_max = annees_max * 365
     jours_avant = random.randint(30, jours_max)
     return date.today() - timedelta(days=jours_avant)
 
-
+# Génère un email avec des défauts aléatoires pour simuler des données imparfaites
 def email_avec_defauts(email):
     """
     La plupart du temps, on renvoie l'email tel quel.
@@ -53,7 +106,7 @@ def email_avec_defauts(email):
     else:
         return email  # email normal
 
-
+# Génère un numéro de téléphone avec des défauts aléatoires pour simuler des données imparfaites
 def telephone_avec_defauts(telephone):
     """Simule un numero de telephone parfois manquant."""
     if random.random() < 0.04:
@@ -110,8 +163,8 @@ def generer_contrats_sinistres_paiements_ab(liste_clients):
 
     for client in liste_clients:
         nombre_contrats = random.randint(0, 3)
-
-        for _ in range(nombre_contrats):
+        
+        for i in range(nombre_contrats):
             reference_contrat = "AB-" + str(numero_contrat).zfill(6)
             numero_contrat = numero_contrat + 1
 
@@ -139,14 +192,14 @@ def generer_contrats_sinistres_paiements_ab(liste_clients):
                     "AB_DATE_SINISTRE": fake.date_time_between(start_date=date_debut, end_date="now"),
                     "AB_MONTANT_ESTIME": round(random.uniform(100, 15000), 2),
                     "AB_STATUT_SINISTRE": random.choice(["DECLARE", "EN_COURS", "CLOTURE", "REJETE"]),
-                    "AB_DESCRIPTION": fake.sentence(nb_words=10),
+                    "AB_DESCRIPTION": generer_description_sinistre(contrat["AB_TYPE_ASSURANCE"]),
                 }
                 liste_sinistres.append(sinistre)
                 numero_sinistre = numero_sinistre + 1
 
             # Entre 1 et 6 paiements sur ce contrat (ex: mensualites)
             nombre_paiements = random.randint(1, 6)
-            for _ in range(nombre_paiements):
+            for i in range(nombre_paiements):
                 paiement = {
                     "AB_PAYMENT_ID": numero_paiement,
                     "AB_POLICY_NUMBER": reference_contrat,
@@ -175,7 +228,7 @@ def generer_users_ap():
         date_naissance = fake.date_of_birth(minimum_age=18, maximum_age=90)
 
         # AssurePlus stocke la date de naissance en texte libre (VARCHAR).
-        # Dans la vraie vie, ca cree souvent des formats incoherents.
+        # En générale, ca cree souvent des formats incoherents.
         # On simule ca ici : 5% des dates sont au format francais JJ/MM/AAAA
         # au lieu du format normal AAAA-MM-JJ.
         if random.random() < 0.05:
@@ -217,7 +270,7 @@ def generer_contracts_claims_payments_ap(liste_users):
     for user in liste_users:
         nombre_contracts = random.randint(0, 3)
 
-        for _ in range(nombre_contracts):
+        for i in range(nombre_contracts):
             reference_contract = "AP-" + str(numero_contract).zfill(6)
             numero_contract = numero_contract + 1
 
@@ -237,9 +290,18 @@ def generer_contracts_claims_payments_ap(liste_users):
             }
             liste_contracts.append(contract)
 
-            # 25% de chance d'avoir un claim sur ce contrat
+            # 25% de claim sur ce contrat
             if random.random() < 0.25:
                 date_incident = fake.date_time_between(start_date=date_debut, end_date="now")
+
+                # On choisit la categorie de description selon le produit :
+                # les produits "AUTO_..." utilisent les phrases AUTO,
+                # les produits "ASSIST_..." utilisent les phrases ASSISTANCE.
+                if contract["AP_PRODUCT_CODE"].startswith("AUTO"):
+                    categorie_description = "AUTO"
+                else:
+                    categorie_description = "ASSISTANCE"
+
                 claim = {
                     "AP_SINISTRE_NUM": numero_claim,
                     "AP_CONTRACT_REF": reference_contract,
@@ -247,7 +309,7 @@ def generer_contracts_claims_payments_ap(liste_users):
                     "AP_INCIDENT_DATE": date_incident.strftime("%Y-%m-%d %H:%M:%S"),
                     "AP_ESTIMATED_AMOUNT": round(random.uniform(100, 12000), 2),
                     "AP_CLAIM_STATUS": random.choice(["REPORTED", "IN_PROGRESS", "CLOSED", "REJECTED"]),
-                    "AP_CLAIM_COMMENT": fake.sentence(nb_words=10),
+                    "AP_CLAIM_COMMENT": generer_description_sinistre(categorie_description),
                     "AP_FRAUD_SCORE": round(random.uniform(0, 100), 2),
                 }
                 liste_claims.append(claim)

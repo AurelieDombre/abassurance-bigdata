@@ -362,15 +362,15 @@ TODO: A revoir !
 
 ## Création d'un dataset
 
-La création du dataset servira à la fois pour tester ton pipeline et pour illustrer concrètement les bonnes pratiques de data cleaning.
+La création du dataset servira à la fois pour tester le pipeline et pour illustrer concrètement les bonnes pratiques de data cleaning.
 Pour l'utiliser :
 
-Ajoute Faker à ton requirements.txt :
+Ajoute Faker au requirements.txt :
 
 ```shell
 pip install Faker
 pip freeze > requirements.txt
 ```
 
-Lancer le script de génération ddes datasets :
+Lancer le script de génération des datasets :
 py generate_dataset.py
