@@ -124,6 +124,8 @@ Les champs AP_FULL_NAME, AP_BIRTH_DATE, AP_MAIL_ADDRESS, AP_PHONE_NUMBER, AP_STR
 
 #### Mapping des deux modèles
 
+Le mapping complet est dans le fichier m͟a͟p͟p͟i͟n͟g͟_͟d͟o͟n͟n͟e͟e͟s.m͟d
+
 Exemple de mapping des données :
 
 | Base AbAssurance    | Base AssurePlus       | Modèle cible     |
@@ -141,8 +143,6 @@ Exemple de mapping des données :
 | `ab_montant_estime` | `AP_ESTIMATED_AMOUNT` | `montant_estime` |
 | `ab_date_paiement`  | `AP_PAYMENT_DATETIME` | `date_paiement`  |
 | `ab_montant`        | `AP_AMOUNT_PAID`      | `montant`        |
-
-Le mapping complet est dans le fichier mapping_donnees
 
 ***Justification du modèle cible***
 
