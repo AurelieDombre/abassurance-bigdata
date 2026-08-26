@@ -32,6 +32,31 @@ Mise à jour de pip : ```python -m pip install --upgrade pip```
 Activation de l'environnement : ```.\.venv\Scripts\Activate.ps1```
 Fichier requirements.txt généré : ````pip freeze > requirements.txt````
 
+***Installation de SonarQube IDE et SonarQube Server***
+
+***Prérequis***
+- Java 21 LTS
+- Eclipse Adoptium / Temurin
+- JAVA_HOME correctement défini
+- Java 64 bits
+
+***Installation***
+SonarQube for IDE (extension VS Code) permet d’avoir les problèmes de qualité directement dans le code VS Code.
+SonarQube Server analyse le projet et affiche le vrai tableau de bord dans un navigateur.
+
+Pour installer SonarQube server :
+
+1. télécharger le package en fonction de l'os
+2. Aller dans le dossier C:\sonarqube\bin\windows-x86-64
+3. Lancer StartSonar.bat
+4. Sur localhost:9000, SonarQube server s'ouvre.
+
+Il faut créer le projet et analysé le projet local pour avoir le rapport sur le server SonarQube
+Il suffit de suivre les étapes énuméré sur la page de SonarQube Server.
+
+Le résultat :
+![Copie-écran-sonarQubeServer.png](images_readme/Copie-écran-sonarQubeServer.png)
+
 ### Choix du framework Python
 
 Le projet utilise PySpark comme framework Python principal.
