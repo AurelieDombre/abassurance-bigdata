@@ -44,9 +44,9 @@ Fichier requirements.txt généré : ````pip freeze > requirements.txt````
 SonarQube for IDE (extension VS Code) permet d’avoir les problèmes de qualité directement dans le code VS Code.
 SonarQube Server analyse le projet et affiche le vrai tableau de bord dans un navigateur.
 
-Pour installer SonarQube server :
+Pour installer SonarQube server en local:
 
-1. télécharger le package en fonction de l'os
+1. Télécharger le package en fonction de l'os
 2. Aller dans le dossier C:\sonarqube\bin\windows-x86-64
 3. Lancer StartSonar.bat
 4. Sur localhost:9000, SonarQube server s'ouvre.
@@ -56,6 +56,8 @@ Il suffit de suivre les étapes énuméré sur la page de SonarQube Server.
 
 Le résultat :
 ![Copie-écran-sonarQubeServer.png](images_readme/Copie-écran-sonarQubeServer.png)
+
+>Pour plus de facilité pour le correcteur, SonarQube server a été chargé dans le container Docker.
 
 ### Choix du framework Python
 
