@@ -57,8 +57,6 @@ Il suffit de suivre les étapes énuméré sur la page de SonarQube Server.
 Le résultat :
 ![Copie-écran-sonarQubeServer.png](images_readme/Copie-écran-sonarQubeServer.png)
 
->Pour plus de facilité pour le correcteur, SonarQube server a été chargé dans le container Docker.
-
 ### Choix du framework Python
 
 Le projet utilise PySpark comme framework Python principal.
