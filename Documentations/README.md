@@ -418,3 +418,40 @@ py generate_dataset.py
 Les volumes de production sont estimés à partir de la présentation de l'entreprise. Les tables filles (contrats, sinistres, paiements) sont estimées par un ratio moyen [x contrats/client], en l'absence de données réelles disponibles.
 
 Les relations entre les tables sont définis dans la section : ***Les modèles conceptuels de données (MCD) de AssurePlus et AbAssurance***
+
+### US 1.2 Extraction Oracle
+
+Les données du dataset ont été générés par un script avec faker afin de simuler une extraction.
+
+Ci dessous les étapes de créaton deu job dans Talaxie :
+
+1. Lire le CSV source (tFileInputDelimited) :
+Crée un nouveau job dans Talaxie, extraction_ab_client (respecte la convention : ce job correspondra à la branche feature/US1.2-extraction-oracle).
+Glisser un composant tFileInputDelimited depuis la palette, et le pointer vers le fichier ab_client.csv généré par generate_dataset.py.
+Définir le schéma des colonnes (ab_client_id, ab_nom, ab_prenom, etc.) manuellement.
+
+2. Écrire le résultat standardisé (tFileOutputDelimited) :
+Un tFileOutputDelimited qui écrit le résultat standardisé dans un dossier output/ab_assurance_extract_talaxie/ab_assurance_extract_client.csv.
+Glisse un tFileOutputDelimited sur le canvas. Relie tFileInputDelimited_1 vers ce nouveau composant (clic droit sur tFileInputDelimited_1 → Ligne → Main → clique sur tFileOutputDelimited).
+Définir le fichier de sortie en zone de staging
+Dans les propriétés du tFileOutputDelimited, définis le chemin de sortie, par exemple C:/xampp/htdocs/projets/abassurance-bigdata/data/output/ab_assurance_extract_talaxie/ab_client_extract_....csv.
+Vérifier en-tête et encodage en sortie
+Coche l'option 'Inclure l'en-tête' (Include header) si disponible, pour que le fichier de sortie garde les noms de colonnes ab_* — utile pour la lisibilité et pour que l'US suivante (nettoyage) puisse relire ce fichier facilement.
+Vérifier que l'encodage est bien UTF-8.
+
+3. Exécuter et valider :
+Executer le job, puis ouvrir le fichier généré dans data/output/ab_assurance_extract_talaxie/ab_assurance_extract_client.csv. pour confirmer le nombre de ligne pour chaque table extraite avec les accents corrects.
+Capture d'écran des jobs :
+![Capture d'écran jobs abassurance.png](images_readme/Capture d'écran jobs abassurance.png)
+
+### US 1.3 Extraction SQL Server
+
+Le processus reste le même en utilisant les csv de assurePlus.
+
+Capture d'écran des jobs :
+
+![Capture d'écran jobs assureplus.png](images_readme/Capture d'écran jobs assureplus.png)
+
+Talaxis a repéré des anomalies dans les formats de date dans l'export csv de la table users. Le format était `"jj/mm/YYYY"` au lieu de `"YYYY-mm-dd"`.
+
+![erreur_format_date_assureplus_users.png](images_readme/erreur_format_date_assureplus_users.png)
