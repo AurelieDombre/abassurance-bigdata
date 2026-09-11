@@ -1,3 +1,4 @@
+ab_payment_id;ab_policy_number;ab_date_paiement;ab_montant;ab_type_paiement
 1;AB-000001;2026-08-21;150.73;PRELEVEMENT
 2;AB-000001;2024-03-01;150.73;CARTE
 3;AB-000001;2024-10-05;150.73;VIREMENT

@@ -455,3 +455,9 @@ Capture d'écran des jobs :
 Talaxis a repéré des anomalies dans les formats de date dans l'export csv de la table users. Le format était `"jj/mm/YYYY"` au lieu de `"YYYY-mm-dd"`.
 
 ![erreur_format_date_assureplus_users.png](images_readme/erreur_format_date_assureplus_users.png)
+
+### US 1.4 Contrôle du nombre d'enregistrement
+Le journal d'extraction se trouve dans : /data/logs/controle_extraction.csv.
+
+Pour AssurePlus, la table Users contient une anomalie.
+Six des enregistrement dont la date n'es pas au bon format doivent être corrigées.

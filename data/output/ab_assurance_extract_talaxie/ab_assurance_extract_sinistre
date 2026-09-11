@@ -1,3 +1,4 @@
+ab_claim_id;ab_policy_number;ab_date_sinistre;ab_montant_estime;ab_statut_sinistre;ab_description
 1;AB-000006;2024-11-14 05:56:19;11987.7;CLOTURE;Bris de glace suite a un impact de gravillon sur autoroute.
 2;AB-000010;2026-05-06 20:35:45;310.81;EN_COURS;Bris de glace suite a un impact de gravillon sur autoroute.
 3;AB-000013;2026-06-24 06:30:36;11490.21;EN_COURS;Vehicule endommage par la grele a Couturierboeuf.

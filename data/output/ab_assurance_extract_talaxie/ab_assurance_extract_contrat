@@ -1,3 +1,4 @@
+ab_policy_number;ab_client_id;ab_type_assurance;ab_date_debut;ab_date_fin;ab_prime_anuuelle;ab_statut_contrat;ab_agence_id
 AB-000001;1;AUTO;2023-12-16;2024-12-15;1808.77;ACTIF;20
 AB-000002;2;HABITATION;2024-05-04;2025-05-04;2365.38;ACTIF;19
 AB-000003;2;AUTO;2023-07-30;2024-07-29;1185.27;ACTIF;17
