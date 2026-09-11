@@ -7,3 +7,4 @@ date_execution,systeme_source,table,nb_lignes_source,nb_lignes_extraites,ecart,s
 2026-09-11 09:12:50,AssurePlus,AP_CLAIMS,37,37,0,OK
 2026-09-11 09:14:48,AssurePlus,AP_CONTRACTS,526,526,0,OK
 2026-09-11 09:15:53,AssurePlus,AP_PAYMENTS,147,147,0,OK
+2026-09-11 10:37:50,AssurePlus,AP_USERS,100,100,0,OK

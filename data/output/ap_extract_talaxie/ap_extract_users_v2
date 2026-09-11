@@ -1,0 +1,101 @@
+ap_user_id;ap_full_name;ap_birth_date;ap_mail_address;ap_phone_number;ap_street_address;ap_zip_code;ap_created_at;ap_customer_status;ap_loyalty_score
+1;Eugène-Jacques Rodriguez;06/10/1943;eugène-jacques.rodriguez@gmail.com;0261177625;39, boulevard de Picard;73666;2023-08-07 21:31:33;ACTIVE;74
+2;Lucas Barbe;1965-02-06;;06 35 40 63 35;339, rue de Delattre;06141;2025-08-25 12:05:05;ACTIVE;5
+3;Alexandria du Laporte;2000-11-14;alexandria.du.laporte@ifrance.com;+33 (0)6 30 73 18 06;55, rue Durand;61785;2024-03-28 07:56:45;SUSPENDED;78
+4;Michel Masse;1997-07-19;michel.masse@voila.fr;02 62 62 57 01;18, avenue Odette Dupuy;89727;2026-04-05 12:34:27;SUSPENDED;45
+5;Françoise-Audrey Legendre;1943-02-07;françoise-audrey.legendre@dbmail.com;0177165790;92, rue de Guilbert;90892;2023-05-22 06:09:30;ACTIVE;66
+6;Jacques Dupuis;2000-10-07;jacques.dupuis@yahoo.fr;+33 3 69 55 48 64;chemin Barre;57597;2025-11-29 04:30:37;SUSPENDED;51
+7;Chantal du Lacombe;1997-02-26;chantal.du.lacombe@club-internet.fr;0188371162;2, chemin Marie;89251;2025-11-13 06:38:02;INACTIVE;42
+8;François Dijoux;1975-07-18;françois.dijoux@voila.fr;02 57 75 67 04;1, boulevard Imbert;42521;2026-07-27 05:01:27;SUSPENDED;60
+9;Marguerite Vallée;1996-03-29;marguerite.vallée@wanadoo.fr;04 63 92 42 43;14, chemin Jacquet;58270;2023-01-05 19:02:37;ACTIVE;14
+10;Louise Vidal-Roger;1957-08-04;louise.vidal-roger@laposte.net;+33 2 49 05 92 74;93, rue de Chartier;40452;2022-11-26 21:12:04;SUSPENDED;79
+11;Sophie Gimenez;2008-04-09;sophie.gimenez_at_free.fr;0252067275;9, chemin de Jourdan;90402;2025-09-04 15:01:18;INACTIVE;14
+12;Sébastien Martineau de la Moreno;1981-09-27;sébastien.martineau.de.la.moreno@tele2.fr;+33 (0)6 95 02 81 40;637, chemin Lefèvre;77756;2023-04-22 13:06:02;SUSPENDED;98
+13;Geneviève-Laurence Pierre;1947-01-08;geneviève-laurence.pierre@voila.fr;02 32 86 37 59;705, avenue Lemaître;49481;2021-10-01 02:41:33;ACTIVE;37
+14;Jérôme Marty Le Cohen;1964-12-31;jérôme.marty.le.cohen@hotmail.fr;05 58 74 26 62;412, avenue Édith Daniel;09704;2024-11-03 17:18:10;ACTIVE;21
+15;Adrien Lejeune;1992-01-22;adrien.lejeune@bouygtel.fr;+33 6 35 92 32 64;50, chemin de Teixeira;71857;2025-08-03 03:09:17;SUSPENDED;8
+16;Alexandre Bernard-Brunet;1976-06-30;alexandre.bernard-brunet@bouygtel.fr;02 53 46 27 30;avenue Daniel Joseph;95470;2026-08-03 13:05:06;SUSPENDED;54
+17;Renée Poirier;1951-12-02;renée.poirier@tiscali.fr;0145429025;35, chemin Alves;53751;2024-09-03 05:47:47;SUSPENDED;99
+18;William Klein;1946-02-06;william.klein@wanadoo.fr;+33 3 29 19 28 55;64, boulevard Delorme;45943;2022-11-13 18:02:08;SUSPENDED;19
+19;Daniel Paul;30/05/1986;daniel.paul@club-internet.fr;;98, boulevard de Boutin;97124;2025-03-12 21:16:25;ACTIVE;6
+20;Astrid Ferreira;1938-01-03;astrid.ferreira@laposte.net;04 87 45 27 98;14, rue de Louis;17977;2022-11-09 12:45:45;ACTIVE;33
+21;Honoré Marchand-Lacroix;1946-05-05;honoré.marchand-lacroix@laposte.net;02 47 10 76 03;boulevard Allain;08580;2022-08-28 17:09:50;INACTIVE;2
+22;Alphonse-Arthur Hernandez;1948-10-11;alphonse-arthur.hernandez@voila.fr;;69, rue Dominique Charrier;97488;2023-09-14 13:16:30;SUSPENDED;79
+23;Antoinette de Delorme;2007-08-14;antoinette.de.delorme@voila.fr;+33 3 52 42 80 13;35, rue Jules Monnier;48534;2023-06-20 23:06:31;ACTIVE;45
+24;Henriette du Marie;1952-06-19;henriette.du.marie@dbmail.com;02 46 82 75 48;2, avenue Gabriel Collin;36567;2024-04-19 14:36:09;INACTIVE;77
+25;Hélène Lenoir;1975-03-12;hélène.lenoir@noos.fr;03 45 17 52 07;7, boulevard Margaux Labbé;11222;2022-11-12 15:56:28;INACTIVE;84
+26;Noémi Lemonnier;10/08/1958;noémi.lemonnier@yahoo.fr;+33 (0)4 95 35 39 61;57, boulevard de Allain;34874;2025-01-18 17:24:18;SUSPENDED;50
+27;Thérèse Martineau;2001-08-03;thérèse.martineau@ifrance.com;0278711477;20, rue de Mercier;63794;2021-11-15 08:13:20;SUSPENDED;18
+28;Laurent Texier;1956-06-06;laurent.texier@dbmail.com;0237187734;97, boulevard Zacharie Gimenez;69118;2021-11-30 09:50:15;SUSPENDED;82
+29;Célina Jacob;1978-06-15;célina.jacob@tele2.fr;05 94 70 02 84;77, chemin Auger;49599;2022-07-30 01:47:37;SUSPENDED;18
+30;Victoire-Sylvie Ollivier;2004-08-08;;+33 (0)5 35 47 96 95;10, rue de Rodriguez;46457;2026-08-12 13:24:55;SUSPENDED;70
+31;Thomas Leblanc;1948-11-22;thomas.leblanc@ifrance.com;04 85 56 50 33;29, rue de Schneider;15445;2023-02-02 17:20:21;SUSPENDED;44
+32;René Germain;1998-05-16;rené.germain@gmail.com;05 62 40 79 05;265, rue Marie Parent;26444;2025-11-14 12:39:30;ACTIVE;20
+33;Maggie de la Bonneau;1985-02-03;maggie.de.la.bonneau@club-internet.fr;03 57 71 83 44;boulevard Andrée Jean;79860;2022-06-05 22:33:15;ACTIVE;23
+34;Brigitte-Maggie Maillard;2007-12-03;brigitte-maggie.maillard@hotmail.fr;05 65 35 14 84;753, chemin Laurence Buisson;58787;2026-04-21 10:53:58;SUSPENDED;59
+35;Alain Techer;1961-01-11;alain.techer@wanadoo.fr;03 63 74 89 69;9, chemin Pinto;19346;2022-12-04 17:44:06;INACTIVE;12
+36;Martin Bouchet Le Andre;1991-10-11;martin.bouchet.le.andre@sfr.fr;0438249363;rue Leroy;31916;2024-04-15 01:15:51;INACTIVE;16
+37;Véronique Vaillant;1993-01-29;véronique.vaillant@noos.fr;+33 (0)3 57 24 20 44;820, rue Perez;40716;2024-03-07 00:37:07;ACTIVE;24
+38;Lucas Marchal;1989-08-29;lucas.marchal@hotmail.fr;+33 3 75 19 81 89;27, boulevard Rivière;97350;2024-06-12 07:01:05;INACTIVE;88
+39;Nath-Inès Briand;1955-04-13;nath-inès.briand@sfr.fr;+33 (0)3 25 34 76 49;boulevard Alix Bonnin;15424;2026-04-15 19:22:48;INACTIVE;54
+40;Thérèse Normand;1973-06-11;thérèse.normand@orange.fr;+33 4 94 75 40 90;4, boulevard Alice Ruiz;81817;2024-09-24 14:07:04;SUSPENDED;94
+41;René Gomez;1988-07-06;rené.gomez@tele2.fr;+33 (0)5 36 44 13 43;75, chemin Faure;97472;2025-08-26 20:47:35;SUSPENDED;93
+42;Margaret Wagner;1949-04-22;margaret.wagner@noos.fr;+33 3 90 81 56 98;17, rue Lombard;56910;2022-10-21 01:27:10;INACTIVE;62
+43;Luc Bourgeois;1978-05-05;luc.bourgeois@club-internet.fr;+33 (0)2 46 23 82 96;37, rue Marianne Allain;41918;2024-01-16 18:00:47;INACTIVE;17
+44;Augustin du Tessier;1989-03-13;augustin.du.tessier@free.fr;03 68 00 89 31;34, avenue Maurice;54714;2023-11-10 12:27:05;SUSPENDED;9
+45;Benjamin Tessier;1951-08-13;benjamin.tessier@free.fr;+33 (0)5 82 77 13 33;77, avenue Leclerc;76320;2024-01-20 09:14:53;SUSPENDED;3
+46;Marc de la Lejeune;1939-07-24;marc.de.la.lejeune@laposte.net;0411397359;11, rue Tristan Jacquot;50803;2023-06-14 13:46:36;ACTIVE;4
+47;Pauline Guyon;1945-08-02;pauline.guyon@bouygtel.fr;+33 (0)1 81 05 37 59;500, boulevard de Weber;38504;2024-10-19 14:04:48;INACTIVE;83
+48;Roger Dupont;1971-01-26;roger.dupont@free.fr;+33 7 75 72 15 86;61, rue Didier;35865;2024-09-17 13:23:05;SUSPENDED;93
+49;Lorraine Charles;2006-01-01;lorraine.charles@bouygtel.fr;0586257287;rue Vincent;29287;2021-12-13 15:45:51;ACTIVE;50
+50;Josette Goncalves;1995-01-16;;+33 (0)7 80 75 87 77;rue de Denis;44195;2023-05-19 05:10:02;SUSPENDED;87
+51;Éric Roy Le Thibault;1936-03-16;éric.roy.le.thibault@sfr.fr;+33 5 59 13 71 50;7, boulevard Franck Breton;20129;2022-05-03 02:11:38;ACTIVE;72
+52;Valentine De Sousa;1936-06-07;valentine.de.sousa@bouygtel.fr;0173975923;chemin de Breton;08861;2022-03-31 23:15:05;SUSPENDED;93
+53;Monique Morin-Alexandre;1959-11-14;monique.morin-alexandre@bouygtel.fr;+33 5 46 10 32 66;51, avenue Nathalie Ruiz;87717;2022-10-06 03:07:28;INACTIVE;29
+54;Brigitte Tessier;1962-11-05;brigitte.tessier@wanadoo.fr;06 06 74 99 61;39, avenue Éric Fournier;65449;2025-08-03 08:36:03;ACTIVE;66
+55;Tristan Torres-Delannoy;2003-01-21;tristan.torres-delannoy@laposte.net;+33 (0)4 43 76 17 42;93, chemin Hélène Rousseau;70178;2022-01-11 08:12:03;INACTIVE;5
+56;Catherine du Pasquier;19/11/1998;catherine.du.pasquier@yahoo.fr;0490491801;32, rue Émile Delattre;90404;2024-04-25 15:13:05;SUSPENDED;81
+57;Susanne-Stéphanie Ferrand;1982-02-05;susanne-stéphanie.ferrand@bouygtel.fr;+33 3 62 21 94 16;1, rue Alexandre Picard;83588;2025-07-23 21:55:21;SUSPENDED;72
+58;Véronique Bailly;1989-05-27;véronique.bailly@live.com;0232220310;40, rue Manon Guillot;55962;2026-03-24 13:18:20;SUSPENDED;9
+59;Benjamin Le Pires;1955-10-23;benjamin.le.pires@tele2.fr;05 63 01 22 77;8, rue de Renaud;37683;2024-12-23 07:26:25;SUSPENDED;51
+60;Jacques Petit;1994-05-30;jacques.petit@yahoo.fr;07 89 98 40 76;899, rue Evrard;03532;2026-07-20 01:25:49;INACTIVE;77
+61;Anouk Royer;24/01/2000;anouk.royer@noos.fr;+33 (0)7 89 57 60 24;67, rue Corinne Vasseur;75801;2024-07-12 22:45:41;ACTIVE;9
+62;Suzanne Payet Le Ramos;1992-05-18;suzanne.payet.le.ramos@ifrance.com;0652934172;82, avenue Teixeira;38340;2023-06-05 22:07:58;ACTIVE;46
+63;Anaïs Moreau-Pelletier;1984-03-27;anaïs.moreau-pelletier@bouygtel.fr;+33 3 25 80 15 61;91, avenue Poirier;43903;2024-08-31 22:22:04;INACTIVE;42
+64;Roger Da Costa;2005-10-15;roger.da.costa@laposte.net;+33 (0)1 76 77 11 99;rue de Guillou;14271;2022-08-26 00:49:27;ACTIVE;75
+65;Jules de la Petitjean;1995-09-25;jules.de.la.petitjean@club-internet.fr;;40, chemin Sébastien Bodin;21187;2023-11-28 17:14:39;ACTIVE;16
+66;Patricia Alves;1956-04-11;patricia.alves@orange.fr;03 70 26 66 78;80, rue Wagner;66171;2022-05-14 15:12:10;ACTIVE;73
+67;Margaux Maréchal;1994-09-20;margaux.maréchal@free.fr;+33 (0)5 36 02 90 84;58, chemin de Barre;02946;2024-01-10 11:38:43;SUSPENDED;51
+68;Claudine du Cohen;1995-10-27;claudine.du.cohen@sfr.fr;;98, rue Éric Gros;70419;2026-01-29 23:18:03;SUSPENDED;93
+69;Constance Simon;1970-11-07;constance.simon@voila.fr;+33 4 63 68 10 54;151, rue de Pons;38686;2021-09-09 10:25:13;INACTIVE;77
+70;Maggie Huet;1983-04-29;maggie.huet@orange.fr;0437926831;693, rue William Mendès;54948;2025-02-24 10:34:35;INACTIVE;76
+71;Benjamin Bonnet;1953-05-06;benjamin.bonnet@noos.fr;03 63 71 58 69;864, avenue de Besnard;88601;2025-03-11 13:39:52;SUSPENDED;84
+72;David Bodin;2001-08-14;david.bodin@laposte.net;02 56 88 13 77;rue de Vaillant;47221;2025-02-13 18:35:11;INACTIVE;76
+73;Charles Lemaître;1941-02-15;charles.lemaître@club-internet.fr;+33 2 50 54 54 47;rue Pruvost;53149;2024-03-29 08:21:19;ACTIVE;2
+74;Franck Vidal du Bernard;1983-02-04;franck.vidal.du.bernard@yahoo.fr;+33 (0)1 73 67 94 97;37, boulevard Bousquet;58879;2025-06-22 02:50:52;INACTIVE;19
+75;Clémence Petitjean;1947-10-19;clémence.petitjean@dbmail.com;05 33 36 58 07;31, rue de Masse;80915;2024-04-09 19:03:46;SUSPENDED;4
+76;Chantal Weiss-Vaillant;1961-10-31;chantal.weiss-vaillant@hotmail.fr;+33 (0)3 45 78 01 82;rue Patrick Munoz;74554;2022-05-14 05:29:21;ACTIVE;61
+77;Margot Maréchal-Pruvost;2002-07-14;margot.maréchal-pruvost@gmail.com;+33 (0)4 83 62 60 85;21, boulevard Roy;36247;2023-03-14 18:27:49;ACTIVE;99
+78;Benjamin-Denis Le Gall;1958-09-02;benjamin-denis.le.gall@noos.fr;+33 (0)4 75 20 04 61;66, avenue Valérie Mathieu;07307;2023-09-07 17:15:50;ACTIVE;89
+79;Inès Teixeira du Noël;1943-11-24;inès.teixeira.du.noël@bouygtel.fr;0636861706;50, boulevard de Parent;13352;2026-05-13 15:39:59;INACTIVE;44
+80;Henri Duhamel;1996-05-04;henri.duhamel@noos.fr;+33 (0)3 58 25 82 38;170, boulevard Stéphane Guibert;21100;2022-02-27 04:39:23;SUSPENDED;73
+81;Laetitia Joseph;1987-05-20;laetitia.joseph@bouygtel.fr;0362984028;5, avenue Rocher;16950;2022-11-01 02:45:35;ACTIVE;10
+82;Laurence Lesage-Lacroix;1978-12-18;laurence.lesage-lacroix@wanadoo.fr;0390743553;350, rue de Raynaud;60104;2021-09-22 23:54:50;ACTIVE;0
+83;Lucas Berthelot;1989-02-06;lucas.berthelot@tiscali.fr;+33 (0)2 23 80 71 56;36, rue de Denis;59479;2023-04-15 20:07:20;ACTIVE;66
+84;Adrienne Louis;27/11/1973;adrienne.louis@voila.fr;0352194337;5, boulevard Marc Robert;25940;2025-01-05 20:00:27;INACTIVE;52
+85;Guillaume Colas;2002-11-17;guillaume.colas@wanadoo.fr;+33 3 53 99 92 19;3, boulevard Michel Barbe;93901;2023-12-24 13:03:27;INACTIVE;33
+86;Yves de Jacquot;1997-06-03;yves.de.jacquot@bouygtel.fr;+33 (0)5 65 05 66 41;677, rue de Mace;28148;2024-01-04 17:52:11;INACTIVE;87
+87;Sophie Gomes;1988-12-22;sophie.gomes@voila.fr;+33 4 80 19 03 61;62, rue Lorraine Toussaint;13128;2025-09-23 10:34:17;SUSPENDED;61
+88;Alexandrie Allain;1969-09-21;alexandrie.allain@dbmail.com;+33 2 45 73 50 58;8, avenue Delorme;16187;2022-02-28 18:49:39;INACTIVE;73
+89;Laurent Bouvier;1952-12-31;laurent.bouvier@hotmail.fr;+33 (0)5 94 04 96 11;9, chemin Weber;51198;2025-02-21 12:06:56;SUSPENDED;15
+90;Théophile Delmas-Ferrand;1997-05-09;théophile.delmas-ferrand@voila.fr;06 36 69 91 50;459, rue Richard;76830;2022-03-22 02:09:42;ACTIVE;12
+91;Élise-Charlotte Diaz;1970-07-11;élise-charlotte.diaz@wanadoo.fr;0562797232;rue Langlois;74546;2026-01-04 11:06:32;SUSPENDED;78
+92;Marcelle Guillon;1955-09-15;marcelle.guillon@laposte.net;04 67 95 45 08;40, boulevard de Vincent;54452;2023-04-23 08:17:32;SUSPENDED;0
+93;Timothée de la Muller;1961-05-31;timothée.de.la.muller@dbmail.com;06 38 95 99 59;35, avenue Dupont;63324;2021-09-04 17:21:17;SUSPENDED;55
+94;Gabriel Turpin-Ferrand;1968-03-04;gabriel.turpin-ferrand@sfr.fr;04 78 63 62 05;chemin Martinez;71217;2022-11-09 15:56:31;SUSPENDED;4
+95;Matthieu Leclercq Le Bertrand;1962-09-29;matthieu.leclercq.le.bertrand@voila.fr;+33 4 37 23 42 58;13, chemin Roussel;03951;2022-10-24 15:18:02;SUSPENDED;66
+96;Cécile Maillot;1977-03-01;cécile.maillot@sfr.fr;03 79 55 28 96;2, rue Aubert;24645;2024-11-11 05:59:01;ACTIVE;81
+97;Margaud Joseph;1968-12-04;;+33 (0)3 45 84 25 30;92, avenue de Lacroix;93183;2025-08-25 13:10:41;SUSPENDED;36
+98;Anouk Brun du Hamel;1986-07-31;anouk.brun.du.hamel@wanadoo.fr;06 36 25 58 77;79, boulevard de Delahaye;05312;2023-07-07 06:44:48;SUSPENDED;29
+99;Maurice de la Delaunay;1977-04-16;maurice.de.la.delaunay@sfr.fr;05 18 92 54 81;5, boulevard Adrienne Rolland;74142;2025-08-08 17:28:03;SUSPENDED;0
+100;Maggie du Lebreton;1994-07-04;maggie.du.lebreton@tele2.fr;04 98 75 46 02;24, rue Théodore Charrier;65659;2022-04-24 01:38:21;INACTIVE;45

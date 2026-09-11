@@ -457,7 +457,10 @@ Talaxis a repéré des anomalies dans les formats de date dans l'export csv de l
 ![erreur_format_date_assureplus_users.png](images_readme/erreur_format_date_assureplus_users.png)
 
 ### US 1.4 Contrôle du nombre d'enregistrement
+
 Le journal d'extraction se trouve dans : /data/logs/controle_extraction.csv.
 
-Pour AssurePlus, la table Users contient une anomalie.
-Six des enregistrement dont la date n'es pas au bon format doivent être corrigées.
+Pour AssurePlus, la table Users contient une anomalie. Six lignes ont été ignoré a cause du format de date qui n'était pas conforme.
+Pour que l'extraction soit sans perte, j'ai modifié le schéma. Pour le champ ap_birth_date, j'ai mis type string au lieu de date avec un modèle "YYYY-mm-dd".
+
+Après avoir relancer le contrôle, j'ai donc bien : 2026-09-11 10:37:50,AssurePlus,AP_USERS,100,100,0,OK.
