@@ -1,5 +1,6 @@
 AP_USER_ID,AP_FULL_NAME,AP_BIRTH_DATE,AP_MAIL_ADDRESS,AP_PHONE_NUMBER,AP_STREET_ADDRESS,AP_ZIP_CODE,AP_CREATED_AT,AP_CUSTOMER_STATUS,AP_LOYALTY_SCORE
 1,Eugène-Jacques Rodriguez,06/10/1943,eugène-jacques.rodriguez@gmail.com,0261177625,"39, boulevard de Picard",73666,2023-08-07 21:31:33,ACTIVE,74
+1,Eugène-Jacques Rodriguez,06/10/1943,eugène-jacques.rodriguez@gmail.com,0261177625,"39, boulevard de Picard",73666,2023-08-07 21:31:33,ACTIVE,74
 2,Lucas Barbe,1965-02-06,,06 35 40 63 35,"339, rue de Delattre",06141,2025-08-25 12:05:05,ACTIVE,5
 3,Alexandria du Laporte,2000-11-14,alexandria.du.laporte@ifrance.com,+33 (0)6 30 73 18 06,"55, rue Durand",61785,2024-03-28 07:56:45,SUSPENDED,78
 4,Michel Masse,1997-07-19,michel.masse@voila.fr,02 62 62 57 01,"18, avenue Odette Dupuy",89727,2026-04-05 12:34:27,SUSPENDED,45

@@ -1,0 +1,2 @@
+ap_contract_ref;ap_user_id;ap_product_code;ap_start_date;ap_end_date;ap_monthly_premium;ap_contract_state;ap_broken_code
+"AP-000147";"100";"AUTO_PREMIUM";"2025-12-05";"2026-12-05";"169.28";"SUSPENDED";"BRK-296"

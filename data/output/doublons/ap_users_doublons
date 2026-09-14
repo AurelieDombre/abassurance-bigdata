@@ -1,0 +1,2 @@
+ap_user_id;ap_full_name;ap_birth_date;ap_mail_address;ap_phone_number;ap_street_address;ap_zip_code;ap_created_at;ap_customer_status;ap_loyalty_score
+"1";"Eugène-Jacques Rodriguez";"06/10/1943";"eugène-jacques.rodriguez@gmail.com";"0261177625";"39, boulevard de Picard";"73666";"2023-08-07 21:31:33";"ACTIVE";"74"

@@ -318,3 +318,30 @@ Après avoir relancé le contrôle, le résultat est le suivant :
 ### Règle de nettoyage :
 
 Les règles sont définis dans le fichier [`regles_nettoyage.md`](./regles_nettoyage.md).
+
+### Configuration de Talaxie pour le nettoyage de données
+
+#### Doublons
+
+1. Configurer tUniqRow sur ab_client_id
+Dans le job nettoyage_ab_client, placer un tUniqRow juste après le tFileInputDelimited.
+Dans ses paramètres, cocher uniquement ab_client_id comme clé de comparaison (les autres colonnes restent décochées) — c'est la clé primaire, deux lignes avec le même ab_client_id sont par définition un doublon technique, quel que soit le contenu des autres champs.
+
+2. Brancher les deux sorties (Uniques / Doublons)
+tUniqRow expose deux sorties distinctes visibles quand on tire une ligne depuis le composant : 'Uniques' (lignes gardées, une par clé) et 'Doublons' (lignes rejetées).
+Relier 'Uniques' vers la suite du pipeline (le futur tMap), et 'Doublons' vers un tFileOutputDelimited séparé : data/rejects/oracle/ab_client_doublons.csv.
+Rien ne doit disparaître sans laisser de trace, même les doublons rejetés.
+
+3. Tester avec un doublon injecté volontairement
+Sur les jeux de données générés par Faker, il est probable qu'il n'y ait aucun vrai doublon (Faker génère des ID séquentiels propres).
+Pour valider concrètement que tUniqRow fonctionne (et pas juste 'zéro doublon car aucun test réel'), il faut dupliquer manuellement une ligne dans une copie de test du CSV, relancer le job sur ce fichier de test, et vérifier que le doublon atterrit bien dans ab_client_doublons.csv et pas dans le fichier propre.
+
+ ---
+
+Exemple avec le nettoyage de la table client pour abassurance avec l'ajout de 2 doublons (Id 1 et 5) afin de s'assurer que le nettoyage fonctionne.
+![capture_talaxie_job_nettoyage.png](images_readme/capture_talaxie_job_nettoyage.png)
+
+Les fichiers d'exctration sont dans ./data/output/ab_assurance_extract_talaxie/ab_assurance_nettoye/ab_assurance_extract_client_clean
+Et pour l'extraction des doublons : ./data\output\doublons\ab_client_doublons.
+
+Pour l'exemple, j'ai fais de même pour AssurePlus. Il y a deux doublons, un pour la table users (ID 1) et l'autre pour la table contracts (ID : AP-AP-000147).
