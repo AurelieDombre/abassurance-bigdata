@@ -345,3 +345,237 @@ Les fichiers d'exctration sont dans ./data/output/ab_assurance_extract_talaxie/a
 Et pour l'extraction des doublons : ./data\output\doublons\ab_client_doublons.
 
 Pour l'exemple, j'ai fais de même pour AssurePlus. Il y a deux doublons, un pour la table users (ID 1) et l'autre pour la table contracts (ID : AP-AP-000147).
+
+#### Routine data Cleaning
+
+Afin de nettoyer les anomalies des données : format de date, format d'email,téléphone maquant.
+
+J'utilise un composant tJavaRow pour appliquer ma routine Java à chaque ligne. La routine centralise les règles de nettoyage. Une fois les données nettoyées, je passe par tUniqRow pour supprimer les doublons, puis j'exporte le résultat dans un nouveau fichier CSV.
+
+Je developpe le code routine afin de nettoyer les données.
+```java
+package routines;
+
+import java.text.SimpleDateFormat;
+import java.util.Date;
+
+public class DataCleaning {
+
+	/**
+     * Nettoie une chaîne de caractères.
+     * Supprime les espaces inutiles.
+     * Transforme une valeur vide en null.
+     */
+    public static String nettoyerTexte(String valeur) {
+
+        if (valeur == null) {
+            return null;
+        }
+
+        valeur = valeur.trim();
+
+        if (valeur.isEmpty()) {
+            return null;
+        }
+
+        return valeur;
+    }
+
+    /**
+     * Nettoie une adresse email.
+     * Vérifie qu'elle contient bien un @ et un point.
+     */
+    public static String nettoyerEmail(String email) {
+
+        if (email == null) {
+            return null;
+        }
+
+        email = email.trim().toLowerCase();
+
+        // Email vide
+        if (email.isEmpty()) {
+            return null;
+        }
+
+        
+        // Correction d'un email mal écrit 
+        if (email.contains("_at_")) { 
+        	email = email.replace("_at_", "@"); 
+        }
+
+        // Vérification simple de l'email
+        if (!email.contains("@") || !email.contains(".")) {
+            return null;
+        }
+
+        return email;
+    }
+
+    /**
+     * Nettoie un numéro de téléphone.
+     * Supprime les espaces au début et à la fin.
+     * Une valeur vide devient null.
+     */
+    public static String nettoyerTelephone(String telephone) {
+
+        if (telephone == null) {
+            return null;
+        }
+
+        telephone = telephone.trim();
+
+        if (telephone.isEmpty()) {
+            return null;
+        }
+
+        return telephone;
+    }
+
+
+    /**
+     * Nettoie et uniformise une date, avec un format de sortie choisi.
+     *
+     * Formats d'entrée acceptés :
+     * - yyyy-MM-dd
+     * - dd/MM/yyyy
+     * - yyyy-MM-dd HH:mm:ss
+     *
+     * @param date la date brute à nettoyer
+     * @param formatSortie le format souhaité en sortie (ex: "yyyy-MM-dd" ou "yyyy-MM-dd HH:mm:ss")
+     */
+    public static String normaliserDate(String date, String formatSortie) {
+
+        if (date == null) {
+            return null;
+        }
+
+        date = date.trim();
+
+        if (date.isEmpty()) {
+            return null;
+        }
+
+        String[] formats = {
+            "yyyy-MM-dd HH:mm:ss",
+            "yyyy-MM-dd",
+            "dd/MM/yyyy"
+        };
+
+        for (String format : formats) {
+
+            try {
+
+                SimpleDateFormat formatEntree =
+                    new SimpleDateFormat(format);
+
+                formatEntree.setLenient(false);
+
+                Date dateConvertie =
+                    formatEntree.parse(date);
+
+                SimpleDateFormat formatSortieFinal =
+                    new SimpleDateFormat(formatSortie);
+
+                return formatSortieFinal.format(dateConvertie);
+
+            } catch (Exception e) {
+                // Format suivant testé automatiquement
+            }
+        }
+
+        return null;
+    }
+
+
+    /**
+     * Nettoie un montant.
+     * Une valeur vide ou incorrecte devient null.
+     */
+    public static Double nettoyerMontant(String montant) {
+
+        if (montant == null) {
+            return null;
+        }
+
+        montant = montant.trim();
+
+        if (montant.isEmpty()) {
+            return null;
+        }
+
+        try {
+
+            return Double.parseDouble(montant);
+
+        } catch (NumberFormatException e) {
+
+            return null;
+        }
+    }
+
+    
+    
+}
+
+```
+
+Dans code de tJavaRow, j'appel pour les champs la méthode concernée.
+
+```java
+// Code générer selon le schéma client de AbAssurance
+output_row.AB_CLIENT_ID = input_row.AB_CLIENT_ID;
+
+output_row.AB_NOM =
+    DataCleaning.nettoyerTexte(input_row.AB_NOM);
+
+output_row.AB_PRENOM =
+    DataCleaning.nettoyerTexte(input_row.AB_PRENOM);
+
+output_row.AB_DATE_NAISSANCE =
+    DataCleaning.normaliserDate(input_row.AB_DATE_NAISSANCE);
+
+output_row.AB_EMAIL =
+    DataCleaning.nettoyerEmail(input_row.AB_EMAIL);
+
+output_row.AB_TELEPHONE =
+    DataCleaning.nettoyerTelephone(input_row.AB_TELEPHONE);
+
+output_row.AB_ADRESSE =
+    DataCleaning.nettoyerTexte(input_row.AB_ADRESSE);
+
+output_row.AB_CODE_POSTAL =
+    DataCleaning.nettoyerTexte(input_row.AB_CODE_POSTAL);
+
+output_row.AB_NUM_FISCAL =
+    DataCleaning.nettoyerTexte(input_row.AB_NUM_FISCAL);
+
+output_row.AB_DATE_CREATION =
+DataCleaning.normaliserDate(input_row.AB_DATE_CREATION, "yyyy-MM-dd HH:mm:ss");
+
+output_row.AB_STATUT_CLIENT =
+    DataCleaning.nettoyerTexte(input_row.AB_STATUT_CLIENT);
+```
+
+```java
+//Code généré selon les schémas d'entrée et de sortie pour AssurePlus
+output_row.ap_user_id = input_row.ap_user_id;
+output_row.ap_full_name = DataCleaning.nettoyerTexte(input_row.ap_full_name);
+
+output_row.ap_birth_date = DataCleaning.normaliserDate(input_row.ap_birth_date);
+
+output_row.ap_mail_address = DataCleaning.nettoyerEmail(input_row.ap_mail_address);
+
+output_row.ap_phone_number = DataCleaning.nettoyerTelephone(input_row.ap_phone_number);
+
+output_row.ap_street_address =  DataCleaning.nettoyerTexte(input_row.ap_street_address);
+
+output_row.ap_zip_code = DataCleaning.nettoyerTexte(input_row.ap_zip_code);
+
+output_row.ap_created_at = DataCleaning.normaliserDate(input_row.ap_created_at, "yyyy-MM-dd HH:mm:ss");
+
+output_row.ap_customer_status = DataCleaning.nettoyerTexte(input_row.ap_customer_status);
+
+output_row.ap_loyalty_score = input_row.ap_loyalty_score;
+
+```
