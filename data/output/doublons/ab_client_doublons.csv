@@ -1,0 +1,3 @@
+ab_client_id;ab_nom;ab_prenom;ab_date_naissance;ab_email;ab_telephone;ab_adresse;ab_code_postal;ab_num_fiscal;ab_date_creation;ab_statut_client
+"1";"Marie";"Lucie";"1973-01-27";"lucie.marie@voila.fr";"";"rue Carpentier";"29617";"FR908386379";"2024-01-05 13:05:01";"INACTIF"
+"5";"Teixeira";"Danielle";"1942-01-21";"danielle.teixeira@hotmail.fr";"+33 (0)2 90 26 91 66";"58, rue de Bazin";"92217";"FR845146270";"2023-11-20 13:23:30";"ACTIF"

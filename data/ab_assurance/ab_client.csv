@@ -1,8 +1,10 @@
 AB_CLIENT_ID,AB_NOM,AB_PRENOM,AB_DATE_NAISSANCE,AB_EMAIL,AB_TELEPHONE,AB_ADRESSE,AB_CODE_POSTAL,AB_NUM_FISCAL,AB_DATE_CREATION,AB_STATUT_CLIENT
 1,Marie,Lucie,1973-01-27,lucie.marie@voila.fr,,rue Carpentier,29617,FR908386379,2024-01-05 13:05:01,INACTIF
+1,Marie,Lucie,1973-01-27,lucie.marie@voila.fr,,rue Carpentier,29617,FR908386379,2024-01-05 13:05:01,INACTIF
 2,Robert,Suzanne,1993-02-28,suzanne.robert@free.fr,0430235116,chemin Josette Aubry,06847,FR781618495,2026-07-23 00:10:39,ACTIF
 3,Fischer,Léon,1941-11-17,léon.fischer@hotmail.fr,+33 4 43 13 16 47,"62, rue Marguerite Da Costa",89799,FR192832764,2026-05-20 14:51:51,ACTIF
 4,Pottier,Matthieu,1943-04-04,matthieu.pottier@dbmail.com,,"83, avenue Guy Aubry",18352,FR884969653,2022-10-28 00:26:36,ACTIF
+5,Teixeira,Danielle,1942-01-21,danielle.teixeira@hotmail.fr,+33 (0)2 90 26 91 66,"58, rue de Bazin",92217,FR845146270,2023-11-20 13:23:30,ACTIF
 5,Teixeira,Danielle,1942-01-21,danielle.teixeira@hotmail.fr,+33 (0)2 90 26 91 66,"58, rue de Bazin",92217,FR845146270,2023-11-20 13:23:30,ACTIF
 6,Ledoux,Constance,2004-09-26,constance.ledoux@free.fr,+33 (0)4 56 89 32 52,"609, rue Frédéric Étienne",39345,FR039117182,2022-09-27 03:14:33,SUSPENDU
 7,Ollivier,Margaux,1971-09-20,margaux.ollivier@free.fr,03 62 83 46 57,"41, rue Maillot",03702,FR839301031,2021-11-29 20:00:03,SUSPENDU
