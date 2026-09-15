@@ -579,3 +579,6 @@ output_row.ap_customer_status = DataCleaning.nettoyerTexte(input_row.ap_customer
 output_row.ap_loyalty_score = input_row.ap_loyalty_score;
 
 ```
+
+Le rapport d'anomalie, confirme que les seules lignes rejetées sont les doublons. Le reste des données ont été corrigés.
+

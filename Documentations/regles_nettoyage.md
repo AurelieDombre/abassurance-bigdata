@@ -120,7 +120,7 @@ Il répond aux critères d'acceptation de l'US2.1 :
 
 ## Rapport de qualité des données
 
-Chaque exécution d'un job de nettoyage génère une ligne dans `data/logs/rapport_qualite.csv`, comparant le taux d'anomalies avant et après nettoyage :
+Pour chaque exécution d'un job de nettoyage, je génère une ligne dans `data/logs/rapport_qualite.csv`, comparant le taux d'anomalies avant et après nettoyage :
 
 ```csv
 date_execution,table,nb_lignes_total,nb_anomalies_avant,taux_anomalies_avant,nb_lignes_rejetees,nb_anomalies_apres,taux_anomalies_apres
@@ -130,3 +130,4 @@ date_execution,table,nb_lignes_total,nb_anomalies_avant,taux_anomalies_avant,nb_
 - `nb_lignes_rejetees` : nombre de lignes exclues du fichier nettoyé (violation d'une règle sur un champ obligatoire).
 - `nb_anomalies_apres` : nombre de lignes restantes (non rejetées) présentant encore une anomalie non-bloquante après correction (ex : email toujours invalide malgré la tentative de correction).
 - `taux_anomalies_*` : `nb_anomalies / nb_lignes_total`, exprimé en pourcentage.
+
