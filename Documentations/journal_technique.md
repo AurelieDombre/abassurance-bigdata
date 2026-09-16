@@ -353,6 +353,7 @@ Afin de nettoyer les anomalies des données : format de date, format d'email,té
 J'utilise un composant tJavaRow pour appliquer ma routine Java à chaque ligne. La routine centralise les règles de nettoyage. Une fois les données nettoyées, je passe par tUniqRow pour supprimer les doublons, puis j'exporte le résultat dans un nouveau fichier CSV.
 
 Je developpe le code routine afin de nettoyer les données.
+
 ```java
 package routines;
 
@@ -580,5 +581,36 @@ output_row.ap_loyalty_score = input_row.ap_loyalty_score;
 
 ```
 
-Le rapport d'anomalie, confirme que les seules lignes rejetées sont les doublons. Le reste des données ont été corrigés.
+Le rapport d'anomalie, confirme que les seules lignes rejetées sont les doublons. Les données incorrectes ont été corrigés.
 
+#### Fusionner les données
+
+L'objectif est de transformer les données nettoyées AB_CLIENT (Oracle) et AP_USERS (SQL Server) vers le schéma cible commun client_commun, avec détection et fusion des doublons inter-systèmes (même client existant dans les deux bases)
+
+Étapes de construction
+1. Lecture des sources nettoyées : deux tFileInputDelimited, un par système, pointant vers les sorties d'US2.1 (ab_client_cleaned.csv, ap_users_cleaned.csv) — pas les fichiers bruts extraits.
+
+2. Mapping vers le schéma commun : implémenté en tJavaRow (et non tMap, suite à une instabilité du tMap sur cette version de Talaxie — schéma/expressions réinitialisés silencieusement au clic sur OK). Un tJavaRow par source, assignant explicitement les 10 champs du schéma cible (client_id, nom_prenom, date_naissance, email, telephone, adresse, code_postal, num_fiscal, date_creation, statut_client, loyalty_score).
+
+3. Fusion des deux flux : tUnite_1, avec le flux AbAssurance connecté en premier (l'ordre conditionne la priorité lors du dédoublonnage à l'étape 5).
+
+4. Détection des doublons inter-systèmes : tUniqRow sur la clé email, appliqué uniquement aux lignes avec email présent.
+
+5. Une sortie pour les données. Pour les clients, il y a deux sorties, une pour les donées correctses et sans doublons et une autre pour les doublons.
+
+6. Journalisation : tJava déclenché en OnComponentOk, écrivant une ligne récapitulative dans journal_transformation.csv.
+
+![schema_transformation_fusion_donnees.png](images_readme/schema_transformation_fusion_donnees.png)
+
+Le canvas Talaxie :
+
+![Capture_talaxie-transformation-datas.png](images_readme/Capture_talaxie-transformation-datas.png)
+
+***Bugs rencontrés et corrections.***
+tMap : schéma de sortie vidé au clic sur OK Version Talaxie snapshot (V8.9.0-SNAPSHOT) instable sur ce composant.
+Diagnostic : Expressions perdues silencieusement sans message d'erreur.
+Correction : Remplacement du tMap par un tJavaRow pour toute la transformation.
+
+Décision client_id : String ("AB-"/"AP-") vs Integer.
+Diagnostic : Le schéma officiel typait client_id en Integer, incompatible avec un préfixe texte.
+Correction : Modification du type de client_id dans le schéma commun (Métadonnées) de Integer vers String, propagée aux jobs.
