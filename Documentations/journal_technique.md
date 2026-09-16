@@ -596,7 +596,7 @@ L'objectif est de transformer les données nettoyées AB_CLIENT (Oracle) et AP_U
 
 4. Détection des doublons inter-systèmes : tUniqRow sur la clé email, appliqué uniquement aux lignes avec email présent.
 
-5. Une sortie pour les données sans doublon et une autre pour les doublon.
+5. Une sortie pour les données. Pour les clients, il y a deux sorties, une pour les donées correctses et sans doublons et une autre pour les doublons.
 
 6. Journalisation : tJava déclenché en OnComponentOk, écrivant une ligne récapitulative dans journal_transformation.csv.
 
