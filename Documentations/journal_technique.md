@@ -632,3 +632,11 @@ Exemple dans Kafka UI
 ![Capture_kafka_ui_topics.png](images_readme/Capture_kafka_ui_topics.png)
 
 La documentation du nombre de ligne et le temps de transmission est dans le fichier [`transmission_kafka.csv`](../data/logs/transmission_kafka.csv).
+
+#### US 3.3 — Synchronisation pendant la phase de transition
+
+Les bases sources Oracle/SQL Server sont simulées via des jeux de données statiques (Faker), il n'existe pas de flux de modifications en direct à synchroniser — l'US3.3 ne peut donc pas être testée dans les conditions réelles décrites par les critères d'acceptation.
+
+Théoriquement, il fadrait mettre en place des connecteurs entre les bases de données Oracle / Sql Server et Kafka Connect, pour capter les modifications au fil de l'eau plutôt qu'en extraction batch.
+
+#### US 4.1 Installer l'espace de stockage centralisé
