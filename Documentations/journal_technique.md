@@ -614,3 +614,21 @@ Correction : Remplacement du tMap par un tJavaRow pour toute la transformation.
 Décision client_id : String ("AB-"/"AP-") vs Integer.
 Diagnostic : Le schéma officiel typait client_id en Integer, incompatible avec un préfixe texte.
 Correction : Modification du type de client_id dans le schéma commun (Métadonnées) de Integer vers String, propagée aux jobs.
+
+#### US 3.2 — Publication des données transformées vers Kafka
+
+1. Télécharger le composant Kafka dans Talaxie. Il permet de réutiliser cette config Kafka dans tous les jobs sans la reconfigurer à chaque fois. Appelé ce composant via un tLibraryLoad.
+2. Comme tKafkaOutput n'existe pas dans Talaxie, j'utilise le client Kafka Java directement (KafkaProducer) dans tJavaRow à la fin de chacun des jobs de nettoyage (client, contrat, sinistre, paiement) après le tFileInputDelimited.
+3. Format du message : comme évoqué dans la doc, il faut décider maintenant JSON ou Avro. Vu le contexte académique/projet, je pars sur JSON simple pour cette US — plus rapide à mettre en place, suffisant pour valider le flux.
+4. Vérification du non-perte de données : compter les lignes en entrée (via tJavaRow + globalMap) et comparer avec le nombre de messages reçus côté consumer (kafka-console-consumer avec --from-beginning puis compter, ou via Kafka UI qui affiche le nombre de messages par topic/partition).
+5. Mesure du temps de latence.
+
+Exemple d'un job pour la transmission des messages dans kafka.
+
+![Capture_job_kafka.png](images_readme/Capture_job_kafka.png)
+
+Exemple dans Kafka UI
+
+![Capture_kafka_ui_topics.png](images_readme/Capture_kafka_ui_topics.png)
+
+La documentation du nombre de ligne et temps de transmission est dans le fichier [`transmission_kafka.csv`](../data/logs/transmission_kafka.csv).
