@@ -632,3 +632,51 @@ Exemple dans Kafka UI
 ![Capture_kafka_ui_topics.png](images_readme/Capture_kafka_ui_topics.png)
 
 La documentation du nombre de ligne et le temps de transmission est dans le fichier [`transmission_kafka.csv`](../data/logs/transmission_kafka.csv).
+
+#### US 3.3 — Synchronisation pendant la phase de transition
+
+Les bases sources Oracle/SQL Server sont simulées via des jeux de données statiques (Faker), il n'existe pas de flux de modifications en direct à synchroniser — l'US3.3 ne peut donc pas être testée dans les conditions réelles décrites par les critères d'acceptation.
+
+Théoriquement, il fadrait mettre en place des connecteurs entre les bases de données Oracle / Sql Server et Kafka Connect, pour capter les modifications au fil de l'eau plutôt qu'en extraction batch.
+
+#### US 4.1 Installer l'espace de stockage centralisé
+
+Mise en place du cluster Hadoop HDFS comme espace de stockage centralisé
+pour les données AbAssurance/AssurePlus, avant intégration Kafka -> HDFS (US4.2).
+
+1. Ajout d'un 2ᵉ conteneur datanode dans le docker-compose (le cluster n'en comptait qu'un seul), avec dfs.replication=2, pour permettre une réplication réelle des blocs sur plusieurs serveurs.
+2. Retrait de l'exposition host des ports HDFS (9870, 9000) : le namenode/datanodes ne sont plus accessibles que depuis le réseau Docker interne
+(conteneur "app" uniquement), pour restreindre l'accès aux seules composantes autorisées du pipeline.
+3. Validation du cluster : ``docker exec namenode hdfs dfsadmin -report`` (2 datanodes "Live", cluster opérationnel).
+4. Création de l'arborescence du data lake : /data/Kafka/{clients,contrats, paiements,sinistres} pour les données brutes issues de Kafka, /data/clean pour les données nettoyées destinées à l'analyse (US5.1).
+
+```shell
+docker exec -it namenode hdfs dfs -mkdir -p /data/kafka/clients
+docker exec -it namenode hdfs dfs -mkdir -p /data/kafka/contrats
+docker exec -it namenode hdfs dfs -mkdir -p /data/kafka/paiements
+docker exec -it namenode hdfs dfs -mkdir -p /data/kafka/sinistres
+docker exec -it namenode hdfs dfs -mkdir -p /data/clean
+```
+
+5.Test d'écriture/lecture Parquet sur cette arborescence via PySpark pour valider le bon fonctionnement du stockage.
+
+```python
+df = spark.createDataFrame([("test", 1)], ["nom", "valeur"])
+df.write.mode("overwrite").parquet("hdfs://namenode:9000/data/raw/contrats/_test")
+spark.read.parquet("hdfs://namenode:9000/data/raw/contrats/_test").show()
+```
+
+Critères d'acceptation :
+
+1. Serveur Hadoop installé et fonctionnel -> OK (2 datanodes live, testé)
+
+2. Duplication automatique multi-serveurs -> OK (2 datanodes, replication=2)
+
+3. Espace prévu vs volumes estimés (US1.1) -> OK : dossier des extractions sources actuel = 1,05 Mo (1 106 712 octets), largement couvert par l'espace disque alloué aux volumes Docker (plusieurs Go disponibles)
+
+4. Accès restreint aux personnes autorisées -> Partiellement couvert :
+
+* ports HDFS non exposés au host (accès limité au réseau Docker interne).
+* Une authentification forte (Kerberos + Apache Ranger) serait la solution de production, non implémentée ici par simplification.
+
+Prochaine étape : US4.2 — Stocker les données reçues de Kafka dans HDFS.
