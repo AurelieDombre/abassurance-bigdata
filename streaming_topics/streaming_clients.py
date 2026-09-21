@@ -86,7 +86,7 @@ df_clients = df_texte.select(
 # ------------------------------------------------------------------
 requete = df_clients.writeStream \
     .format("parquet") \
-    .option("path", "hdfs://namenode:9000/data/topics/clients") \
+    .option("path", "hdfs://namenode:9000/data/kafka/clients") \
     .option("checkpointLocation", "hdfs://namenode:9000/data/checkpoints/clients") \
     .trigger(processingTime="30 seconds") \
     .outputMode("append") \

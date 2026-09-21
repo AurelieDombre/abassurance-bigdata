@@ -84,7 +84,7 @@ df_sinistres = df_texte.select(
 # ------------------------------------------------------------------
 requete = df_sinistres.writeStream \
     .format("parquet") \
-    .option("path", "hdfs://namenode:9000/data/topics/sinistres") \
+    .option("path", "hdfs://namenode:9000/data/kafka/sinistres") \
     .option("checkpointLocation", "hdfs://namenode:9000/data/checkpoints/sinistres") \
     .trigger(processingTime="30 seconds") \
     .outputMode("append") \

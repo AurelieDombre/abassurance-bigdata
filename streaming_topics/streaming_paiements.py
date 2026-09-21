@@ -83,7 +83,7 @@ df_paiements = df_texte.select(
 # ------------------------------------------------------------------
 requete = df_paiements.writeStream \
     .format("parquet") \
-    .option("path", "hdfs://namenode:9000/data/topics/paiements") \
+    .option("path", "hdfs://namenode:9000/data/kafka/paiements") \
     .option("checkpointLocation", "hdfs://namenode:9000/data/checkpoints/paiements") \
     .trigger(processingTime="30 seconds") \
     .outputMode("append") \
