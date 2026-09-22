@@ -680,5 +680,15 @@ Critères d'acceptation :
 * ports HDFS non exposés au host (accès limité au réseau Docker interne).
 * Une authentification forte (Kerberos + Apache Ranger) serait la solution de production, non implémentée ici par simplification.
 
-Prochaine étape : US4.2 — Stocker les données reçues de Kafka dans HDFS.
+#### US4.2 — Stocker les données reçues de Kafka dans (Hadoop)
 
+Mise en place de 4 jobs Spark Structured Streaming (un par topic Kafka :
+contrats, paiements, sinistres, clients) consommant en continu les messages
+publiés par Talaxie et les écrivant au format Parquet dans HDFS.
+
+* Développement de 4 scripts PySpark Structured Streaming (streaming_contrats.py, streaming_paiements.py, streaming_sinistres.py, streaming_clients.py), un par topic, avec un schéma JSON dédié par type de donnée (contrat, paiement, sinistre, client).
+* Ajout du connecteur spark-sql-kafka-0-10 (et ses dépendances kafka-clients, spark-token-provider-kafka-0-10) téléchargés au build de l'image Docker via curl et chargés dans la SparkSession via spark.jars, la version pyspark installée ne l'incluant pas nativement.
+* Organisation des dossiers HDFS en deux zones : /data/kafka/topic pour les données brutes reçues de Kafka, /data/clean pour les futures données nettoyées (répond au critère 2 : "dossiers organisés brutes/nettoyées").
+* Gestion de checkpoints HDFS dédiés par topic (/data/checkpoints/topic`) pour permettre une reprise sans duplication en cas de redémarrage du job.
+
+Incident traversé: un problème de permissions sur le volume Docker du broker Kafka (AccessDeniedException, utilisateur non-root du conteneur vs volume créé par root) a provoqué une perte des topics et de leur contenu ; corrigé via chown sur le volume, topics recréés, données republiées depuis Talaxie
