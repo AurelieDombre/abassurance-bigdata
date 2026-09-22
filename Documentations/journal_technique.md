@@ -639,6 +639,7 @@ Les bases sources Oracle/SQL Server sont simulées via des jeux de données stat
 
 Théoriquement, il fadrait mettre en place des connecteurs entre les bases de données Oracle / Sql Server et Kafka Connect, pour capter les modifications au fil de l'eau plutôt qu'en extraction batch.
 
+
 #### US 4.1 Installer l'espace de stockage centralisé
 
 Mise en place du cluster Hadoop HDFS comme espace de stockage centralisé
@@ -680,3 +681,4 @@ Critères d'acceptation :
 * Une authentification forte (Kerberos + Apache Ranger) serait la solution de production, non implémentée ici par simplification.
 
 Prochaine étape : US4.2 — Stocker les données reçues de Kafka dans HDFS.
+
