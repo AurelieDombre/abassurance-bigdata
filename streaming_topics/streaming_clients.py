@@ -43,6 +43,9 @@ schema_client = StructType([
 # ------------------------------------------------------------------
 spark = SparkSession.builder \
     .appName("StreamingClients") \
+    .config("spark.jars", "/opt/spark-jars/spark-sql-kafka-0-10_2.13-4.2.0.jar,"
+                           "/opt/spark-jars/kafka-clients-3.9.0.jar,"
+                           "/opt/spark-jars/spark-token-provider-kafka-0-10_2.13-4.2.0.jar") \
     .config("spark.hadoop.fs.defaultFS", "hdfs://namenode:9000") \
     .getOrCreate()
 

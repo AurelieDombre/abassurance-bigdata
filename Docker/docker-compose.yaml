@@ -41,6 +41,7 @@ services:
       - bigdata
 
   kafka:
+    user: "1000:1000"
     image: apache/kafka:latest
     hostname: kafka
     container_name: kafka
