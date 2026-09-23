@@ -743,3 +743,42 @@ Exemple du fichier sinistres :
 
 ![resultat_sinistre_stockage.png](images_readme/resultat_sinistre_stockage.png)
 
+#### US 4.3 Protéger les données sensibles stockées
+
+#### US 5.1 Analyser les données pour produire des rapports
+
+Pour pouvoir facilité l'analyse, il faut développer un tableau de bord.
+Pour cela j'ai choisi l'outils Streamlit. Il s'intègre bien avec PySpark pout lire du Parquet depuis Hadoop, et plus simple a mettre en place qu'un framework comme Flash ou Django.
+
+##### Installation de Streamlit
+
+```shell
+python -m pip install streamlit
+
+# Vérifier l'installation
+streamlit --version
+
+# Ajouter au requirements.txt
+pip freeze > requirements.txt
+```
+
+Création d'une architercture :
+
+abassurance-bigdata/
+│
+├── .venv/
+├── data/
+├── Documentations/
+├── src/
+│   ├── pipeline/
+│   └── prediction/
+│
+├── app/
+│   └── app.py
+├── Docker/
+│   ├── docker-compose.yml/
+├   |──Dockerfile/
+│   └──requirements.txt
+|
+└── README.md
+

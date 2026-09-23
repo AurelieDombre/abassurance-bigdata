@@ -24,4 +24,6 @@ RUN mkdir -p /opt/spark-jars && \
 
 COPY . .
 
-CMD ["tail", "-f", "/dev/null"]
+EXPOSE 8501
+
+CMD ["streamlit", "run", "app.py", "--server.address=0.0.0.0", "--server.port=8501"]

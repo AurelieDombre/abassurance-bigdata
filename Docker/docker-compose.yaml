@@ -8,6 +8,8 @@ services:
       - CLUSTER_NAME=abassurance-cluster
       - CORE_CONF_fs_defaultFS=hdfs://namenode:9000
       - HDFS_CONF_dfs_replication=2
+    volumes:
+      - namenode-data:/hadoop/dfs/name
     networks:
       - bigdata
     # Ports HDFS retirés de l'exposition host : accès restreint au réseau
@@ -22,6 +24,8 @@ services:
       - CORE_CONF_fs_defaultFS=hdfs://namenode:9000
       - SERVICE_PRECONDITION=namenode:9870
       - HDFS_CONF_dfs_replication=2
+    volumes:
+      - datanode-data:/hadoop/dfs/data
     depends_on:
       - namenode
     networks:
@@ -35,6 +39,8 @@ services:
       - CORE_CONF_fs_defaultFS=hdfs://namenode:9000
       - SERVICE_PRECONDITION=namenode:9870
       - HDFS_CONF_dfs_replication=2
+    volumes:
+      - datanode2-data:/hadoop/dfs/data
     depends_on:
       - namenode
     networks:
@@ -93,6 +99,8 @@ services:
       context: ..
       dockerfile: Docker/Dockerfile
     container_name: pyspark-app
+    ports:
+      - "8501:8501"
     depends_on:
       - namenode
       - datanode
@@ -105,6 +113,9 @@ services:
 
 volumes :
   kafka-data:
+  namenode-data:
+  datanode-data:
+  datanode2-data:
 networks:
   bigdata:
     driver: bridge
