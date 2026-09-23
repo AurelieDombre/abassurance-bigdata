@@ -1,0 +1,53 @@
+services:
+
+  namenode:
+    image: bde2020/hadoop-namenode:2.0.0-hadoop3.2.1-java8
+    hostname: namenode
+    container_name: namenode
+    environment:
+      - CLUSTER_NAME=abassurance-cluster
+      - CORE_CONF_fs_defaultFS=hdfs://namenode:9000
+    ports:
+      - "9870:9870"
+      - "9000:9000"
+    networks:
+      - bigdata
+
+  datanode:
+    image: bde2020/hadoop-datanode:2.0.0-hadoop3.2.1-java8
+    hostname: datanode
+    container_name: datanode
+    environment:
+      - CORE_CONF_fs_defaultFS=hdfs://namenode:9000
+      - SERVICE_PRECONDITION=namenode:9870
+    depends_on:
+      - namenode
+    networks:
+      - bigdata
+
+  kafka:
+    image: apache/kafka:latest
+    hostname: kafka
+    container_name: kafka
+    ports:
+      - "9092:9092"
+    networks:
+      - bigdata
+
+  app:
+    build:
+      context: ..
+      dockerfile: Docker/Dockerfile
+    container_name: pyspark-app
+    depends_on:
+      - namenode
+      - datanode
+      - kafka
+    environment:
+      - SPARK_LOCAL_IP=127.0.0.1
+    networks:
+      - bigdata
+
+networks:
+  bigdata:
+    driver: bridge

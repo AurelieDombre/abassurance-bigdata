@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xmi:XMI xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:TalendProperties="http://www.talend.org/properties">
+  <TalendProperties:Project xmi:id="_gGIGUZxfEfGWjvgsSjb51w" label="abassuranceBigdata" description="" language="java" technicalLabel="ABASSURANCEBIGDATA" local="true" author="_gGujQJxfEfGWjvgsSjb51w" productVersion="Talaxie Open Studio for Data Integration-8.9.0.20260627-1651-SNAPSHOT" itemsRelationVersion="1.3" bigData="false">
+    <migrationTask xmi:id="_gHKBEJxfEfGWjvgsSjb51w" id="org.talend.repository.model.migration.CheckProductVersionMigrationTask" breaks="7.1.0" version="7.1.1"/>
+  </TalendProperties:Project>
+  <TalendProperties:User xmi:id="_gGujQJxfEfGWjvgsSjb51w" login="aure.dombre.formation@gmail.com" password="D41D8CD98F00B204E9800998ECF8427E"/>
+</xmi:XMI>

@@ -1,0 +1,37 @@
+1,AP-000003,2026-07-30 16:41:21,961.39,CLOSED,Vehicule immobilise suite a une panne moteur.,94.7
+2,AP-000004,2025-02-06 15:50:06,903.9,IN_PROGRESS,Vehicule vole sur un parking a Sainte Roland dans la nuit.,80.02
+3,AP-000012,2026-03-17 03:19:48,5144.92,REJECTED,Vehicule immobilise suite a une panne moteur.,36.51
+4,AP-000017,2024-12-29 00:23:10,4189.14,CLOSED,Vehicule immobilise suite a une panne moteur.,65.3
+5,AP-000023,2026-03-15 23:08:10,9803.02,IN_PROGRESS,Vehicule immobilise suite a une panne moteur.,28.68
+6,AP-000027,2026-04-09 09:20:15,275.23,IN_PROGRESS,Bris de glace suite a un impact de gravillon sur autoroute.,42.02
+7,AP-000030,2026-04-06 18:46:07,8766.02,REPORTED,Vehicule immobilise suite a une panne moteur.,48.12
+8,AP-000036,2026-08-06 13:13:25,322.77,CLOSED,Demande d'assistance suite a une crevaison sur autoroute.,32.07
+9,AP-000037,2024-10-26 03:28:31,3469.24,REJECTED,Vehicule immobilise suite a une panne moteur.,11.05
+10,AP-000041,2026-02-17 15:21:21,8729.55,REJECTED,Vehicule vole sur un parking a Saint Pénélope dans la nuit.,19.31
+11,AP-000042,2025-06-14 12:44:09,2246.72,REJECTED,Vehicule immobilise suite a une panne moteur.,65.75
+12,AP-000045,2024-05-04 17:58:03,4332.3,IN_PROGRESS,Bris de glace suite a un impact de gravillon sur autoroute.,36.71
+13,AP-000057,2026-01-19 22:33:58,10422.18,REJECTED,Demande d'assistance suite a une crevaison sur autoroute.,97.98
+14,AP-000058,2025-09-17 18:59:58,6400.04,CLOSED,"Accrochage en stationnement, retroviseur casse."
+15,AP-000061,2026-02-23 04:18:24,1917.71,CLOSED,Vehicule endommage par la grele a Roux.,32.93
+16,AP-000063,2025-06-11 22:05:26,3892.38,REJECTED,"Accrochage en stationnement, retroviseur casse."
+17,AP-000064,2024-06-07 06:43:36,9379.93,IN_PROGRESS,Vehicule endommage par la grele a Pons-sur-Bousquet.,84.61
+18,AP-000079,2023-11-14 09:24:35,10326.95,CLOSED,Assistance rapatriement suite a un accident a l'etranger.,52.46
+19,AP-000085,2024-09-11 01:42:22,6300.77,CLOSED,Panne du vehicule necessitant un remorquage a Besson.,20.83
+20,AP-000088,2024-03-10 15:06:04,4147.38,REJECTED,Vehicule immobilise suite a une panne moteur.,77.55
+21,AP-000091,2023-08-11 05:25:45,1876.92,CLOSED,Panne du vehicule necessitant un remorquage a Dupont-sur-Pereira.,1.53
+22,AP-000095,2026-02-14 21:43:14,2763.15,CLOSED,Vehicule immobilise suite a une panne moteur.,39.21
+23,AP-000096,2025-10-06 04:01:51,9828.88,REPORTED,Bris de glace suite a un impact de gravillon sur autoroute.,55.61
+24,AP-000097,2026-01-27 18:28:32,1992.34,REJECTED,"Accrochage en stationnement, retroviseur casse."
+25,AP-000100,2025-08-21 08:56:15,1753.11,REPORTED,Vehicule vole sur un parking a DelmasBourg dans la nuit.,66.09
+26,AP-000104,2025-11-18 04:33:02,7815.83,IN_PROGRESS,"Accrochage en stationnement, retroviseur casse."
+27,AP-000105,2024-02-18 09:28:01,6162.04,REJECTED,Assistance rapatriement suite a un accident a l'etranger.,35.53
+28,AP-000108,2024-08-12 15:57:48,4188.2,REPORTED,Assistance rapatriement suite a un accident a l'etranger.,45.4
+29,AP-000109,2024-05-24 12:34:08,714.28,CLOSED,Panne du vehicule necessitant un remorquage a Poirier.,28.68
+30,AP-000110,2026-03-07 07:25:11,3443.57,CLOSED,Panne du vehicule necessitant un remorquage a Traore.,74.14
+31,AP-000117,2025-09-25 09:31:29,11268.22,IN_PROGRESS,Vehicule endommage par la grele a Martel-sur-Lefort.,63.81
+32,AP-000120,2026-02-27 05:36:37,9247.62,IN_PROGRESS,Panne du vehicule necessitant un remorquage a Lévêquenec.,91.26
+33,AP-000127,2024-02-20 14:17:58,694.5,CLOSED,"Collision avec un autre vehicule sur Saint Olivier, degats importants a l'avant."
+34,AP-000130,2023-12-21 09:56:19,1289.62,REJECTED,Vehicule vole sur un parking a Saint Gérarddan dans la nuit.,1.56
+35,AP-000131,2026-03-10 18:36:26,1802.75,CLOSED,Assistance rapatriement suite a un accident a l'etranger.,41.2
+36,AP-000135,2026-03-13 17:44:22,10751.44,REJECTED,Vehicule immobilise suite a une panne moteur.,41.91
+37,AP-000140,2025-05-26 06:34:36,5194.51,IN_PROGRESS,Demande d'assistance suite a une crevaison sur autoroute.,32.73
