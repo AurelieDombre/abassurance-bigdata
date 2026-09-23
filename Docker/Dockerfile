@@ -9,7 +9,7 @@ ENV SPARK_LOCAL_IP=127.0.0.1
 
 WORKDIR /app
 
-COPY requirements.txt .
+COPY Docker/requirements.txt .
 RUN pip install --no-cache-dir --default-timeout=120 --retries 10 -r requirements.txt
 RUN mkdir -p /opt/spark-jars && \
     curl --retry 10 --retry-delay 5 --max-time 120 -o /opt/spark-jars/spark-sql-kafka-0-10_2.13-4.2.0.jar \
@@ -26,4 +26,4 @@ COPY . .
 
 EXPOSE 8501
 
-CMD ["streamlit", "run", "app.py", "--server.address=0.0.0.0", "--server.port=8501"]
+CMD ["streamlit", "run", "app/app.py", "--server.address=0.0.0.0", "--server.port=8501"]

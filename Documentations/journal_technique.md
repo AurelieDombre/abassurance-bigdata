@@ -782,3 +782,30 @@ abassurance-bigdata/
 |
 └── README.md
 
+Je modifie le Dockerfile afin qu'il lance Strealit : 
+
+```dockerfile
+CMD ["streamlit", "run", "app/app.py", "--server.address=0.0.0.0", "--server.port=8501"]
+```
+
+J'ajoute le port dans le docker-compose.yml
+
+```yaml
+  app:
+    build:
+      context: ..
+      dockerfile: Docker/Dockerfile
+    container_name: pyspark-app
+    ports:
+      - "8501:8501"
+    depends_on:
+      - namenode
+      - datanode
+      - datanode2
+      - kafka
+    environment:
+      - SPARK_LOCAL_IP=127.0.0.1
+    networks:
+      - bigdata
+```
+
