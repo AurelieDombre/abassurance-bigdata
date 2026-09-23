@@ -40,11 +40,21 @@ services:
     networks:
       - bigdata
 
+  kafka-init-permissions:
+    image: alpine
+    command: chown -R 1000:1000 /data
+    volumes:
+      - kafka-data:/data
+    networks:
+      - bigdata
+
   kafka:
     user: "1000:1000"
     image: apache/kafka:latest
     hostname: kafka
     container_name: kafka
+    depends_on:
+      - kafka-init-permissions
     ports:
       - "9092:9092"
     volumes:

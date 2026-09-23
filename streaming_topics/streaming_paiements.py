@@ -40,9 +40,15 @@ schema_paiement = StructType([
 # ------------------------------------------------------------------
 spark = SparkSession.builder \
     .appName("StreamingPaiements") \
+    .master("local[2]") \
+    .config("spark.driver.memory", "1g") \
+    .config("spark.executor.memory", "512m") \
+    .config("spark.executor.heartbeatInterval", "30s") \
+    .config("spark.network.timeout", "300s") \
     .config("spark.jars", "/opt/spark-jars/spark-sql-kafka-0-10_2.13-4.2.0.jar,"
-                           "/opt/spark-jars/kafka-clients-3.9.0.jar,"
-                           "/opt/spark-jars/spark-token-provider-kafka-0-10_2.13-4.2.0.jar") \
+                        "/opt/spark-jars/kafka-clients-3.9.0.jar,"
+                        "/opt/spark-jars/spark-token-provider-kafka-0-10_2.13-4.2.0.jar,"
+                        "/opt/spark-jars/commons-pool2-2.13.1.jar") \
     .config("spark.hadoop.fs.defaultFS", "hdfs://namenode:9000") \
     .getOrCreate()
 
