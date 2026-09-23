@@ -691,4 +691,55 @@ publiés par Talaxie et les écrivant au format Parquet dans HDFS.
 * Organisation des dossiers HDFS en deux zones : /data/kafka/topic pour les données brutes reçues de Kafka, /data/clean pour les futures données nettoyées (répond au critère 2 : "dossiers organisés brutes/nettoyées").
 * Gestion de checkpoints HDFS dédiés par topic (/data/checkpoints/topic`) pour permettre une reprise sans duplication en cas de redémarrage du job.
 
-Incident traversé: un problème de permissions sur le volume Docker du broker Kafka (AccessDeniedException, utilisateur non-root du conteneur vs volume créé par root) a provoqué une perte des topics et de leur contenu ; corrigé via chown sur le volume, topics recréés, données republiées depuis Talaxie
+Incident traversé: un problème de permissions sur le volume Docker du broker Kafka (AccessDeniedException, utilisateur non-root du conteneur vs volume créé par root) a provoqué une perte des topics et de leur contenu ; corrigé via chown sur le volume, topics recréés, données republiées depuis Talaxie.
+
+Le nombre de données stockées correspond au nombre de données extraites au départ (aucune perte) :
+
+Capture d'écran pour client :
+
+![Capture_terminal_script_clients.png](images_readme/Capture_terminal_script_clients.png)
+
+Dans Kafka, il a bien 
+
+Capture d'écran pour contrats :
+
+![Capture_terminal_script_contrats.png](images_readme/Capture_terminal_script_contrats.png)
+
+Capture d'écran pour paiements :
+
+![Capture_terminal_script_paiements.png](images_readme/Capture_terminal_script_paiements.png)
+
+Capture d'écran pour sinistres :
+
+![Capture_terminal_script_sinistres.png](images_readme/Capture_terminal_script_sinistres.png)
+![Capture_terminal_script_sinistres_nbr_lignes.png](images_readme/Capture_terminal_script_sinistres_nbr_lignes.png)
+
+Pour chaque topics, le nombre de ligne correspond bien :
+
+![Capture_kafka_ui_topics_messages.png](images_readme/Capture_kafka_ui_topics_messages.png)
+
+***Résultat dans Hadoop***
+
+```shell
+(.venv) PS C:\xampp\htdocs\Projets\abassurance-bigdata> docker exec -it namenode hdfs dfs -ls /data/kafka/clients
+>> docker exec -it namenode hdfs dfs -ls /data/kafka/contrats
+>> docker exec -it namenode hdfs dfs -ls /data/kafka/paiements
+>> docker exec -it namenode hdfs dfs -ls /data/kafka/sinistres
+Found 2 items
+drwxr-xr-x   - root supergroup          0 2026-09-23 11:25 /data/kafka/clients/_spark_metadata
+-rw-r--r--   3 root supergroup       8445 2026-09-23 11:25 /data/kafka/clients/part-00000-2e41640a-1863-44cb-aaaf-a0f110c2da0c-c000.snappy.parquet
+Found 2 items
+drwxr-xr-x   - root supergroup          0 2026-09-23 12:06 /data/kafka/contrats/_spark_metadata
+-rw-r--r--   3 root supergroup       2714 2026-09-23 12:06 /data/kafka/contrats/part-00000-73ff930e-6059-4950-9239-800abc357b31-c000.snappy.parquet
+Found 2 items
+drwxr-xr-x   - root supergroup          0 2026-09-23 12:07 /data/kafka/paiements/_spark_metadata
+-rw-r--r--   3 root supergroup      44180 2026-09-23 12:07 /data/kafka/paiements/part-00000-aefa4965-cf7e-40b9-9822-d0cce4a78f8a-c000.snappy.parquet
+Found 2 items
+drwxr-xr-x   - root supergroup          0 2026-09-23 09:25 /data/kafka/sinistres/_spark_metadata
+-rw-r--r--   3 root supergroup       6919 2026-09-23 09:25 /data/kafka/sinistres/part-00000-aeb49b99-9d83-4d62-9dfd-a7134819e8ca-c000.snappy.parquet
+```
+
+Exemple du fichier sinistres :
+
+![resultat_sinistre_stockage.png](images_readme/resultat_sinistre_stockage.png)
+
