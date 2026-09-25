@@ -353,6 +353,7 @@ Afin de nettoyer les anomalies des données : format de date, format d'email,té
 J'utilise un composant tJavaRow pour appliquer ma routine Java à chaque ligne. La routine centralise les règles de nettoyage. Une fois les données nettoyées, je passe par tUniqRow pour supprimer les doublons, puis j'exporte le résultat dans un nouveau fichier CSV.
 
 Je developpe le code routine afin de nettoyer les données.
+
 ```java
 package routines;
 
@@ -580,5 +581,188 @@ output_row.ap_loyalty_score = input_row.ap_loyalty_score;
 
 ```
 
-Le rapport d'anomalie, confirme que les seules lignes rejetées sont les doublons. Le reste des données ont été corrigés.
+Le rapport d'anomalie, confirme que les seules lignes rejetées sont les doublons. Les données incorrectes ont été corrigés.
+
+#### Fusionner les données
+
+L'objectif est de transformer les données nettoyées AB_CLIENT (Oracle) et AP_USERS (SQL Server) vers le schéma cible commun client_commun, avec détection et fusion des doublons inter-systèmes (même client existant dans les deux bases)
+
+Étapes de construction
+1. Lecture des sources nettoyées : deux tFileInputDelimited, un par système, pointant vers les sorties d'US2.1 (ab_client_cleaned.csv, ap_users_cleaned.csv) — pas les fichiers bruts extraits.
+
+2. Mapping vers le schéma commun : implémenté en tJavaRow (et non tMap, suite à une instabilité du tMap sur cette version de Talaxie — schéma/expressions réinitialisés silencieusement au clic sur OK). Un tJavaRow par source, assignant explicitement les 10 champs du schéma cible (client_id, nom_prenom, date_naissance, email, telephone, adresse, code_postal, num_fiscal, date_creation, statut_client, loyalty_score).
+
+3. Fusion des deux flux : tUnite_1, avec le flux AbAssurance connecté en premier (l'ordre conditionne la priorité lors du dédoublonnage à l'étape 5).
+
+4. Détection des doublons inter-systèmes : tUniqRow sur la clé email, appliqué uniquement aux lignes avec email présent.
+
+5. Une sortie pour les données. Pour les clients, il y a deux sorties, une pour les donées correctses et sans doublons et une autre pour les doublons.
+
+6. Journalisation : tJava déclenché en OnComponentOk, écrivant une ligne récapitulative dans journal_transformation.csv.
+
+![schema_transformation_fusion_donnees.png](images_readme/schema_transformation_fusion_donnees.png)
+
+Le canvas Talaxie :
+
+![Capture_talaxie-transformation-datas.png](images_readme/Capture_talaxie-transformation-datas.png)
+
+***Bugs rencontrés et corrections.***
+tMap : schéma de sortie vidé au clic sur OK Version Talaxie snapshot (V8.9.0-SNAPSHOT) instable sur ce composant.
+Diagnostic : Expressions perdues silencieusement sans message d'erreur.
+Correction : Remplacement du tMap par un tJavaRow pour toute la transformation.
+
+Décision client_id : String ("AB-"/"AP-") vs Integer.
+Diagnostic : Le schéma officiel typait client_id en Integer, incompatible avec un préfixe texte.
+Correction : Modification du type de client_id dans le schéma commun (Métadonnées) de Integer vers String, propagée aux jobs.
+
+#### US 3.2 — Publication des données transformées vers Kafka
+
+1. Télécharger le composant Kafka dans Talaxie. Il permet de réutiliser cette config Kafka dans tous les jobs sans la reconfigurer à chaque fois. Appelé ce composant via un tLibraryLoad.
+2. Comme tKafkaOutput n'existe pas dans Talaxie, j'utilise le client Kafka Java directement (KafkaProducer) dans tJavaRow. Je créé un nouveau job avec le tLabraryLoad -> tInputDelimited->tJavaFlex->tOutputDelimieted à la fin de chacun des jobs afin d'aoir un fichier et pouvoir comparer le nombre de ligne avec le nombre de message dans Kafka pour chaque.
+3. Format du message : comme évoqué dans la doc, il faut décider maintenant JSON ou Avro. Vu le contexte académique/projet, je pars sur JSON simple pour cette US — plus rapide à mettre en place, suffisant pour valider le flux.
+4. Vérification du non-perte de données : compter les lignes en entrée (via tJavaRow + globalMap) et comparer avec le nombre de messages reçus côté consumer (kafka-console-consumer avec --from-beginning puis compter, ou via Kafka UI qui affiche le nombre de messages par topic/partition).
+5. Mesure du temps de latence.
+
+Exemple d'un job pour la transmission des messages dans kafka.
+
+![Capture_job_kafka.png](images_readme/Capture_job_kafka.png)
+
+Exemple dans Kafka UI
+
+![Capture_kafka_ui_topics.png](images_readme/Capture_kafka_ui_topics.png)
+
+La documentation du nombre de ligne et le temps de transmission est dans le fichier [`transmission_kafka.csv`](../data/logs/transmission_kafka.csv).
+
+#### US 3.3 — Synchronisation pendant la phase de transition
+
+Les bases sources Oracle/SQL Server sont simulées via des jeux de données statiques (Faker), il n'existe pas de flux de modifications en direct à synchroniser — l'US3.3 ne peut donc pas être testée dans les conditions réelles décrites par les critères d'acceptation.
+
+Théoriquement, il fadrait mettre en place des connecteurs entre les bases de données Oracle / Sql Server et Kafka Connect, pour capter les modifications au fil de l'eau plutôt qu'en extraction batch.
+
+
+#### US 4.1 Installer l'espace de stockage centralisé
+
+Mise en place du cluster Hadoop HDFS comme espace de stockage centralisé
+pour les données AbAssurance/AssurePlus, avant intégration Kafka -> HDFS (US4.2).
+
+1. Ajout d'un 2ᵉ conteneur datanode dans le docker-compose (le cluster n'en comptait qu'un seul), avec dfs.replication=2, pour permettre une réplication réelle des blocs sur plusieurs serveurs.
+2. Retrait de l'exposition host des ports HDFS (9870, 9000) : le namenode/datanodes ne sont plus accessibles que depuis le réseau Docker interne
+(conteneur "app" uniquement), pour restreindre l'accès aux seules composantes autorisées du pipeline.
+3. Validation du cluster : ``docker exec namenode hdfs dfsadmin -report`` (2 datanodes "Live", cluster opérationnel).
+4. Création de l'arborescence du data lake : /data/Kafka/{clients,contrats, paiements,sinistres} pour les données brutes issues de Kafka, /data/clean pour les données nettoyées destinées à l'analyse (US5.1).
+
+```shell
+docker exec -it namenode hdfs dfs -mkdir -p /data/kafka/clients
+docker exec -it namenode hdfs dfs -mkdir -p /data/kafka/contrats
+docker exec -it namenode hdfs dfs -mkdir -p /data/kafka/paiements
+docker exec -it namenode hdfs dfs -mkdir -p /data/kafka/sinistres
+docker exec -it namenode hdfs dfs -mkdir -p /data/clean
+```
+
+5.Test d'écriture/lecture Parquet sur cette arborescence via PySpark pour valider le bon fonctionnement du stockage.
+
+```python
+df = spark.createDataFrame([("test", 1)], ["nom", "valeur"])
+df.write.mode("overwrite").parquet("hdfs://namenode:9000/data/raw/contrats/_test")
+spark.read.parquet("hdfs://namenode:9000/data/raw/contrats/_test").show()
+```
+
+Critères d'acceptation :
+
+1. Serveur Hadoop installé et fonctionnel -> OK (2 datanodes live, testé)
+
+2. Duplication automatique multi-serveurs -> OK (2 datanodes, replication=2)
+
+3. Espace prévu vs volumes estimés (US1.1) -> OK : dossier des extractions sources actuel = 1,05 Mo (1 106 712 octets), largement couvert par l'espace disque alloué aux volumes Docker (plusieurs Go disponibles)
+
+4. Accès restreint aux personnes autorisées -> Partiellement couvert :
+
+* ports HDFS non exposés au host (accès limité au réseau Docker interne).
+* Une authentification forte (Kerberos + Apache Ranger) serait la solution de production, non implémentée ici par simplification.
+
+#### US4.2 — Stocker les données reçues de Kafka dans (Hadoop)
+
+Mise en place de 4 jobs Spark Structured Streaming (un par topic Kafka :
+contrats, paiements, sinistres, clients) consommant en continu les messages
+publiés par Talaxie et les écrivant au format Parquet dans HDFS.
+
+* Développement de 4 scripts PySpark Structured Streaming (streaming_contrats.py, streaming_paiements.py, streaming_sinistres.py, streaming_clients.py), un par topic, avec un schéma JSON dédié par type de donnée (contrat, paiement, sinistre, client).
+* Ajout du connecteur spark-sql-kafka-0-10 (et ses dépendances kafka-clients, spark-token-provider-kafka-0-10) téléchargés au build de l'image Docker via curl et chargés dans la SparkSession via spark.jars, la version pyspark installée ne l'incluant pas nativement.
+* Organisation des dossiers HDFS en deux zones : /data/kafka/topic pour les données brutes reçues de Kafka, /data/clean pour les futures données nettoyées (répond au critère 2 : "dossiers organisés brutes/nettoyées").
+* Gestion de checkpoints HDFS dédiés par topic (/data/checkpoints/topic`) pour permettre une reprise sans duplication en cas de redémarrage du job.
+
+Incident traversé: un problème de permissions sur le volume Docker du broker Kafka (AccessDeniedException, utilisateur non-root du conteneur vs volume créé par root) a provoqué une perte des topics et de leur contenu ; corrigé via chown sur le volume, topics recréés, données republiées depuis Talaxie.
+
+Le nombre de données stockées correspond au nombre de données extraites au départ (aucune perte) :
+
+Capture d'écran pour client :
+
+![Capture_terminal_script_clients.png](images_readme/Capture_terminal_script_clients.png)
+
+Dans Kafka, il a bien 
+
+Capture d'écran pour contrats :
+
+![Capture_terminal_script_contrats.png](images_readme/Capture_terminal_script_contrats.png)
+
+Capture d'écran pour paiements :
+
+![Capture_terminal_script_paiements.png](images_readme/Capture_terminal_script_paiements.png)
+
+Capture d'écran pour sinistres :
+
+![Capture_terminal_script_sinistres.png](images_readme/Capture_terminal_script_sinistres.png)
+![Capture_terminal_script_sinistres_nbr_lignes.png](images_readme/Capture_terminal_script_sinistres_nbr_lignes.png)
+
+Pour chaque topics, le nombre de ligne correspond bien :
+
+![Capture_kafka_ui_topics_messages.png](images_readme/Capture_kafka_ui_topics_messages.png)
+
+***Résultat dans Hadoop***
+
+```shell
+(.venv) PS C:\xampp\htdocs\Projets\abassurance-bigdata> docker exec -it namenode hdfs dfs -ls /data/kafka/clients
+>> docker exec -it namenode hdfs dfs -ls /data/kafka/contrats
+>> docker exec -it namenode hdfs dfs -ls /data/kafka/paiements
+>> docker exec -it namenode hdfs dfs -ls /data/kafka/sinistres
+Found 2 items
+drwxr-xr-x   - root supergroup          0 2026-09-23 11:25 /data/kafka/clients/_spark_metadata
+-rw-r--r--   3 root supergroup       8445 2026-09-23 11:25 /data/kafka/clients/part-00000-2e41640a-1863-44cb-aaaf-a0f110c2da0c-c000.snappy.parquet
+Found 2 items
+drwxr-xr-x   - root supergroup          0 2026-09-23 12:06 /data/kafka/contrats/_spark_metadata
+-rw-r--r--   3 root supergroup       2714 2026-09-23 12:06 /data/kafka/contrats/part-00000-73ff930e-6059-4950-9239-800abc357b31-c000.snappy.parquet
+Found 2 items
+drwxr-xr-x   - root supergroup          0 2026-09-23 12:07 /data/kafka/paiements/_spark_metadata
+-rw-r--r--   3 root supergroup      44180 2026-09-23 12:07 /data/kafka/paiements/part-00000-aefa4965-cf7e-40b9-9822-d0cce4a78f8a-c000.snappy.parquet
+Found 2 items
+drwxr-xr-x   - root supergroup          0 2026-09-23 09:25 /data/kafka/sinistres/_spark_metadata
+-rw-r--r--   3 root supergroup       6919 2026-09-23 09:25 /data/kafka/sinistres/part-00000-aeb49b99-9d83-4d62-9dfd-a7134819e8ca-c000.snappy.parquet
+```
+
+Exemple du fichier sinistres :
+
+![resultat_sinistre_stockage.png](images_readme/resultat_sinistre_stockage.png)
+
+#### US4.3 Proteger les données  sensibles stockées
+
+Ceci est une partie lourde et qui demande du temps. je vais lister ce qu'il faudrait faire.
+
+>Ce qu'il faudrait implémenter :
+
+*Critère 1* — chiffrer les champs les plus sensibles (num_fiscal, email, telephone, adresse du topic clients) avant écriture dans HDFS, plutôt que de configurer un chiffrement natif HDFS (Transparent Data Encryption) qui demande une gestion de clés KMS complexe. Ça se fait directement dans le script streaming_clients.py, avec une librairie de chiffrement symétrique simple :
+
+```python
+from cryptography.fernet import Fernet
+# clé générée une fois et stockée en variable d'environnement
+```
+
+*Critère 2* — accès par rôle : un groupe Unix "dev" qui n'a pas accès en lecture au dossier /data/kafka/clients contenant les données sensibles, contre un groupe "analyste" qui y a accès. C'est un vrai mécanisme fonctionnel.
+
+*Critère 3* — audit des connexions : HDFS dispose d'un audit log natif (hdfs-audit.log) censé tracer les opérations de lecture/écriture par utilisateur. Tentative d'activation réalisée : modification de
+log4j.properties (NullAppender -> RFAAUDIT), config confirmée rechargée au démarrage du namenode. Cependant, le fichier généré reste vide malgré
+des opérations de consultation réelles, sans cause identifiée dans le
+temps imparti. En conditions de production, ce mécanisme serait de toute façon complété par une solution plus robuste.
+(Apache Ranger avec ses plugins d'audit).
+
+
 

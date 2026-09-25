@@ -7,11 +7,12 @@ services:
     environment:
       - CLUSTER_NAME=abassurance-cluster
       - CORE_CONF_fs_defaultFS=hdfs://namenode:9000
-    ports:
-      - "9870:9870"
-      - "9000:9000"
+      - HDFS_CONF_dfs_replication=2
     networks:
       - bigdata
+    # Ports HDFS retirés de l'exposition host : accès restreint au réseau
+    # Docker interne uniquement (seul le conteneur "app" peut y accéder),
+    # répond au critère "seules les personnes autorisées peuvent accéder au serveur"
 
   datanode:
     image: bde2020/hadoop-datanode:2.0.0-hadoop3.2.1-java8
@@ -20,17 +21,70 @@ services:
     environment:
       - CORE_CONF_fs_defaultFS=hdfs://namenode:9000
       - SERVICE_PRECONDITION=namenode:9870
+      - HDFS_CONF_dfs_replication=2
     depends_on:
       - namenode
     networks:
       - bigdata
 
+  datanode2:
+    image: bde2020/hadoop-datanode:2.0.0-hadoop3.2.1-java8
+    hostname: datanode2
+    container_name: datanode2
+    environment:
+      - CORE_CONF_fs_defaultFS=hdfs://namenode:9000
+      - SERVICE_PRECONDITION=namenode:9870
+      - HDFS_CONF_dfs_replication=2
+    depends_on:
+      - namenode
+    networks:
+      - bigdata
+
+  kafka-init-permissions:
+    image: alpine
+    command: chown -R 1000:1000 /data
+    volumes:
+      - kafka-data:/data
+    networks:
+      - bigdata
+
   kafka:
+    user: "1000:1000"
     image: apache/kafka:latest
     hostname: kafka
     container_name: kafka
+    depends_on:
+      - kafka-init-permissions
     ports:
       - "9092:9092"
+    volumes:
+      - kafka-data:/tmp/kraft-combined-logs
+    environment:
+      KAFKA_HEAP_OPTS: "-Xmx512M -Xms256M"
+      KAFKA_NODE_ID: 1
+      KAFKA_PROCESS_ROLES: broker,controller
+      KAFKA_LISTENERS: PLAINTEXT://kafka:19092,CONTROLLER://kafka:19093,PLAINTEXT_HOST://0.0.0.0:9092
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:19092,PLAINTEXT_HOST://localhost:9092
+      KAFKA_CONTROLLER_QUORUM_VOTERS: 1@kafka:19093
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: CONTROLLER:PLAINTEXT,PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
+      KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
+      KAFKA_CONTROLLER_LISTENER_NAMES: CONTROLLER
+      KAFKA_LOG_DIRS: /tmp/kraft-combined-logs
+      KAFKA_AUTO_CREATE_TOPICS_ENABLE: "false"
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+    networks:
+      - bigdata
+
+  kafka-ui:
+    image: provectuslabs/kafka-ui:latest
+    container_name: kafka-ui
+    ports:
+      - "8080:8080"
+    environment:
+      KAFKA_CLUSTERS_0_NAME: abassurance-cluster
+      KAFKA_CLUSTERS_0_BOOTSTRAPSERVERS: kafka:19092
+    depends_on:
+      - kafka
     networks:
       - bigdata
 
@@ -42,12 +96,15 @@ services:
     depends_on:
       - namenode
       - datanode
+      - datanode2
       - kafka
     environment:
       - SPARK_LOCAL_IP=127.0.0.1
     networks:
       - bigdata
 
+volumes :
+  kafka-data:
 networks:
   bigdata:
     driver: bridge
