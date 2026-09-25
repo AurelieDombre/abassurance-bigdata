@@ -743,3 +743,26 @@ Exemple du fichier sinistres :
 
 ![resultat_sinistre_stockage.png](images_readme/resultat_sinistre_stockage.png)
 
+#### US4.3 Proteger les données  sensibles stockées
+
+Ceci est une partie lourde et qui demande du temps. je vais lister ce qu'il faudrait faire.
+
+>Ce qu'il faudrait implémenter :
+
+*Critère 1* — chiffrer les champs les plus sensibles (num_fiscal, email, telephone, adresse du topic clients) avant écriture dans HDFS, plutôt que de configurer un chiffrement natif HDFS (Transparent Data Encryption) qui demande une gestion de clés KMS complexe. Ça se fait directement dans le script streaming_clients.py, avec une librairie de chiffrement symétrique simple :
+
+```python
+from cryptography.fernet import Fernet
+# clé générée une fois et stockée en variable d'environnement
+```
+
+*Critère 2* — accès par rôle : un groupe Unix "dev" qui n'a pas accès en lecture au dossier /data/kafka/clients contenant les données sensibles, contre un groupe "analyste" qui y a accès. C'est un vrai mécanisme fonctionnel.
+
+*Critère 3* — audit des connexions : HDFS dispose d'un audit log natif (hdfs-audit.log) censé tracer les opérations de lecture/écriture par utilisateur. Tentative d'activation réalisée : modification de
+log4j.properties (NullAppender -> RFAAUDIT), config confirmée rechargée au démarrage du namenode. Cependant, le fichier généré reste vide malgré
+des opérations de consultation réelles, sans cause identifiée dans le
+temps imparti. En conditions de production, ce mécanisme serait de toute façon complété par une solution plus robuste.
+(Apache Ranger avec ses plugins d'audit).
+
+
+
