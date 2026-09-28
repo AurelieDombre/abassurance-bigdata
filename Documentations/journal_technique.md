@@ -836,6 +836,10 @@ J'ai identifier un bug donc je passe directement à ma users storie 8.1 :
 
 Dans le tableau de bord, le menu déroulant des statuts de contrat est vide : tous les contrats tombent dans l'étiquette « (vide) ».
 
+![menu-deroulant-contrat-vide.png](images_readme/menu-deroulant-contrat-vide.png)
+
+![tableau_streamlit_contrat-vide.png](images_readme/tableau_streamlit_contrat-vide.png)
+
 ##### Étapes de reproduction
 
 1. **Vérifier la source** : dans `data/output/dataClean_fusion/contrats`, les 446 contrats ont un statut renseigné (`ACTIF`, `SUSPENDU`, `RESILIE`, mais aussi `ACTIVE`, `SUSPENDED`, `TERMINATED`).
@@ -964,7 +968,11 @@ docker exec -it pyspark-app python -c "from pyspark.sql import SparkSession; s=S
 
 Résultat attendu : 446 lignes et 3 statuts (`ACTIF`, `SUSPENDU`, `RESILIE`).
 
-Résultat obtenu : [À COMPLÉTER] [CAPTURE À AJOUTER]
+Résultat obtenu :
+
+![menu-deroulant-contrat-ok.png](images_readme/menu-deroulant-contrat-ok.png)
+
+![tableau-streamlit-contrat-ok.png](images_readme/tableau-streamlit-contrat-ok.png)
 
 ##### Non-régression
 
