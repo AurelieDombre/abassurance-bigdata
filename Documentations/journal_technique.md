@@ -748,7 +748,7 @@ Exemple du fichier sinistres :
 #### US 5.1 Analyser les données pour produire des rapports
 
 Pour pouvoir facilité l'analyse, il faut développer un tableau de bord.
-Pour cela j'ai choisi l'outils Streamlit. Il s'intègre bien avec PySpark pout lire du Parquet depuis Hadoop, et plus simple a mettre en place qu'un framework comme Flash ou Django.
+Pour cela j'ai choisi l'outils Streamlit. Il s'intègre bien avec PySpark pour lire du Parquet depuis Hadoop, et plus simple a mettre en place qu'un framework comme Flask ou Django.
 
 ##### Installation de Streamlit
 
@@ -759,10 +759,10 @@ python -m pip install streamlit
 streamlit --version
 
 # Ajouter au requirements.txt
-pip freeze > requirements.txt
+streamlit==1.64.0
 ```
 
-Création d'une architercture :
+Création d'une architecture :
 
 abassurance-bigdata/
 │
@@ -782,7 +782,7 @@ abassurance-bigdata/
 |
 └── README.md
 
-Je modifie le Dockerfile afin qu'il lance Strealit : 
+Je modifie le Dockerfile afin qu'il lance Streamlit : 
 
 ```dockerfile
 CMD ["streamlit", "run", "app/app.py", "--server.address=0.0.0.0", "--server.port=8501"]
