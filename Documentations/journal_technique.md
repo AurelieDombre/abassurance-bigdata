@@ -743,6 +743,7 @@ Exemple du fichier sinistres :
 
 ![resultat_sinistre_stockage.png](images_readme/resultat_sinistre_stockage.png)
 
+
 #### US4.3 Proteger les données  sensibles stockées
 
 Ceci est une partie lourde et qui demande du temps. je vais lister ce qu'il faudrait faire.
@@ -764,5 +765,68 @@ des opérations de consultation réelles, sans cause identifiée dans le
 temps imparti. En conditions de production, ce mécanisme serait de toute façon complété par une solution plus robuste.
 (Apache Ranger avec ses plugins d'audit).
 
+#### US 5.1 Analyser les données pour produire des rapports
+
+Pour pouvoir facilité l'analyse, il faut développer un tableau de bord.
+Pour cela j'ai choisi l'outils Streamlit. Il s'intègre bien avec PySpark pour lire du Parquet depuis Hadoop, et plus simple a mettre en place qu'un framework comme Flask ou Django.
+
+##### Installation de Streamlit
+
+```shell
+python -m pip install streamlit
+
+# Vérifier l'installation
+streamlit --version
+
+# Ajouter au requirements.txt
+streamlit==1.64.0
+```
+
+Création d'une architecture :
+
+abassurance-bigdata/
+│
+├── .venv/
+├── data/
+├── Documentations/
+├── src/
+│   ├── pipeline/
+│   └── prediction/
+│
+├── app/
+│   └── app.py
+├── Docker/
+│   ├── docker-compose.yml/
+├   |──Dockerfile/
+│   └──requirements.txt
+|
+└── README.md
+
+Je modifie le Dockerfile afin qu'il lance Streamlit : 
+
+```dockerfile
+CMD ["streamlit", "run", "app/app.py", "--server.address=0.0.0.0", "--server.port=8501"]
+```
+
+J'ajoute le port dans le docker-compose.yml
+
+```yaml
+  app:
+    build:
+      context: ..
+      dockerfile: Docker/Dockerfile
+    container_name: pyspark-app
+    ports:
+      - "8501:8501"
+    depends_on:
+      - namenode
+      - datanode
+      - datanode2
+      - kafka
+    environment:
+      - SPARK_LOCAL_IP=127.0.0.1
+    networks:
+      - bigdata
+```
 
 
