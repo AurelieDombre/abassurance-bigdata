@@ -743,7 +743,26 @@ Exemple du fichier sinistres :
 
 ![resultat_sinistre_stockage.png](images_readme/resultat_sinistre_stockage.png)
 
-#### US 4.3 Protéger les données sensibles stockées
+#### US4.3 Proteger les données  sensibles stockées
+
+Ceci est une partie lourde et qui demande du temps. je vais lister ce qu'il faudrait faire.
+
+>Ce qu'il faudrait implémenter :
+
+*Critère 1* — chiffrer les champs les plus sensibles (num_fiscal, email, telephone, adresse du topic clients) avant écriture dans HDFS, plutôt que de configurer un chiffrement natif HDFS (Transparent Data Encryption) qui demande une gestion de clés KMS complexe. Ça se fait directement dans le script streaming_clients.py, avec une librairie de chiffrement symétrique simple :
+
+```python
+from cryptography.fernet import Fernet
+# clé générée une fois et stockée en variable d'environnement
+```
+
+*Critère 2* — accès par rôle : un groupe Unix "dev" qui n'a pas accès en lecture au dossier /data/kafka/clients contenant les données sensibles, contre un groupe "analyste" qui y a accès. C'est un vrai mécanisme fonctionnel.
+
+*Critère 3* — audit des connexions : HDFS dispose d'un audit log natif (hdfs-audit.log) censé tracer les opérations de lecture/écriture par utilisateur. Tentative d'activation réalisée : modification de
+log4j.properties (NullAppender -> RFAAUDIT), config confirmée rechargée au démarrage du namenode. Cependant, le fichier généré reste vide malgré
+des opérations de consultation réelles, sans cause identifiée dans le
+temps imparti. En conditions de production, ce mécanisme serait de toute façon complété par une solution plus robuste.
+(Apache Ranger avec ses plugins d'audit).
 
 #### US 5.1 Analyser les données pour produire des rapports
 
@@ -808,4 +827,78 @@ J'ajoute le port dans le docker-compose.yml
     networks:
       - bigdata
 ```
+
+J'ai identifier un bug donc je passe directement à ma users storie 8.1 :
+
+#### US 8.1 — Identifier un bug du pipeline
+
+##### Symptôme
+
+Dans le tableau de bord, le menu déroulant des statuts de contrat est vide : tous les contrats tombent dans l'étiquette « (vide) ».
+
+##### Étapes de reproduction
+
+1. **Vérifier la source** : dans `data/output/dataClean_fusion/contrats`, les 446 contrats ont un statut renseigné (`ACTIF`, `SUSPENDU`, `RESILIE`, mais aussi `ACTIVE`, `SUSPENDED`, `TERMINATED`).
+
+2. **Compter les statuts dans HDFS** :
+
+```shell
+docker exec -it pyspark-app python -c "from pyspark.sql import SparkSession; s=SparkSession.builder.master('local[1]').config('spark.hadoop.fs.defaultFS','hdfs://namenode:9000').getOrCreate(); s.read.parquet('hdfs://namenode:9000/data/kafka/contrats').groupBy('statut_contrat').count().show()"
+```
+
+Résultat : les 446 lignes ont `statut_contrat` à `NULL`.
+
+```
++--------------+-----+
+|statut_contrat|count|
++--------------+-----+
+|          NULL|  446|
+```
+
+3. **Lire un message brut du topic Kafka** :
+
+```shell
+docker exec -it kafka /opt/kafka/bin/kafka-console-consumer.sh --bootstrap-server kafka:19092 --topic abassurance.contrats.v1 --from-beginning --max-messages 2
+```
+
+Résultat :
+
+```
+{"contrat_id":"AB-000001","client_id":"AB-1","type_assurance":"AUTO","code_produit":"","date_debut":"2023-12-16","date_fin":"2024-12-15","prime_annuelle":1808.77,"prime_mensuelle":,"statut_contrat":"ACTIF","agence_id":"20","code_courtier":""}
+```
+
+Le champ `"prime_mensuelle":,` n'a pas de valeur : ce n'est pas du JSON valide.
+
+1. **Confirmer l'étendue du problème** : `docker exec -it pyspark-app python -c "from pyspark.sql import SparkSession; s=SparkSession.builder.master('local[1]').config('spark.hadoop.fs.defaultFS','hdfs://namenode:9000').getOrCreate(); d=s.read.parquet('hdfs://namenode:9000/data/kafka/contrats'); print('lignes:', d.count(), '| contrat_id non nul:', d.filter('contrat_id IS NOT NULL').count())"` sur `contrat_id IS NOT NULL` dans le Parquet HDFS : résultat de la commande lignes: 446 | contrat_id non nul: 0.
+
+##### Origine
+
+Les contrats AbAssurance n'ont qu'une prime annuelle et les contrats AssurePlus qu'une prime mensuelle. Pour chaque contrat, l'un des deux champs numériques est donc vide :
+
+| Origine | Contrats | Champ vide dans le JSON |
+|---|---|---|
+| AbAssurance | 299 | `prime_mensuelle` |
+| AssurePlus | 147 | `prime_annuelle` |
+
+Le job Talaxie qui publie sur Kafka écrit alors la clé sans valeur, ce qui rend le message invalide. Dans `streaming_contrats.py`, `from_json` ne plante pas sur un message invalide : il renvoie une ligne dont **toutes** les colonnes sont `NULL`. Les 446 messages sont donc devenus 446 lignes vides dans HDFS.
+
+Hypothèse écartée : une clé JSON mal nommée. Dans ce cas, seule la colonne concernée aurait été `NULL`, et le message montre que `statut_contrat` est correctement nommé.
+
+##### Impact
+
+* Toute la table `contrats` est inutilisable dans HDFS (statut, type, primes, dates), pas seulement le statut.
+* Le nombre de lignes stockées correspond au nombre de lignes extraites (446), ce qui masque le problème dans la vérification de l'US 4.2. Seule la taille du fichier Parquet (2,7 Ko pour 446 lignes) était un indice.
+* Les indicateurs du dashboard par statut de contrat (actifs, suspendus, résiliés) sont impossibles à calculer.
+* Les topics `clients`, `paiements` et `sinistres` ne sont pas concernés : leurs champs numériques sont tous renseignés dans la fusion (0 valeur vide sur 1576 paiements et 98 sinistres).
+
+##### Problème secondaire constaté
+
+Les statuts de contrat sont un mélange de français et d'anglais (6 valeurs au lieu de 3), alors que `mapping_donnees.md` prévoit une harmonisation en français. La traduction `ACTIVE/SUSPENDED/TERMINATED` → `ACTIF/SUSPENDU/RESILIE` n'a pas été faite dans Talaxie à la fusion.
+
+##### Critères d'acceptation
+
+* [x] Le bug est reproduit.
+* [x] Son origine est identifiée.
+* [x] Son impact est documenté.
+* [x] Les étapes de reproduction sont décrites.
 
