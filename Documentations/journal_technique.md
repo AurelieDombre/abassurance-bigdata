@@ -902,3 +902,78 @@ Les statuts de contrat sont un mélange de français et d'anglais (6 valeurs au 
 * [x] Son impact est documenté.
 * [x] Les étapes de reproduction sont décrites.
 
+#### US 8.2 — Corriger le bug
+
+##### Démarche de recherche d'erreur
+
+Le bug a été localisé en remontant la chaîne, étape par étape, pour éliminer les causes possibles :
+
+| Étape contrôlée | Constat | Conclusion |
+|---|---|---|
+| Fichier de fusion Talaxie | 446 lignes, statuts renseignés | Source correcte |
+| Parquet dans HDFS | 446 lignes, `statut_contrat` à `NULL` | Perte de données après la fusion |
+| Script `streaming_contrats.py` | `from_json` associe les champs par nom, le schéma contient bien `statut_contrat` | Script correct |
+| Message brut dans Kafka | `"prime_mensuelle":,` (JSON invalide) | **Origine trouvée : le job Talaxie de publication** |
+
+##### Correctif
+
+**1. Talaxie : publier un JSON valide**
+
+Faire en sorte qu'une prime vide soit écrite `null` dans le JSON (ou `0`), au lieu de rien. Composant modifié : [À COMPLÉTER].
+
+**2. Talaxie : harmoniser les statuts en français**
+
+Ajouter la traduction dans le `tMap` de la fusion (à adapter au nom réel du flux) :
+
+```java
+"ACTIVE".equals(row1.statut_contrat) ? "ACTIF" :
+"SUSPENDED".equals(row1.statut_contrat) ? "SUSPENDU" :
+"TERMINATED".equals(row1.statut_contrat) ? "RESILIE" :
+row1.statut_contrat
+```
+
+**3. Repartir d'un état propre**
+
+Les anciens messages invalides restent dans le topic, et le streaming lit depuis le début (`startingOffsets: earliest`). Republier sans nettoyer donnerait 446 lignes vides en plus des 446 bonnes lignes. Il faut donc, dans cet ordre :
+
+```shell
+# a. Arrêter streaming_contrats.py (Ctrl+C dans son terminal)
+
+# b. Supprimer le topic contrats (les messages invalides)
+docker exec -it kafka /opt/kafka/bin/kafka-topics.sh --bootstrap-server kafka:19092 --delete --topic abassurance.contrats.v1
+
+# c. Le recréer (la création automatique est désactivée dans le docker-compose)
+docker exec -it kafka /opt/kafka/bin/kafka-topics.sh --bootstrap-server kafka:19092 --create --topic abassurance.contrats.v1 --partitions 1 --replication-factor 1
+
+# d. Supprimer les données et le checkpoint HDFS des contrats uniquement
+docker exec -it namenode hdfs dfs -rm -r -f /data/kafka/contrats /data/checkpoints/contrats
+```
+
+Adapter `--partitions` et `--replication-factor` à la configuration d'origine du topic si elle était différente.
+
+**4. Republier et relancer**
+
+* Relancer le job Talaxie de publication des contrats.
+* Relancer `python streaming_topics/streaming_contrats.py`.
+
+##### Vérification
+
+```shell
+docker exec -it pyspark-app python -c "from pyspark.sql import SparkSession; s=SparkSession.builder.master('local[1]').config('spark.hadoop.fs.defaultFS','hdfs://namenode:9000').getOrCreate(); d=s.read.parquet('hdfs://namenode:9000/data/kafka/contrats'); print('lignes:', d.count()); d.groupBy('statut_contrat').count().show()"
+```
+
+Résultat attendu : 446 lignes et 3 statuts (`ACTIF`, `SUSPENDU`, `RESILIE`).
+
+Résultat obtenu : [À COMPLÉTER] [CAPTURE À AJOUTER]
+
+##### Non-régression
+
+* Le nombre de lignes des topics `clients`, `paiements` et `sinistres` dans HDFS est inchangé : [À COMPLÉTER].
+* Le tableau de bord affiche le menu des statuts (Actif / Suspendu / Résilié) avec les bons comptages : [À COMPLÉTER] [CAPTURE À AJOUTER].
+* Le dictionnaire de correspondance des statuts ajouté dans `app.py` reste en place comme garde-fou, il n'a plus d'effet une fois les données corrigées à la source.
+
+##### Critères d'acceptation
+
+* [ ] Le correctif est développé.
+* [ ] Les fonctionnalités existantes continuent de fonctionner.
+* [ ] Le correctif est documenté.
