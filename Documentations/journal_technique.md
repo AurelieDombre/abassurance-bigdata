@@ -828,7 +828,235 @@ J'ajoute le port dans le docker-compose.yml
       - bigdata
 ```
 
+##### Écriture du tableau de bord (app.py)
 
+Le script se lit en 3 grandes étapes : préparer les outils, calculer les chiffres avec Spark, puis les afficher avec Streamlit.
+
+###### Étape 1 — Connexion à Spark et à Hadoop
+
+```python
+import time
+
+import pandas as pd
+import streamlit as st
+from pyspark.sql import SparkSession
+from pyspark.sql import functions as F
+
+DOSSIER_HDFS = "hdfs://namenode:9000/data/kafka"
+
+st.set_page_config(page_title="Tableau de bord AbAssurance", layout="wide")
+
+
+@st.cache_resource
+def demarrer_spark():
+    spark = (
+        SparkSession.builder.appName("DashboardAbAssurance")
+        .master("local[2]")
+        .config("spark.driver.memory", "1g")
+        .config("spark.hadoop.fs.defaultFS", "hdfs://namenode:9000")
+        .getOrCreate()
+    )
+    return spark
+
+
+def lire(spark, nom_table):
+    """Lire une table (clients, contrats...) dans Hadoop."""
+    return spark.read.parquet(DOSSIER_HDFS + "/" + nom_table)
+```
+
+Le décorateur `@st.cache_resource` évite de redémarrer Spark à chaque clic
+sur la page (démarrer Spark prend plusieurs secondes).
+
+###### Étape 2 — Calcul des indicateurs avec Spark
+
+```python
+@st.cache_data(show_spinner="Spark calcule les chiffres à partir de Hadoop...")
+def calculer():
+    spark = demarrer_spark()
+    debut = time.time()
+
+    clients = lire(spark, "clients")
+    contrats = lire(spark, "contrats")
+    paiements = lire(spark, "paiements")
+    sinistres = lire(spark, "sinistres")
+
+    # Nombre de contrats pour chaque statut
+    contrats_par_statut = {}
+    for ligne in contrats.groupBy("statut_contrat").count().collect():
+        statut = ligne["statut_contrat"]
+        if statut is None:
+            statut = "(vide)"
+        contrats_par_statut[statut] = ligne["count"]
+
+    # Montant total estimé des sinistres
+    total_sinistres = sinistres.agg(F.sum("montant_estime")).first()[0]
+    if total_sinistres is None:
+        total_sinistres = 0
+
+    duree = time.time() - debut
+
+    return {
+        "nb_clients": clients.count(),
+        "nb_contrats": contrats.count(),
+        "nb_paiements": paiements.count(),
+        "nb_sinistres": sinistres.count(),
+        "contrats_par_statut": contrats_par_statut,
+        "total_sinistres": total_sinistres,
+        "duree": duree,
+    }
+```
+
+`@st.cache_data` garde le résultat en mémoire : tant qu'on ne demande pas
+explicitement un recalcul, on ne relance pas Spark à chaque interaction.
+
+###### Étape 3 — Affichage
+
+```python
+st.title("Tableau de bord AbAssurance / AssurePlus")
+
+if st.sidebar.button("Recalculer depuis Hadoop"):
+    st.cache_data.clear()
+
+resultats = calculer()
+
+st.subheader("Chiffres clés")
+col1, col2, col3, col4 = st.columns(4)
+col1.metric("Clients", resultats["nb_clients"])
+col2.metric("Contrats", resultats["nb_contrats"])
+col3.metric("Paiements", resultats["nb_paiements"])
+col4.metric("Sinistres", resultats["nb_sinistres"])
+
+st.info("Temps de traitement Spark : " + str(round(resultats["duree"], 1)) + " secondes")
+
+st.subheader("Contrats")
+statuts = list(resultats["contrats_par_statut"].keys())
+choix = st.selectbox("Quel statut veux-tu regarder ?", statuts)
+st.metric("Nombre de contrats « " + choix + " »", resultats["contrats_par_statut"][choix])
+
+st.subheader("Sinistres")
+st.metric("Montant total estimé des sinistres", round(resultats["total_sinistres"], 2))
+```
+
+Le menu déroulant (`st.selectbox`) permet de choisir un statut de contrat
+(ACTIF, suspendu, résilié) parmi ceux réellement présents dans les données.
+
+###### Amélioration : le graphique change avec le statut choisi
+
+Pour que le menu déroulant ne serve pas qu'à afficher un chiffre isolé, un
+second calcul croise le statut avec le type d'assurance, sous la forme d'un
+dictionnaire de dictionnaires :
+
+```python
+par_statut_et_type = {
+    "ACTIF":    {"auto": 300, "habitation": 200},
+    "suspendu": {"auto": 20,  "habitation": 10},
+}
+```
+
+Construction (à l'intérieur de `calculer()`) :
+
+```python
+par_statut_et_type = {}
+lignes_croisees = contrats.groupBy("statut_contrat", "type_assurance").count().collect()
+for ligne in lignes_croisees:
+    statut = ligne["statut_contrat"] or "(vide)"
+    type_assurance = ligne["type_assurance"] or "(non renseigné)"
+    if statut not in par_statut_et_type:
+        par_statut_et_type[statut] = {}
+    par_statut_et_type[statut][type_assurance] = ligne["count"]
+```
+
+Affichage : on ouvre le "tiroir" correspondant au statut choisi, et on
+dessine son contenu.
+
+```python
+detail_du_statut = resultats["par_statut_et_type"].get(choix, {})
+st.bar_chart(pd.Series(detail_du_statut))
+```
+
+Le graphique se redessine donc automatiquement à chaque changement de
+sélection dans le menu déroulant.
+
+##### Ajout des exports (CSV et PDF)
+
+###### Installation de fpdf2
+
+```shell
+python -m pip install fpdf2
+
+# Ajouter au requirements.txt
+fpdf2==2.8.5
+```
+
+###### Export CSV
+
+Chaque table (clients, contrats, paiements, sinistres) est gardée sous
+forme de tableau pandas complet, pas juste un échantillon, pour pouvoir
+être téléchargée :
+
+```python
+def vers_csv(tableau_pandas):
+    # encoding="utf-8-sig" : ajoute un marqueur invisible en début de
+    # fichier pour qu'Excel affiche correctement les accents.
+    return tableau_pandas.to_csv(index=False, sep=";").encode("utf-8-sig")
+```
+
+Affichage, un bouton de téléchargement par table :
+
+```python
+st.subheader("Exporter les données")
+for nom_table, tableau in resultats["tables"].items():
+    st.download_button(
+        label="Télécharger " + nom_table + ".csv",
+        data=vers_csv(tableau),
+        file_name=nom_table + ".csv",
+        mime="text/csv",
+    )
+```
+
+Pour les tables clients et sinistres, seules les colonnes non sensibles
+sont incluses (pas d'email, téléphone, adresse, numéro fiscal, ni texte
+libre de description), cohérent avec la protection des données prévue à
+l'US 4.3.
+
+###### Export PDF
+
+Le rapport est construit ligne par ligne avec la librairie `fpdf2` :
+
+```python
+from fpdf import FPDF
+
+def generer_rapport_pdf(resultats):
+    pdf = FPDF()
+    pdf.add_page()
+
+    pdf.set_font("Helvetica", "B", 16)
+    pdf.cell(0, 10, "Rapport AbAssurance / AssurePlus", ln=True)
+
+    pdf.set_font("Helvetica", "", 11)
+    pdf.cell(0, 8, "Clients : " + str(resultats["nb_clients"]), ln=True)
+    pdf.cell(0, 8, "Contrats : " + str(resultats["nb_contrats"]), ln=True)
+    pdf.cell(0, 8, "Sinistres : " + str(resultats["nb_sinistres"]), ln=True)
+
+    # pdf.output() renvoie directement les octets du PDF, sans créer
+    # de fichier sur le disque : pratique pour le bouton de téléchargement.
+    return bytes(pdf.output())
+```
+
+Affichage :
+
+```python
+st.subheader("Exporter le rapport")
+pdf_bytes = generer_rapport_pdf(resultats)
+st.download_button(
+    label="Télécharger le rapport PDF",
+    data=pdf_bytes,
+    file_name="rapport_abassurance.pdf",
+    mime="application/pdf",
+)
+```
+
+---
 
 J'ai identifier un bug donc je passe directement à ma users storie 8.1 :
 
@@ -987,3 +1215,5 @@ Résultat obtenu :
 * [ ] Le correctif est développé.
 * [ ] Les fonctionnalités existantes continuent de fonctionner.
 * [ ] Le correctif est documenté.
+
+---
