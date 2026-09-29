@@ -62,13 +62,36 @@ def calculer():
 
     # --- Nombre de contrats pour chaque statut
     # On construit un dictionnaire : un carnet où chaque statut a son nombre.
-    # Exemple : {"Actif": 500, "Résilié": 120}
+    # Exemple : {"ACTIF": 500, "suspendu": 30, "résilié": 120}
     contrats_par_statut = {}
     for ligne in contrats.groupBy("statut_contrat").count().collect():
         statut = ligne["statut_contrat"]
         if statut is None:            # si le statut est vide, on met une étiquette lisible
             statut = "(vide)"
         contrats_par_statut[statut] = ligne["count"]
+
+    # --- Nombre de contrats par statut ET par type d'assurance.
+    # Résultat voulu, par exemple :
+    #   {
+    #     "ACTIF":    {"auto": 300, "habitation": 200},
+    #     "suspendu": {"auto": 20,  "habitation": 10},
+    #   }
+    par_statut_et_type = {}
+    lignes_croisees = contrats.groupBy("statut_contrat", "type_assurance").count().collect()
+    for ligne in lignes_croisees:
+        statut = ligne["statut_contrat"]
+        if statut is None:
+            statut = "(vide)"
+        type_assurance = ligne["type_assurance"]
+        if type_assurance is None:
+            type_assurance = "(non renseigné)"
+
+        # Si on n'a encore jamais vu ce statut, on ouvre un tiroir vide pour lui
+        if statut not in par_statut_et_type:
+            par_statut_et_type[statut] = {}
+
+        # On range le compte dans le bon tiroir
+        par_statut_et_type[statut][type_assurance] = ligne["count"]
 
     # --- Montant total estimé des sinistres
     total_sinistres = sinistres.agg(F.sum("montant_estime")).first()[0]
@@ -97,6 +120,7 @@ def calculer():
         "nb_paiements": paiements.count(),
         "nb_sinistres": sinistres.count(),
         "contrats_par_statut": contrats_par_statut,
+        "par_statut_et_type": par_statut_et_type,
         "total_sinistres": total_sinistres,
         "duree": duree,
         "echantillons": {
@@ -147,9 +171,23 @@ st.subheader("Contrats")
 statuts = list(resultats["contrats_par_statut"].keys())   # la liste des statuts trouvés
 
 if len(statuts) > 0:
-    choix = st.selectbox("Quel statut correspond à un contrat actif ?", statuts)
-    st.metric("Nombre de contrats avec ce statut", resultats["contrats_par_statut"][choix])
-    st.bar_chart(pd.Series(resultats["contrats_par_statut"]))
+    choix = st.selectbox("Quel statut veux-tu regarder ?", statuts)
+
+    # On affiche d'abord le nombre total de contrats pour ce statut
+    st.metric("Nombre de contrats « " + choix + " »", resultats["contrats_par_statut"][choix])
+
+    # Puis on ouvre le "tiroir" de ce statut : le détail par type d'assurance.
+    # C'est CE dictionnaire qui change selon le choix fait dans le menu déroulant,
+    # donc le graphique en dessous change lui aussi.
+    detail_du_statut = resultats["par_statut_et_type"].get(choix, {})
+
+    if len(detail_du_statut) > 0:
+        st.caption("Répartition des contrats « " + choix + " » par type d'assurance :")
+        # pd.Series transforme le dictionnaire {"auto": 300, "habitation": 200}
+        # en une petite colonne que st.bar_chart sait dessiner.
+        st.bar_chart(pd.Series(detail_du_statut))
+    else:
+        st.warning("Aucun type d'assurance trouvé pour ce statut.")
 else:
     st.warning("Aucun contrat trouvé dans Hadoop.")
 
