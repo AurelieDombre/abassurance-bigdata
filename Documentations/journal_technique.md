@@ -828,6 +828,8 @@ J'ajoute le port dans le docker-compose.yml
       - bigdata
 ```
 
+
+
 J'ai identifier un bug donc je passe directement à ma users storie 8.1 :
 
 #### US 8.1 — Identifier un bug du pipeline
