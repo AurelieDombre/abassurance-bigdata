@@ -24,6 +24,7 @@ from pyspark.sql.types import StructType, StructField, StringType, DoubleType
 # ------------------------------------------------------------------
 schema_client = StructType([
     StructField("client_id", StringType()),
+    StructField("nom_prenom", StringType()),
     StructField("date_naissance", StringType()),
     StructField("email", StringType()),
     StructField("telephone", StringType()),
