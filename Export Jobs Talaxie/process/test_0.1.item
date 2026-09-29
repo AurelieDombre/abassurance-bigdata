@@ -43,7 +43,7 @@
     <elementParameter field="TEXT" name="PROPERTIES_IMPLICIT_CONTEXT" value="&quot;&quot;" show="false"/>
     <elementParameter field="TEXT" name="SCHEMA_DB_IMPLICIT_CONTEXT" value="&quot;&quot;" show="false"/>
     <elementParameter field="TEXT" name="USER_IMPLICIT_CONTEXT" value="&quot;&quot;" show="false"/>
-    <elementParameter field="PASSWORD" name="PASS_IMPLICIT_CONTEXT" value="enc:system.encryption.key.v1:vFRqxCh72OMcJTXXGb/eSpPVFXN9nJDmn2oMTmoJ" show="false"/>
+    <elementParameter field="PASSWORD" name="PASS_IMPLICIT_CONTEXT" value="enc:system.encryption.key.v1:zcUC1IGyYtb+EkezSKO5sAlYPDZTYryUl/7GIocQ" show="false"/>
     <elementParameter field="FILE" name="DBFILE_IMPLICIT_CONTEXT" value="&quot;&quot;" show="false"/>
     <elementParameter field="DBTABLE" name="DBTABLE_IMPLICIT_CONTEXT" value="&quot;&quot;" show="false"/>
     <elementParameter field="TEXT" name="QUERY_CONDITION_IMPLICIT_CONTEXT" value="&quot;&quot;" show="false"/>
@@ -58,7 +58,7 @@
     <elementParameter field="CHECK" name="ON_METERCATCHER_FLAG" value="false"/>
     <elementParameter field="CHECK" name="ON_CONSOLE_FLAG" value="false" show="false"/>
     <elementParameter field="CHECK" name="ON_FILES_FLAG" value="false" show="false"/>
-    <elementParameter field="DIRECTORY" name="FILE_PATH" value="&quot;E:/workspace-bigdata/.metadata&quot;" show="false"/>
+    <elementParameter field="DIRECTORY" name="FILE_PATH" value="&quot;C:/Users/Mon PC/OneDrive/Bureau/TOS_DI-20260627_1635-V8.9.0SNAPSHOT-win32.win32.x86_64/workspace/.metadata&quot;" show="false"/>
     <elementParameter field="TEXT" name="FILENAME_STATS" value="&quot;stats_file.txt&quot;" show="false"/>
     <elementParameter field="TEXT" name="FILENAME_LOGS" value="&quot;logs_file.txt&quot;" show="false"/>
     <elementParameter field="TEXT" name="FILENAME_METTER" value="&quot;meter_file.txt&quot;" show="false"/>
@@ -78,7 +78,7 @@
     <elementParameter field="TEXT" name="PROPERTIES" value="&quot;&quot;" show="false"/>
     <elementParameter field="TEXT" name="SCHEMA_DB" value="&quot;&quot;" show="false"/>
     <elementParameter field="TEXT" name="USER" value="&quot;&quot;" show="false"/>
-    <elementParameter field="PASSWORD" name="PASS" value="enc:system.encryption.key.v1:oQSzzBdrK9l1W5nIcm+nSjFLWVYf/SMwEsRHAl9Z" show="false"/>
+    <elementParameter field="PASSWORD" name="PASS" value="enc:system.encryption.key.v1:EPIqz2ft5Ueaz02psl6CuyAzKL+PgG6agchKiRnd" show="false"/>
     <elementParameter field="FILE" name="DBFILE" value="&quot;&quot;" show="false"/>
     <elementParameter field="DBTABLE" name="TABLE_STATS" value="&quot;&quot;" show="false"/>
     <elementParameter field="DBTABLE" name="TABLE_LOGS" value="&quot;&quot;" show="false"/>
@@ -97,19 +97,19 @@
     <elementParameter field="TEXT" name="FOOTER_LIBRARY" value="" show="false"/>
     <elementParameter field="TEXT" name="FOOTER_CODE" value="" show="false"/>
     <elementParameter field="TEXT" name="FOOTER_IMPORT" value="" show="false"/>
-    <routinesParameter id="_g2hogJxfEfGWjvgsSjb51w" name="DataOperation"/>
-    <routinesParameter id="_g3OzJpxfEfGWjvgsSjb51w" name="Mathematical"/>
-    <routinesParameter id="_g3XWCZxfEfGWjvgsSjb51w" name="Numeric"/>
-    <routinesParameter id="_g3jjQJxfEfGWjvgsSjb51w" name="Relational"/>
-    <routinesParameter id="_g3obyZxfEfGWjvgsSjb51w" name="StringHandling"/>
-    <routinesParameter id="_g3rfGZxfEfGWjvgsSjb51w" name="TalendDataGenerator"/>
-    <routinesParameter id="_g313KZxfEfGWjvgsSjb51w" name="TalendDate"/>
-    <routinesParameter id="_g4APOZxfEfGWjvgsSjb51w" name="TalendString"/>
-    <routinesParameter id="_g4O4sJxfEfGWjvgsSjb51w" name="TalendStringUtil"/>
+    <routinesParameter id="_gsIJoKExEfGU46RmF5Y7AQ" name="DataOperation"/>
+    <routinesParameter id="_gt_x4KExEfGU46RmF5Y7AQ" name="Mathematical"/>
+    <routinesParameter id="_guObYKExEfGU46RmF5Y7AQ" name="Numeric"/>
+    <routinesParameter id="_gvPvEKExEfGU46RmF5Y7AQ" name="Relational"/>
+    <routinesParameter id="_gvY5AKExEfGU46RmF5Y7AQ" name="StringHandling"/>
+    <routinesParameter id="_gvrz8KExEfGU46RmF5Y7AQ" name="TalendDataGenerator"/>
+    <routinesParameter id="_gv1k8KExEfGU46RmF5Y7AQ" name="TalendDate"/>
+    <routinesParameter id="_gv_9AKExEfGU46RmF5Y7AQ" name="TalendString"/>
+    <routinesParameter id="_gwj9sKExEfGU46RmF5Y7AQ" name="TalendStringUtil"/>
   </parameters>
-  <node componentName="tJava" componentVersion="0.101" offsetLabelX="0" offsetLabelY="0" posX="480" posY="96">
+  <node componentName="tJava" componentVersion="0.101" offsetLabelX="0" offsetLabelY="0" posX="224" posY="96">
     <elementParameter field="TEXT" name="UNIQUE_NAME" value="tJava_1" show="false"/>
-    <elementParameter field="MEMO_JAVA" name="CODE" value="System.out.println(&quot;Talaxie OK - environnement fonctionnel&quot;);"/>
+    <elementParameter field="MEMO_JAVA" name="CODE" value="System.out.println(&quot;Talaxie OK - environnement fonctionnel&quot;);&#xA;"/>
     <elementParameter field="MEMO_IMPORT" name="IMPORT" value="//import java.util.List;"/>
     <elementParameter field="TEXT" name="CONNECTION_FORMAT" value="row"/>
     <metadata connector="FLOW" name="tJava_1"/>
