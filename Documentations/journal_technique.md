@@ -2049,3 +2049,9 @@ Résultat obtenu :
 * [ ] Le correctif est documenté.
 
 ---
+
+#### US 5.2 : Préparer les données pour la future IA
+
+Objectif : à partir des 4 tables stockées dans HDFS (/data/kafka/...), produire UN jeu de données propre, sans doublon, aux valeurs harmonisées, avec UNE ligne par sinistre.
+C'est la base d'entraînement du modèle de détection de fraude (US 5.3).
+
