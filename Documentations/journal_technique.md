@@ -2038,8 +2038,8 @@ Résultat obtenu :
 
 ##### Non-régression
 
-* Le nombre de lignes des topics `clients`, `paiements` et `sinistres` dans HDFS est inchangé : [À COMPLÉTER].
-* Le tableau de bord affiche le menu des statuts (Actif / Suspendu / Résilié) avec les bons comptages : [À COMPLÉTER] [CAPTURE À AJOUTER].
+* Le nombre de lignes des topics `clients`, `paiements` et `sinistres` dans HDFS est inchangé.
+* Le tableau de bord affiche le menu des statuts (Actif / Suspendu / Résilié) avec les bons comptages.
 * Le dictionnaire de correspondance des statuts ajouté dans `app.py` reste en place comme garde-fou, il n'a plus d'effet une fois les données corrigées à la source.
 
 ##### Critères d'acceptation
@@ -2049,3 +2049,279 @@ Résultat obtenu :
 * [ ] Le correctif est documenté.
 
 ---
+
+#### US 5.2 : Préparer les données pour la future IA
+
+##### Objectif
+
+L'objectif de cette User Story est de préparer les données nécessaires à l'entraînement du futur modèle de détection de fraude.
+
+Construire **une ligne par sinistre**, avec des caractéristiques (features) susceptibles de révéler une fraude, et une cible (`est_suspect`) quand le score de fraude est connu. Le résultat est écrit dans HDFS, prêt à être relu par l'US 5.3 (entraînement du modèle).
+
+---
+
+##### Fichiers utilisés
+
+Le traitement repose principalement sur deux fichiers :
+
+* `src/pipeline/preparer_dataset_fraude.py` : il s'agit du script principal permettant de préparer le jeu de données.
+* `nettoyage_donnees_ia.py` : ce fichier contient notamment les fonctions `nettoyer` et `harmoniser_statuts`.
+
+Les données utilisées en entrée sont stockées dans HDFS aux emplacements suivants :
+
+`hdfs://namenode:9000/data/kafka/{clients,contrats,paiements,sinistres}`
+
+Ces fichiers au format Parquet sont produits à partir des données récupérées par Spark Streaming.
+
+Le traitement produit ensuite deux jeux de données :
+
+* `hdfs://namenode:9000/data/clean/dataset_fraude_entrainement`
+* `hdfs://namenode:9000/data/clean/dataset_fraude_a_predire`
+
+
+Le dictionnaire de données du dataset est disponible dans  /Documentations/dictionnaire_dataset.md
+---
+
+###### Fonctionnement du traitement
+
+La préparation des données se déroule en plusieurs étapes.
+
+###### Lecture et nettoyage des données
+
+Le script commence par lire les quatre tables présentes dans HDFS : clients, contrats, paiements et sinistres.
+
+Les données sont ensuite nettoyées grâce aux fonctions déjà développées dans l'US 5.1. Cette étape permet notamment :
+
+* de supprimer les espaces inutiles ;
+* de transformer les chaînes de caractères vides en valeurs `null` ;
+* d'harmoniser les différents statuts utilisés dans les données ;
+* de supprimer les doublons.
+
+La déduplication doit être réalisée avec des identifiants adaptés afin de ne pas supprimer des données provenant de sources différentes.
+
+###### Création d'un résumé des paiements
+
+Les paiements sont regroupés par contrat afin de créer deux nouvelles informations :
+
+* `nb_paiements` : nombre total de paiements associés au contrat ;
+* `nb_paiements_echoues` : nombre de paiements dont le statut est `ECHOUE`.
+
+Ces informations permettront ensuite au modèle d'avoir une vision plus complète de l'historique du contrat.
+
+###### Regroupement des différentes données
+
+Les tables sont ensuite regroupées grâce à des `left join` réalisés sur le champ `contrat_id`.
+
+Pour chaque sinistre, le traitement récupère ainsi les informations concernant :
+
+* le contrat associé ;
+* les paiements effectués pour ce contrat ;
+* les informations nécessaires à l'analyse du sinistre.
+
+Le choix du `left join` permet de conserver tous les sinistres, même lorsqu'aucune information correspondante n'est disponible dans les autres tables.
+
+###### Création de la variable `jours_avant_sinistre`
+
+Une nouvelle variable appelée `jours_avant_sinistre` est calculée.
+
+Elle correspond au nombre de jours entre la date de début du contrat (`date_debut`) et la date à laquelle le sinistre a été déclaré (`date_sinistre`).
+
+Cette information peut être intéressante pour la détection de fraude. Par exemple, un sinistre déclaré très peu de temps après la souscription d'un contrat peut constituer un élément à prendre en compte par le modèle.
+
+Lorsque certaines informations sont absentes, les valeurs de `nb_paiements`, `nb_paiements_echoues` et `montant_estime` sont remplacées par `0`.
+
+###### Vérification de la cohérence des données
+
+Certaines lignes sont supprimées lorsqu'elles ne correspondent pas aux critères attendus.
+
+Le traitement conserve uniquement les sinistres pour lesquels :
+
+* `montant_estime > 0` ;
+* `jours_avant_sinistre >= 0`.
+
+Cela permet d'éviter de transmettre au futur modèle des données incohérentes.
+
+###### Sélection des informations utiles
+
+Après les différentes étapes de préparation, seules les colonnes nécessaires au futur modèle sont conservées :
+
+* `sinistre_id`
+* `contrat_id`
+* `montant_estime`
+* `statut_sinistre`
+* `type_assurance`
+* `prime_annuelle`
+* `jours_avant_sinistre`
+* `nb_paiements`
+* `nb_paiements_echoues`
+* `fraud_score`
+
+L'objectif est de conserver uniquement les informations utiles à l'analyse des sinistres.
+
+###### Création des deux jeux de données
+
+Le dataset final est séparé en deux parties.
+
+**Le jeu d'entraînement** contient les sinistres pour lesquels le `fraud_score` est connu.
+
+Une nouvelle variable appelée `est_suspect` est créée à partir de ce score :
+
+* si `fraud_score >= 70`, alors `est_suspect = 1` ;
+* sinon, `est_suspect = 0`.
+
+Cette variable constitue la **cible que le modèle devra apprendre à prédire**.
+
+**Le jeu de données à prédire** contient les sinistres pour lesquels le `fraud_score` n'est pas disponible.
+
+Ces données seront utilisées ultérieurement par le modèle afin d'obtenir une prédiction.
+
+---
+
+##### Exécution du traitement
+
+Le script de préparation n'est pas un traitement en continu comme le streaming Kafka/Spark.
+
+Il s'agit d'un traitement ponctuel : il est lancé, prépare les données présentes dans HDFS, produit les deux datasets puis s'arrête.
+
+Pour exécuter le script, les commandes suivantes sont utilisées :
+
+```powershell
+# Copier le script dans docker
+docker cp src/pipeline/preparer_dataset_fraude.py pyspark-app:/app/src/pipeline/preparer_dataset_fraude.py
+# Execution du script
+docker exec -it pyspark-app python /app/src/pipeline/preparer_dataset_fraude.py
+```
+
+---
+
+##### Résultats obtenus
+
+Après l'exécution du traitement, les résultats suivants sont obtenus :
+
+| Élément                           | Résultat |
+| --------------------------------- | -------: |
+| Sinistres présents dans HDFS      |       98 |
+| Sinistres provenant d'AbAssurance |       61 |
+| Sinistres provenant d'AssurePlus  |       37 |
+| Lignes d'entraînement             |       37 |
+| Sinistres suspects                |        7 |
+| Sinistres non suspects            |       30 |
+| Lignes à prédire                  |       61 |
+
+Les **37 sinistres provenant d'AssurePlus** disposent d'un `fraud_score`, grâce au champ `AP_FRAUD_SCORE`. Ils peuvent donc être utilisés pour construire le jeu d'entraînement.
+
+Les **61 sinistres provenant d'AbAssurance** ne possèdent pas ce score. Ils constituent donc le jeu de données qui sera utilisé pour effectuer les futures prédictions.
+
+---
+
+##### Problèmes rencontrés et solutions apportées
+
+###### Problème de doublons entre les deux sources
+
+Un problème est apparu lors de la déduplication.
+
+Au départ, 98 sinistres étaient présents dans Kafka et HDFS, mais seulement 61 étaient conservés par le script. De plus, aucune ligne d'entraînement n'était obtenue.
+
+La cause était liée aux identifiants utilisés par les deux sources.
+
+AbAssurance et AssurePlus utilisent chacune des identifiants de sinistre commençant à `1`. Ainsi, deux sinistres différents pouvaient avoir le même `sinistre_id`.
+
+Par exemple :
+
+```text
+AB-000006 → sinistre_id = 1
+AP-000003 → sinistre_id = 1
+```
+
+Ces deux lignes correspondent pourtant à deux sinistres différents.
+
+La commande suivante avait donc un problème :
+
+```python
+sinistres.dropDuplicates(["sinistre_id"])
+```
+
+Elle considérait les deux sinistres comme des doublons et en supprimait un. Dans ce cas, le sinistre provenant d'AssurePlus pouvait être supprimé alors qu'il contenait le `fraud_score` nécessaire à l'entraînement.
+
+Pour résoudre ce problème, une clé de déduplication plus précise a été utilisée :
+
+```python
+clients = clients.dropDuplicates(["client_id", "email"])
+
+contrats = contrats.dropDuplicates(["contrat_id", "client_id"])
+
+paiements = paiements.dropDuplicates(["paiement_id", "contrat_id"])
+
+sinistres = sinistres.dropDuplicates(["sinistre_id", "contrat_id"])
+```
+
+Le `contrat_id` permet notamment de distinguer les données provenant des différentes sources puisque les contrats possèdent des préfixes différents (`AB-` et `AP-`).
+
+Grâce à cette modification, les **98 sinistres sont désormais conservés**, dont les **37 sinistres possédant un `fraud_score`**.
+
+---
+
+##### Vérifications effectuées
+
+Plusieurs vérifications peuvent être réalisées afin de s'assurer que les données ont correctement été produites.
+
+###### Vérification des offsets Kafka
+
+```powershell
+docker exec kafka /opt/kafka/bin/kafka-get-offsets.sh --bootstrap-server localhost:9092 --topic abassurance.sinistres.v1
+```
+
+###### Vérification des fichiers produits dans HDFS
+
+```powershell
+docker exec namenode hdfs dfs -ls /data/clean/dataset_fraude_entrainement
+
+Found 2 items
+-rw-r--r--   3 root supergroup          0 2026-10-02 06:41 /data/clean/dataset_fraude_entrainement/_SUCCESS
+-rw-r--r--   3 root supergroup       4306 2026-10-02 06:41 /data/clean/dataset_fraude_entrainement/part-00000-83b34fad-63dc-435f-90e8-d2b29c565724-c000.snappy.parquet
+
+
+docker exec namenode hdfs dfs -ls /data/clean/dataset_fraude_a_predire
+
+Found 2 items
+-rw-r--r--   3 root supergroup          0 2026-10-02 06:41 /data/clean/dataset_fraude_a_predire/_SUCCESS
+-rw-r--r--   3 root supergroup       4607 2026-10-02 06:41 /data/clean/dataset_fraude_a_predire/part-00000-3ffcb227-b9da-480d-b6f8-b8d20506b051-c000.snappy.parquet
+```
+
+Ces commandes permettent notamment de vérifier que les datasets ont bien été créés dans HDFS.
+
+---
+
+##### Limites du jeu de données
+
+Plusieurs limites doivent être prises en compte avant d'utiliser ces données pour entraîner le modèle.
+
+###### Quantité limitée de données
+
+Le jeu d'entraînement contient seulement **37 lignes**, dont **7 sinistres considérés comme suspects**.
+
+Cette quantité de données est faible pour entraîner un modèle d'intelligence artificielle de manière fiable.
+
+###### Seuil utilisé pour définir un sinistre suspect
+
+Le seuil de `70` utilisé pour créer la variable `est_suspect` est actuellement défini de manière arbitraire.
+
+Il devra être vérifié en fonction de la distribution réelle des `fraud_score` et éventuellement adapté.
+
+###### Différence entre les deux sources
+
+Le modèle sera entraîné à partir des données d'AssurePlus, puis utilisé sur les données d'AbAssurance.
+
+Il existe donc un risque que les caractéristiques des deux sources soient différentes, par exemple concernant les montants des sinistres ou les délais entre la souscription et la déclaration.
+
+Cette différence devra être prise en compte lors de l'évaluation du modèle.
+
+###### Utilisation du `fraud_score`
+
+Enfin, le `fraud_score` ne doit pas être utilisé comme variable d'entrée du modèle.
+
+Il sert uniquement à créer la variable cible `est_suspect`.
+
+Le modèle devra apprendre à identifier les sinistres suspects à partir des autres informations disponibles, puis utiliser ces informations pour effectuer ses propres prédictions.
+
+
