@@ -1,5 +1,4 @@
-import os
-import argparse
+
 
 from pyspark.sql import SparkSession
 from pyspark.sql import functions as F
@@ -11,38 +10,43 @@ from pyspark.sql import functions as F
 
 def harmoniser_statuts(df):
 
-    df = df.withColumn(
-        "statut_client",
-        F.when(F.col("statut_client") == "ACTIVE", "ACTIF")
-         .when(F.col("statut_client") == "INACTIVE", "INACTIF")
-         .when(F.col("statut_client") == "SUSPENDED", "SUSPENDU")
-         .otherwise(F.col("statut_client"))
-    )
+    # On ne modifie une colonne que si elle existe vraiment dans cette table.
+    if "statut_client" in df.columns:
+        df = df.withColumn(
+            "statut_client",
+            F.when(F.col("statut_client") == "ACTIVE", "ACTIF")
+             .when(F.col("statut_client") == "INACTIVE", "INACTIF")
+             .when(F.col("statut_client") == "SUSPENDED", "SUSPENDU")
+             .otherwise(F.col("statut_client"))
+        )
 
-    df = df.withColumn(
-        "statut_contrat",
-        F.when(F.col("statut_contrat") == "ACTIVE", "ACTIF")
-         .when(F.col("statut_contrat") == "TERMINATED", "RESILIE")
-         .when(F.col("statut_contrat") == "SUSPENDED", "SUSPENDU")
-         .otherwise(F.col("statut_contrat"))
-    )
+    if "statut_contrat" in df.columns:
+        df = df.withColumn(
+            "statut_contrat",
+            F.when(F.col("statut_contrat") == "ACTIVE", "ACTIF")
+             .when(F.col("statut_contrat") == "TERMINATED", "RESILIE")
+             .when(F.col("statut_contrat") == "SUSPENDED", "SUSPENDU")
+             .otherwise(F.col("statut_contrat"))
+        )
 
-    df = df.withColumn(
-        "statut_sinistre",
-        F.when(F.col("statut_sinistre") == "REPORTED", "DECLARE")
-         .when(F.col("statut_sinistre") == "IN_PROGRESS", "EN_COURS")
-         .when(F.col("statut_sinistre") == "CLOSED", "CLOTURE")
-         .when(F.col("statut_sinistre") == "REJECTED", "REJETE")
-         .otherwise(F.col("statut_sinistre"))
-    )
+    if "statut_sinistre" in df.columns:
+        df = df.withColumn(
+            "statut_sinistre",
+            F.when(F.col("statut_sinistre") == "REPORTED", "DECLARE")
+             .when(F.col("statut_sinistre") == "IN_PROGRESS", "EN_COURS")
+             .when(F.col("statut_sinistre") == "CLOSED", "CLOTURE")
+             .when(F.col("statut_sinistre") == "REJECTED", "REJETE")
+             .otherwise(F.col("statut_sinistre"))
+        )
 
-    df = df.withColumn(
-        "statut_transaction",
-        F.when(F.col("statut_transaction") == "SUCCESS", "REUSSI")
-         .when(F.col("statut_transaction") == "PENDING", "EN_ATTENTE")
-         .when(F.col("statut_transaction") == "FAILED", "ECHOUE")
-         .otherwise(F.col("statut_transaction"))
-    )
+    if "statut_transaction" in df.columns:
+        df = df.withColumn(
+            "statut_transaction",
+            F.when(F.col("statut_transaction") == "SUCCESS", "REUSSI")
+             .when(F.col("statut_transaction") == "PENDING", "EN_ATTENTE")
+             .when(F.col("statut_transaction") == "FAILED", "ECHOUE")
+             .otherwise(F.col("statut_transaction"))
+        )
 
     return df
 
@@ -67,21 +71,21 @@ def lire_fichier(spark, chemin):
 # ============================================================
 
 def nettoyer(df):
-
     for colonne in df.columns:
+        type_colonne = df.schema[colonne].dataType.typeName()
 
-        df = df.withColumn(
-            colonne,
-            F.when(
-                F.trim(F.col(colonne)) == "",
-                None
-            ).otherwise(
-                F.trim(F.col(colonne))
+        if type_colonne == "string":
+            df = df.withColumn(
+                colonne,
+                F.when(
+                    F.trim(F.col(colonne)) == "",
+                    None
+                ).otherwise(
+                    F.trim(F.col(colonne))
+                )
             )
-        )
 
     return df
-
 
 # ============================================================
 # PREPARER LES CLIENTS
@@ -91,41 +95,19 @@ def preparer_clients(clients):
 
     clients = nettoyer(clients)
 
-    # Correction du décalage statut/date
-    clients = clients.withColumn(
-        "ancien_statut",
-        F.col("statut_client")
-    )
-
-    clients = clients.withColumn(
-        "statut_client",
-        F.when(
-            F.col("ancien_statut").rlike(r"^\d{4}-\d{2}-\d{2}"),
-            F.col("date_creation")
-        ).otherwise(F.col("ancien_statut"))
-    )
-
-    clients = clients.withColumn(
-        "date_naissance",
-        F.to_timestamp("date_naissance")
-    )
-
-    clients = clients.withColumn(
-        "loyalty_score",
-        F.col("loyalty_score").cast("double")
-    )
-
     clients = harmoniser_statuts(clients)
 
-    return (
-        clients
-        .dropDuplicates(["client_id"])
-        .select(
-            "client_id",
-            "date_naissance",
-            "statut_client",
-            "loyalty_score"
-        )
+    clients = clients.dropDuplicates(["client_id"])
+
+    return clients.select(
+        "client_id",
+        "nom_prenom",
+        "date_naissance",
+        "email",
+        "telephone",
+        "statut_client",
+        "date_creation",
+        "loyalty_score"
     )
 
 
@@ -204,7 +186,7 @@ def preparer_contrats(contrats):
 
 
 # ============================================================
-# 6. PREPARER LES PAIEMENTS
+# PREPARER LES PAIEMENTS
 # ============================================================
 
 def preparer_paiements(paiements):
@@ -237,3 +219,37 @@ def preparer_paiements(paiements):
         )
     )
 
+
+# ============================================================
+# PREPARER LES SINITRES
+# ============================================================
+
+def preparer_sinistres(sinistres):
+
+    sinistres = nettoyer(sinistres)
+
+    sinistres = harmoniser_statuts(sinistres)
+
+    sinistres = sinistres.dropDuplicates(["sinistre_id"])
+
+    return (
+        sinistres
+        .groupBy("contrat_id")
+        .agg(
+            F.count("*").alias("nb_sinistres"),
+
+            F.round(
+                F.sum(
+                    F.col("montant_estime").cast("double")
+                ),
+                2
+            ).alias("total_sinistres"),
+
+            F.sum(
+                F.when(
+                    F.col("statut_sinistre") == "REJETE",
+                    1
+                ).otherwise(0)
+            ).alias("nb_sinistres_rejetes")
+        )
+    )
