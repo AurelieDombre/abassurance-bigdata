@@ -2078,6 +2078,8 @@ Le traitement produit ensuite deux jeux de données :
 * `hdfs://namenode:9000/data/clean/dataset_fraude_entrainement`
 * `hdfs://namenode:9000/data/clean/dataset_fraude_a_predire`
 
+
+Le dictionnaire de données du dataset est disponible dans  /Documentations/dictionnaire_dataset.md
 ---
 
 ###### Fonctionnement du traitement
