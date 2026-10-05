@@ -2487,6 +2487,15 @@ DecisionTreeClassificationModel: uid=DecisionTreeClassifier_482c0a03bd94, depth=
     Predict: 0.0
 Modèle sauvegardé : hdfs://namenode:9000/data/models/modele_fraude
 
+Le raisonnement :
+Question 1 : le client a-t-il 0 paiement échoué ?
+ ├─ OUI → pas suspect
+ └─ NON → Question 2 : a-t-il 1 ou 2 paiements échoués ?
+           ├─ OUI → Question 3 : a-t-il au moins 2 paiements au total ?
+           │         ├─ NON (0 ou 1) → pas suspect
+           │         └─ OUI → SUSPECT
+           └─ NON (3 échoués ou plus) → pas suspect
+
 # 3. Vérifier les fichiers produits dans HDFS
 docker exec namenode hdfs dfs -ls /data/clean/
 Found 4 items
