@@ -1,0 +1,173 @@
+package routines;
+
+import java.text.SimpleDateFormat;
+import java.util.Date;
+
+public class DataCleaning {
+
+	/**
+     * Nettoie une chaîne de caractères.
+     * Supprime les espaces inutiles.
+     * Transforme une valeur vide en null.
+     */
+    public static String nettoyerTexte(String valeur) {
+
+        if (valeur == null) {
+            return null;
+        }
+
+        valeur = valeur.trim();
+
+        if (valeur.isEmpty()) {
+            return null;
+        }
+
+        return valeur;
+    }
+
+
+    /**
+     * Nettoie une adresse email.
+     * Vérifie qu'elle contient bien un @ et un point.
+     */
+    public static String nettoyerEmail(String email) {
+
+        if (email == null) {
+            return null;
+        }
+
+        email = email.trim().toLowerCase();
+
+        // Email vide
+        if (email.isEmpty()) {
+            return null;
+        }
+
+        
+        // Correction d'un email mal écrit 
+        if (email.contains("_at_")) { 
+        	email = email.replace("_at_", "@"); 
+        }
+
+        // Vérification simple de l'email
+        if (!email.contains("@") || !email.contains(".")) {
+            return null;
+        }
+
+        return email;
+    }
+
+
+    /**
+     * Nettoie un numéro de téléphone.
+     * Supprime les espaces au début et à la fin.
+     * Une valeur vide devient null.
+     */
+    public static String nettoyerTelephone(String telephone) {
+
+        if (telephone == null) {
+            return null;
+        }
+
+        telephone = telephone.trim();
+
+        if (telephone.isEmpty()) {
+            return null;
+        }
+
+        return telephone;
+    }
+
+
+    /**
+     * Nettoie et uniformise une date, avec un format de sortie choisi.
+     *
+     * Formats d'entrée acceptés :
+     * - yyyy-MM-dd
+     * - dd/MM/yyyy
+     * - yyyy-MM-dd HH:mm:ss
+     *
+     * @param date la date brute à nettoyer
+     * @param formatSortie le format souhaité en sortie (ex: "yyyy-MM-dd" ou "yyyy-MM-dd HH:mm:ss")
+     */
+    public static String normaliserDate(String date, String formatSortie) {
+
+        if (date == null) {
+            return null;
+        }
+
+        date = date.trim();
+
+        if (date.isEmpty()) {
+            return null;
+        }
+
+        String[] formats = {
+            "yyyy-MM-dd HH:mm:ss",
+            "yyyy-MM-dd",
+            "dd/MM/yyyy"
+        };
+
+        for (String format : formats) {
+
+            try {
+
+                SimpleDateFormat formatEntree =
+                    new SimpleDateFormat(format);
+
+                formatEntree.setLenient(false);
+
+                Date dateConvertie =
+                    formatEntree.parse(date);
+
+                SimpleDateFormat formatSortieFinal =
+                    new SimpleDateFormat(formatSortie);
+
+                return formatSortieFinal.format(dateConvertie);
+
+            } catch (Exception e) {
+                // Format suivant testé automatiquement
+            }
+        }
+
+        return null;
+    }
+
+    /**
+     * Ancienne version, gardée pour compatibilité :
+     * produit toujours une date au format yyyy-MM-dd.
+     */
+    public static String normaliserDate(String date) {
+        return normaliserDate(date, "yyyy-MM-dd");
+    }
+
+
+    /**
+     * Nettoie un montant.
+     * Une valeur vide ou incorrecte devient null.
+     */
+    public static Double nettoyerMontant(String montant) {
+
+        if (montant == null) {
+            return null;
+        }
+
+        montant = montant.trim();
+
+        if (montant.isEmpty()) {
+            return null;
+        }
+
+        try {
+
+            return Double.parseDouble(montant);
+
+        } catch (NumberFormatException e) {
+
+            return null;
+        }
+    }
+
+    
+    
+}
