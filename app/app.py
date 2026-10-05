@@ -9,10 +9,10 @@ from fpdf import FPDF
 from pyspark.sql import SparkSession
 from pyspark.sql import functions as F
 
-# L'adresse du "rayon" de l'entrepôt où le streaming (US 4.2) a rangé les données.
-DOSSIER_HDFS = "hdfs://namenode:9000/data/kafka"
-
+# Config de la page : une seule fois, tout en haut
 st.set_page_config(page_title="Tableau de bord AbAssurance", layout="wide")
+
+DOSSIER_HDFS = "hdfs://namenode:9000/data/kafka"
 
 
 # ------------------------------------------------------------------
@@ -210,99 +210,103 @@ def generer_rapport_pdf(resultats):
 # ------------------------------------------------------------------
 # L'affichage
 # ------------------------------------------------------------------
-st.title("Tableau de bord AbAssurance / AssurePlus")
-st.caption("Données lues dans Hadoop et calculées avec Spark.")
+def tableau_de_bord():
+    # Cette fonction est la "salle" du tableau de bord : elle ne s'exécute
+    # que si l'utilisateur clique sur cette page dans le menu.
+    st.title("Tableau de bord AbAssurance / AssurePlus")
+    st.caption("Données lues dans Hadoop et calculées avec Spark.")
 
-# Un bouton dans le menu de gauche pour vider la mémoire et tout recalculer
-if st.sidebar.button("Recalculer depuis Hadoop"):
-    st.cache_data.clear()
+    # Un bouton dans le menu de gauche pour vider la mémoire et tout recalculer
+    if st.sidebar.button("Recalculer depuis Hadoop"):
+        st.cache_data.clear()
 
-try:
-    resultats = calculer()
-except Exception as erreur:
-    st.error(
-        "Impossible de lire les données dans Hadoop. Vérifie que le namenode et les "
-        "datanodes sont 'healthy' et que le streaming a bien écrit des fichiers "
-        "Parquet dans /data/kafka/."
-    )
-    st.exception(erreur)
-    st.stop()
+    try:
+        resultats = calculer()
+    except Exception as erreur:
+        st.error(
+            "Impossible de lire les données dans Hadoop. Vérifie que le namenode et les "
+            "datanodes sont 'healthy' et que le streaming a bien écrit des fichiers "
+            "Parquet dans /data/kafka/."
+        )
+        st.exception(erreur)
+        st.stop()
 
-# --- Les chiffres clés, dans 4 colonnes côte à côte
-st.subheader("Chiffres clés")
-col1, col2, col3, col4 = st.columns(4)
-col1.metric("Clients", resultats["nb_clients"])
-col2.metric("Contrats", resultats["nb_contrats"])
-col3.metric("Paiements", resultats["nb_paiements"])
-col4.metric("Sinistres", resultats["nb_sinistres"])
+    # --- Les chiffres clés, dans 4 colonnes côte à côte
+    st.subheader("Chiffres clés")
+    col1, col2, col3, col4 = st.columns(4)
+    col1.metric("Clients", resultats["nb_clients"])
+    col2.metric("Contrats", resultats["nb_contrats"])
+    col3.metric("Paiements", resultats["nb_paiements"])
+    col4.metric("Sinistres", resultats["nb_sinistres"])
 
-# Le temps de traitement (critère 2 de l'US 5.1)
-st.info("Temps de traitement Spark : " + str(round(resultats["duree"], 1)) + " secondes")
+    st.info("Temps de traitement Spark : " + str(round(resultats["duree"], 1)) + " secondes")
 
-# --- Les contrats, avec le menu déroulant des statuts
-st.subheader("Contrats")
-statuts = list(resultats["contrats_par_statut"].keys())   # la liste des statuts trouvés
+    # --- Les contrats, avec le menu déroulant des statuts
+    st.subheader("Contrats")
+    statuts = list(resultats["contrats_par_statut"].keys())
 
-if len(statuts) > 0:
-    choix = st.selectbox("Quel statut veux-tu regarder ?", statuts)
+    if len(statuts) > 0:
+        choix = st.selectbox("Quel statut veux-tu regarder ?", statuts)
+        st.metric("Nombre de contrats « " + choix + " »", resultats["contrats_par_statut"][choix])
 
-    # On affiche d'abord le nombre total de contrats pour ce statut
-    st.metric("Nombre de contrats « " + choix + " »", resultats["contrats_par_statut"][choix])
-
-    # Puis on ouvre le "tiroir" de ce statut : le détail par type d'assurance.
-    # C'est CE dictionnaire qui change selon le choix fait dans le menu déroulant,
-    # donc le graphique en dessous change lui aussi.
-    detail_du_statut = resultats["par_statut_et_type"].get(choix, {})
-
-    if len(detail_du_statut) > 0:
-        st.caption("Répartition des contrats « " + choix + " » par type d'assurance :")
-        # pd.Series transforme le dictionnaire {"auto": 300, "habitation": 200}
-        # en une petite colonne que st.bar_chart sait dessiner.
-        st.bar_chart(pd.Series(detail_du_statut))
+        detail_du_statut = resultats["par_statut_et_type"].get(choix, {})
+        if len(detail_du_statut) > 0:
+            st.caption("Répartition des contrats « " + choix + " » par type d'assurance :")
+            st.bar_chart(pd.Series(detail_du_statut))
+        else:
+            st.warning("Aucun type d'assurance trouvé pour ce statut.")
     else:
-        st.warning("Aucun type d'assurance trouvé pour ce statut.")
-else:
-    st.warning("Aucun contrat trouvé dans Hadoop.")
+        st.warning("Aucun contrat trouvé dans Hadoop.")
 
-# --- Les sinistres
-st.subheader("Sinistres")
-st.metric("Montant total estimé des sinistres", round(resultats["total_sinistres"], 2))
+    # --- Les sinistres
+    st.subheader("Sinistres")
+    st.metric("Montant total estimé des sinistres", round(resultats["total_sinistres"], 2))
 
-# --- Export des données (CSV)
-st.subheader("Exporter les données")
-st.caption("Un fichier CSV par table, prêt à ouvrir dans Excel.")
+    # --- Export des données (CSV)
+    st.subheader("Exporter les données")
+    st.caption("Un fichier CSV par table, prêt à ouvrir dans Excel.")
 
-col_export_1, col_export_2, col_export_3, col_export_4 = st.columns(4)
-colonnes_export = [
-    (col_export_1, "clients"),
-    (col_export_2, "contrats"),
-    (col_export_3, "paiements"),
-    (col_export_4, "sinistres"),
-]
-for colonne, nom_table in colonnes_export:
-    tableau = resultats["tables"][nom_table]
-    colonne.download_button(
-        label="Télécharger " + nom_table + ".csv",
-        data=vers_csv(tableau),
-        file_name=nom_table + ".csv",
-        mime="text/csv",
+    col_export_1, col_export_2, col_export_3, col_export_4 = st.columns(4)
+    colonnes_export = [
+        (col_export_1, "clients"),
+        (col_export_2, "contrats"),
+        (col_export_3, "paiements"),
+        (col_export_4, "sinistres"),
+    ]
+    for colonne, nom_table in colonnes_export:
+        tableau = resultats["tables"][nom_table]
+        colonne.download_button(
+            label="Télécharger " + nom_table + ".csv",
+            data=vers_csv(tableau),
+            file_name=nom_table + ".csv",
+            mime="text/csv",
+        )
+
+    # --- Export du rapport (PDF)
+    st.subheader("Exporter le rapport")
+    pdf_bytes = generer_rapport_pdf(resultats)
+    st.download_button(
+        label="Télécharger le rapport PDF",
+        data=pdf_bytes,
+        file_name="rapport_abassurance.pdf",
+        mime="application/pdf",
     )
 
-# --- Export du rapport (PDF)
-st.subheader("Exporter le rapport")
-pdf_bytes = generer_rapport_pdf(resultats)
-st.download_button(
-    label="Télécharger le rapport PDF",
-    data=pdf_bytes,
-    file_name="rapport_abassurance.pdf",
-    mime="application/pdf",
-)
+    # --- Les échantillons à vérifier
+    st.subheader("Échantillons à vérifier à la main")
+    st.caption("Compare ces lignes avec tes fichiers d'extraction pour confirmer qu'elles sont correctes.")
+    for nom, tableau in resultats["echantillons"].items():
+        with st.expander("10 premières lignes : " + nom):
+            st.dataframe(tableau)
 
-# --- Les échantillons à vérifier (critère 3 de l'US 5.1)
-st.subheader("Échantillons à vérifier à la main")
-st.caption("Compare ces lignes avec tes fichiers d'extraction pour confirmer qu'elles sont correctes.")
 
-# .items() donne à chaque tour de boucle le nom (clients, contrats...) et son tableau
-for nom, tableau in resultats["echantillons"].items():
-    with st.expander("10 premières lignes : " + nom):
-        st.dataframe(tableau)
+# ------------------------------------------------------------------
+# Le panneau d'affichage (le menu de la sidebar)
+# ------------------------------------------------------------------
+pg = st.navigation([
+    st.Page(tableau_de_bord, title="Tableau de bord", icon="📊", default=True),
+    st.Page("pages/Detection_de_fraude.py", title="Détection de fraude", icon="🕵️"),
+])
+
+# L'aiguilleur de train : il envoie vers la page choisie
+pg.run()

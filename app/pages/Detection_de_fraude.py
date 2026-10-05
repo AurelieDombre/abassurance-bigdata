@@ -16,9 +16,9 @@ CHEMIN_MODELE = HDFS + "/data/models/modele_fraude"
 # Format : nom de colonne -> (libellé affiché, valeur par défaut du simulateur)
 # ATTENTION : l'ordre doit être le même que dans entrainer_modele_fraude.py.
 CHAMPS = {
-    "montant_estime": ("Mtt estimé du sinistre (€)", 1000.0),
+    "montant_estime": ("Montant estimé du sinistre (€)", 1000.0),
     "prime_annuelle": ("Prime annuelle (€)", 500.0),
-    "jours_avant_sinistre": ("Ecart début contrat et sinistre", 30.0),
+    "jours_avant_sinistre": ("Ecart entre début contrat et sinistre", 30.0),
     "nb_paiements": ("Nbr de paiements du contrat", 10.0),
     "nb_paiements_echoues": ("Dont paiements échoués", 0.0),
 }
