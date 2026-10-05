@@ -2596,3 +2596,16 @@ Pour ces raisons, les résultats affichés doivent être lus comme des **alertes
 * comparer l'arbre à d'autres modèles (forêt aléatoire, régression logistique) lorsque le volume de données le permettra ;
 * ajuster le seuil de 70 après analyse de la distribution des `fraud_score` ;
 * comparer les distributions des variables entre AssurePlus et AbAssurance pour mesurer l'écart entre les deux sources.
+
+##### US 6.1 : Ne jamais couper les applications existantes
+
+Limite assumée : « Le projet étant une simulation sans système en production, ces mesures sont décrites mais n'ont pas pu être testées en conditions réelles. »
+
+Imaginons :
+
+Les anciennes bases (Oracle, SQL Server) ne sont jamais modifiées ni arrêtées. Le pipeline ne fait que les lire. L'ancien et le nouveau système tournent en parallèle pendant la transition.
+
+* Plan de secours : comme l'ancien système reste intact, le retour en arrière consiste à continuer de l'utiliser et à couper le pipeline.
+On peut aussi relancer l'extraction depuis la source, car les checkpoints Spark et les topics Kafka permettent de rejouer les données.
+
+* Tests après chaque étape : après chaque étape (extraction, Kafka, Hadoop), on vérifie que les applications existantes répondent encore, avec des contrôles de comptage.
