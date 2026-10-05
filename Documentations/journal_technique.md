@@ -2324,4 +2324,275 @@ Il sert uniquement à créer la variable cible `est_suspect`.
 
 Le modèle devra apprendre à identifier les sinistres suspects à partir des autres informations disponibles, puis utiliser ces informations pour effectuer ses propres prédictions.
 
+##### US 5.3 : Entraîner un modèle de détection de fraude et l'afficher dans le dashboard
 
+###### Objectif
+
+L'objectif de cette User Story est de construire le modèle d'intelligence artificielle de détection de fraude, à partir des données préparées dans l'US 5.2.
+
+Le modèle apprend sur les sinistres dont le niveau de fraude est connu (AssurePlus), puis estime une **probabilité de fraude** pour les sinistres qui n'ont pas de score (AbAssurance). Les résultats sont enregistrés dans HDFS et affichés dans une page dédiée du dashboard Streamlit.
+
+---
+
+###### Fichiers utilisés
+
+* `src/prediction/entrainer_modele_fraude.py` : script qui entraîne, évalue et sauvegarde le modèle, puis calcule les prédictions.
+* `detection_fraude.py` : page du dashboard Streamlit qui affiche les résultats et propose un simulateur.
+
+Les données en entrée sont celles produites par l'US 5.2 :
+
+* `hdfs://namenode:9000/data/clean/dataset_fraude_entrainement` (37 sinistres avec la cible `est_suspect`)
+* `hdfs://namenode:9000/data/clean/dataset_fraude_a_predire` (61 sinistres sans score)
+
+Le traitement produit trois éléments dans HDFS :
+
+* `hdfs://namenode:9000/data/models/modele_fraude` : le modèle entraîné, sauvegardé pour être rechargé sans le réentraîner ;
+* `hdfs://namenode:9000/data/clean/predictions_fraude` : la probabilité de fraude de chaque sinistre à prédire ;
+* `hdfs://namenode:9000/data/clean/metriques_fraude` : les indicateurs de qualité du modèle (une seule ligne).
+
+---
+
+###### Choix du modèle : un arbre de décision
+
+Le modèle utilisé est un **arbre de décision** (`DecisionTreeClassifier` de Spark ML).
+
+Un arbre de décision fonctionne comme un questionnaire : « le montant dépasse-t-il tel seuil ? », puis « le sinistre est-il déclaré moins de X jours après la souscription ? », etc. Chaque réponse oriente vers une branche, et chaque extrémité (« feuille ») donne un verdict.
+
+Ce choix a été fait pour trois raisons :
+
+* **il est explicable** : on peut afficher les règles apprises et les expliquer à un conducteur de travaux ou à un jury, ce qui est impossible avec un réseau de neurones ;
+* **il est adapté aux petits jeux de données** : avec 37 lignes, un modèle plus complexe apprendrait « par cœur » les exemples au lieu de généraliser ;
+* **il est natif de Spark ML** : il s'intègre à la stack Big Data du projet sans dépendance supplémentaire.
+
+---
+
+###### Fonctionnement du traitement
+
+###### Choix des caractéristiques (features)
+
+Le modèle utilise cinq caractéristiques numériques :
+
+| Caractéristique | Signification |
+| --- | --- |
+| `montant_estime` | montant estimé du sinistre (€) |
+| `prime_annuelle` | prime annuelle du contrat (€) |
+| `jours_avant_sinistre` | jours entre le début du contrat et le sinistre |
+| `nb_paiements` | nombre de paiements du contrat |
+| `nb_paiements_echoues` | dont paiements échoués |
+
+Le `fraud_score` n'est **jamais** utilisé comme entrée : il sert uniquement à fabriquer la cible `est_suspect` (voir US 5.2). L'utiliser reviendrait à donner la réponse au modèle avant l'examen.
+
+Seules des colonnes **numériques**, présentes dans les deux sources (AbAssurance et AssurePlus), ont été retenues. Les colonnes textuelles comme `type_assurance` et `statut_sinistre` ne sont donc pas utilisées.
+
+Avant l'entraînement, une étape de préparation (`preparer`) force ces cinq colonnes au type nombre décimal (`double`) et remplace les valeurs vides par `0`, car Spark ML n'accepte pas de valeurs manquantes dans le vecteur d'entrée.
+
+###### Construction du pipeline
+
+Le traitement est un `Pipeline` Spark ML en deux étapes :
+
+1. **`VectorAssembler`** : rassemble les cinq colonnes en une seule colonne `features`, car Spark ML attend un vecteur en entrée. L'ordre des colonnes est important : c'est pourquoi la même liste est utilisée dans le script d'entraînement et dans la page du dashboard.
+2. **`DecisionTreeClassifier`** : l'arbre lui-même, avec deux réglages importants :
+   * `maxDepth=3` : l'arbre ne peut poser que 3 questions successives. Une profondeur limitée évite le surapprentissage, c'est-à-dire un arbre qui retient les 37 exemples par cœur au lieu de comprendre ce qui distingue une fraude.
+   * `weightCol="poids"` : chaque sinistre a un poids. Comme il y a seulement 7 suspects contre 30 non suspects, les cas suspects reçoivent un poids plus fort. Sans cela, le modèle pourrait répondre « non suspect » à chaque fois et avoir raison dans 81 % des cas, tout en étant inutile.
+
+Le poids d'un sinistre suspect est égal au nombre de non-suspects divisé par le nombre de suspects (30 / 7 ≈ 4,3), et celui d'un non-suspect vaut 1. Un suspect « compte » donc environ quatre fois plus qu'un non-suspect, ce qui rééquilibre les deux groupes.
+
+Un garde-fou arrête le script si le jeu d'entraînement ne contient pas à la fois des suspects et des non-suspects, car l'arbre ne pourrait rien apprendre.
+
+###### Évaluation du modèle
+
+Avec seulement 37 lignes, il n'est pas possible de mettre de côté un jeu de test classique sans que celui-ci devienne trop petit pour être significatif.
+
+L'évaluation utilise donc une **validation croisée à 5 plis** (fonction `evaluer`).
+
+Concrètement :
+
+1. les 37 sinistres sont répartis en 5 paquets (les « plis ») d'environ 7 ou 8 lignes ;
+   On coupe les 37 lignes en 5 paquets (les 5 plis), d'environ 7 ou 8 lignes chacun.
+    Tour 1 : on entraîne sur les plis 2, 3, 4 et 5, et on teste sur le pli 1.
+    Tour 2 : on entraîne sur les plis 1, 3, 4 et 5, et on teste sur le pli 2.
+2. pour chaque pli, le modèle est entraîné sur les 4 autres plis, puis testé sur le pli mis de côté ;
+3. à la fin, chaque sinistre a été prédit par un modèle qui ne l'avait jamais vu, et toutes ces prédictions sont rassemblées pour calculer :
+
+* la **précision (suspects)** : parmi les sinistres que le modèle signale comme suspects, quelle part l'est réellement ? C'est la mesure des « fausses alertes » ;
+* le **rappel (suspects)** : parmi les vrais sinistres suspects, quelle part le modèle a-t-il trouvée ? C'est la mesure des fraudes « qui passent entre les mailles ».
+
+Les suspects étant très rares (7 sur 37), un tirage au hasard pourrait mettre tous les suspects dans le même pli, et certains plis de test n'en contiendraient aucun. Les suspects et les non-suspects sont donc numérotés **séparément**, puis répartis à égalité entre les 5 plis (numéro de la ligne modulo 5). Chaque pli contient ainsi 1 ou 2 suspects. Le tirage utilise une graine fixe (`rand(42)`), ce qui rend l'évaluation reproductible, et `cache()` fige la numérotation pour qu'elle ne change pas entre deux utilisations.
+
+Ces deux indicateurs sont enregistrés dans `metriques_fraude`, avec le nombre de lignes et le nombre de suspects.
+
+###### Entraînement final et prédictions
+
+Une fois l'évaluation faite, le modèle est entraîné une dernière fois sur les 37 sinistres, puis :
+
+* il est sauvegardé dans `/data/models/modele_fraude` ;
+* il est appliqué aux 61 sinistres d'AbAssurance ;
+* la probabilité de la classe « suspect » est extraite dans une colonne `proba_fraude`, et le verdict de l'arbre (0 ou 1) dans une colonne `suspect` ;
+* le résultat est enregistré dans `predictions_fraude` avec `sinistre_id`, `contrat_id` et les cinq caractéristiques, ce qui permet de retrouver chaque sinistre.
+
+---
+
+###### Page du dashboard « Détection de fraude »
+
+La page lit les résultats dans HDFS et se compose de quatre parties :
+
+1. **Qualité du modèle** : nombre de sinistres d'entraînement, nombre de suspects, précision et rappel, accompagnés d'un avertissement rappelant que les chiffres sont indicatifs.
+2. **Sinistres à surveiller** : un curseur règle le seuil de probabilité ; le tableau affiche les sinistres au-dessus du seuil, triés du plus suspect au moins suspect, avec un export CSV (séparateur `;`, ouvrable directement dans Excel).
+3. **Ce que le modèle a appris** : un graphique de l'importance de chaque caractéristique et les règles de l'arbre en texte.
+4. **Simulateur** : l'utilisateur saisit les cinq caractéristiques d'un sinistre fictif et obtient sa probabilité de fraude, calculée par le modèle sauvegardé.
+
+Deux choix techniques permettent à la page de rester fluide :
+
+* `@st.cache_resource` garde la session Spark et le modèle en mémoire, au lieu de les recréer à chaque clic ;
+* `@st.cache_data` mémorise la lecture des résultats dans HDFS. Un bouton « Recharger depuis Hadoop » dans la barre latérale vide ces mémoires lorsque le modèle a été réentraîné.
+
+Si les fichiers sont absents de HDFS, la page affiche un message d'erreur explicite et indique les scripts à lancer.
+
+La conversion des résultats Spark vers un tableau pandas est faite avec `.collect()` plutôt que `.toPandas()`, pour éviter les problèmes de compatibilité entre PySpark et pandas 3 (voir l'avertissement affiché au lancement de Spark).
+
+---
+
+##### Exécution du traitement
+
+Comme pour l'US 5.2, il s'agit d'un traitement ponctuel : il est lancé, produit les résultats, puis s'arrête.
+
+```powershell
+# 1. Copier le script dans docker
+docker cp src/prediction/entrainer_modele_fraude.py pyspark-app:/app/src/prediction/entrainer_modele_fraude.py
+Successfully copied 9.22kB to pyspark-app:/app/src/prediction/entrainer_modele_fraude.py
+
+# 2. Exécuter l'entraînement
+docker exec -it pyspark-app python /app/src/prediction/entrainer_modele_fraude.py
+
+Entraînement :  37 lignes dont 7 suspects
+26/10/02 15:25:26 WARN SparkStringUtils: Truncated the string representation of a plan since it was too large. This behavior can be adjusted by setting 
+26/10/02 15:25:30 WARN DecisionTreeMetadata: DecisionTree reducing maxBins from 32 to 30 (= number of training instances)
+26/10/02 15:25:36 WARN DecisionTreeMetadata: DecisionTree reducing maxBins from 32 to 29 (= number of training instances)
+26/10/02 15:25:41 WARN DecisionTreeMetadata: DecisionTree reducing maxBins from 32 to 29 (= number of training instances)
+26/10/02 15:25:46 WARN DecisionTreeMetadata: DecisionTree reducing maxBins from 32 to 30 (= number of training instances)
+26/10/02 15:25:51 WARN DecisionTreeMetadata: DecisionTree reducing maxBins from 32 to 30 (= number of training instances)
+Précision (suspects) : 0.12                                                     
+Rappel (suspects)    : 0.29
+Règles apprises (feature 0 = montant_estime, 1 = prime_annuelle, etc.) :        
+DecisionTreeClassificationModel: uid=DecisionTreeClassifier_482c0a03bd94, depth=3, numNodes=7, numClasses=2, numFeatures=5
+  If (feature 4 <= 0.5)
+   Predict: 0.0
+  Else (feature 4 > 0.5)
+   If (feature 4 <= 2.5)
+    If (feature 3 <= 1.5)
+     Predict: 0.0
+    Else (feature 3 > 1.5)
+     Predict: 1.0
+   Else (feature 4 > 2.5)
+    Predict: 0.0
+Modèle sauvegardé : hdfs://namenode:9000/data/models/modele_fraude
+
+Le raisonnement :
+Question 1 : le client a-t-il 0 paiement échoué ?
+ ├─ OUI → pas suspect
+ └─ NON → Question 2 : a-t-il 1 ou 2 paiements échoués ?
+           ├─ OUI → Question 3 : a-t-il au moins 2 paiements au total ?
+           │         ├─ NON (0 ou 1) → pas suspect
+           │         └─ OUI → SUSPECT
+           └─ NON (3 échoués ou plus) → pas suspect
+
+# 3. Vérifier les fichiers produits dans HDFS
+docker exec namenode hdfs dfs -ls /data/clean/
+Found 4 items
+drwxr-xr-x   - root supergroup          0 2026-10-02 15:21 /data/clean/dataset_fraude_a_predire
+drwxr-xr-x   - root supergroup          0 2026-10-02 15:21 /data/clean/dataset_fraude_entrainement
+drwxr-xr-x   - root supergroup          0 2026-10-02 15:25 /data/clean/metriques_fraude
+drwxr-xr-x   - root supergroup          0 2026-10-02 15:25 /data/clean/predictions_fraude
+
+docker exec namenode hdfs dfs -ls /data/models/
+Found 1 items
+drwxr-xr-x   - root supergroup          0 2026-10-02 15:25 /data/models/modele_fraude
+```
+
+Après l'exécution, `predictions_fraude` et `metriques_fraude` doivent apparaître dans `/data/clean/`, et `modele_fraude` dans `/data/models/`. Il suffit ensuite de cliquer sur « Recharger depuis Hadoop » dans le dashboard.
+
+---
+
+##### Résultats obtenus
+
+| Élément | Résultat |
+| --- | -------: |
+| Sinistres d'entraînement | 37 |
+| dont suspects | 7 |
+| Précision (suspects) | 12% |
+| Rappel (suspects) | 29% |
+| Sinistres prédits (AbAssurance) | 61 |
+| Sinistres au-dessus du seuil de 0,5 | 0|
+
+![stat_sinistre_prediction.png](images_readme/stat_sinistre_prediction.png)
+
+![simulateur_sinistre_prediction.png](images_readme/simulateur_sinistre_prediction.png)
+
+---
+
+##### Problèmes rencontrés et solutions apportées
+
+###### Erreur de nom de paramètre dans le classifieur
+
+Lors du premier lancement, le script d'entraînement s'est arrêté avec l'erreur suivante :
+
+```text
+TypeError: DecisionTreeClassifier.__init__() got an unexpected keyword argument 'featureCol'
+```
+
+Le paramètre de Spark ML s'appelle `featuresCol` (avec un **s**), alors que `labelCol` et `weightCol` s'écrivent au singulier. Une lettre en trop ou en moins suffit à faire échouer l'appel.
+
+```python
+# Avant (erreur)
+DecisionTreeClassifier(featureCol="features", ...)
+
+# Après
+DecisionTreeClassifier(featuresCol="features", ...)
+```
+
+###### Page du dashboard en erreur « PATH_NOT_FOUND »
+
+Pendant que le script d'entraînement était en échec, la page du dashboard affichait :
+
+```text
+AnalysisException: [PATH_NOT_FOUND] Path does not exist: hdfs://namenode:9000/data/clean/predictions_fraude
+```
+
+Ce n'était pas un bug de la page : elle cherchait des résultats que le script n'avait jamais pu écrire. Un `hdfs dfs -ls /data/clean/` a permis de le confirmer, puisque seuls les deux datasets de l'US 5.2 étaient présents. Après correction du script et relance de l'entraînement, la page fonctionne.
+
+---
+
+##### Limites du modèle
+
+Cette US met en place la chaîne complète (données, modèle, dashboard), mais les résultats ne doivent pas être pris pour des certitudes.
+
+###### Un jeu d'entraînement très petit
+
+Le modèle apprend sur **37 sinistres, dont 7 suspects**. Avec si peu de cas positifs, un seul suspect mal classé fait varier le rappel d'environ 14 points (1 sur 7), et chaque pli de test ne contient que 1 ou 2 suspects. Les indicateurs affichés sont donc très instables et ne servent qu'à donner un ordre de grandeur.
+
+###### Un modèle entraîné sur une source et appliqué à une autre
+
+Le modèle apprend sur AssurePlus mais prédit sur AbAssurance. Si les deux assureurs ont des habitudes différentes (montants moyens, délais de déclaration, primes), les règles apprises peuvent ne pas se transposer correctement. C'est la limite la plus importante du projet.
+
+###### Aucune vérité pour valider les prédictions
+
+Les 61 sinistres d'AbAssurance n'ont pas de `fraud_score`. Il est donc impossible de savoir si les prédictions sont justes : les métriques affichées mesurent uniquement la qualité sur AssurePlus.
+
+###### Un seuil de suspicion arbitraire
+
+La cible `est_suspect` repose sur le seuil `fraud_score >= 70`, défini sans analyse de la distribution des scores (limite déjà identifiée dans l'US 5.2). Changer ce seuil changerait les données d'entraînement et donc le modèle.
+
+###### Des probabilités peu nuancées
+
+Avec un arbre de profondeur 3, le modèle ne peut produire qu'un petit nombre de valeurs de probabilité différentes (une par feuille). Le curseur de seuil du dashboard produit donc des paliers, plutôt qu'un classement fin des sinistres.
+
+Pour ces raisons, les résultats affichés doivent être lus comme des **alertes à faire vérifier par un humain**, et non comme des décisions automatiques.
+
+---
+
+##### Pistes d'amélioration
+
+* collecter davantage de sinistres étiquetés, ou obtenir des scores de fraude côté AbAssurance ;
+* comparer l'arbre à d'autres modèles (forêt aléatoire, régression logistique) lorsque le volume de données le permettra ;
+* ajuster le seuil de 70 après analyse de la distribution des `fraud_score` ;
+* comparer les distributions des variables entre AssurePlus et AbAssurance pour mesurer l'écart entre les deux sources.
