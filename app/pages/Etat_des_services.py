@@ -1,0 +1,201 @@
+# Etat_des_services.py — US 6.2 : surveiller chaque étape du pipeline.
+# Etat de toute la chaîne : Kafka → Hadoop → Spark
+
+import json
+import os
+import socket
+import urllib.request
+from datetime import datetime
+
+import streamlit as st
+from pyspark.sql import SparkSession
+
+# mails 
+import smtplib
+from email.message import EmailMessage
+
+
+# Le carnet de bord : un simple fichier texte
+FICHIER_LOG = "logs/etat_services.log"
+
+
+# ------------------------------------------------------------------
+# L'outil de base : "frapper à la porte" d'un service
+# ------------------------------------------------------------------
+def tester_porte(nom_machine, port):
+    """Frappe à la porte d'un service. Si quelqu'un ouvre : True, sinon : False."""
+    try:
+        porte = socket.create_connection((nom_machine, port), timeout=3)
+        porte.close()
+        return True
+    except Exception:
+        return False
+
+
+# ------------------------------------------------------------------
+# Une fonction par étape. Chacune répond par :
+#   (True ou False, un petit message)
+# ------------------------------------------------------------------
+def verifier_kafka():
+    # 19092 = la porte INTERNE de Kafka dans le réseau Docker
+    if tester_porte("kafka", 19092):
+        return True, "Kafka répond"
+    return False, "Kafka ne répond pas"
+
+
+def verifier_hadoop():
+    # On demande si le namenode est en service.
+    adresse = "http://namenode:9870/jmx?qry=Hadoop:service=NameNode,name=FSNamesystemState"
+    try:
+        reponse = urllib.request.urlopen(adresse, timeout=3)
+        infos = json.loads(reponse.read())["beans"][0]   # la réponse
+        vivants = infos["NumLiveDataNodes"]               # nombre de datanodes vivants
+        silencieux = infos.get("NumStaleDataNodes", 0) # "silencieux" = pas de signal depuis 30 secondes : peut-être en panne.
+    except Exception as erreur:
+        # S'il ne répond pas, tout Hadoop est inutilisable
+        return False, "namenode injoignable : " + str(erreur)
+    # Les datanodes en bonne santé = vivants moins ceux qui sont silencieux
+    en_bonne_sante = vivants - silencieux
+    
+    # On a 2 datanodes et chaque donnée est copiée sur les 2 (réplication = 2)
+    if en_bonne_sante  == 2:
+        return True, "2 datanodes sur 2 vivants : données copiées en double"
+    if en_bonne_sante  == 1:
+        # Un seul est tombé : l'autre a encore une copie de tout, donc rien n'est perdu.
+        return False, "1 datanode sur 2 : données lisibles grâce à l'autre, mais plus de copie de secours"
+    return False, "aucun datanode vivant : les données sont inaccessibles"
+
+
+
+def verifier_streaming():
+    # On regarde si chaque table contient des fichiers
+    tables = ["clients", "contrats", "paiements", "sinistres"]
+    vides = []
+    for table in tables:
+        adresse = "http://namenode:9870/webhdfs/v1/data/kafka/" + table + "?op=LISTSTATUS"
+        try:
+            reponse = urllib.request.urlopen(adresse, timeout=3)
+            donnees = json.loads(reponse.read())
+            fichiers = donnees["FileStatuses"]["FileStatus"]
+            if len(fichiers) == 0:
+                vides.append(table)
+        except Exception:
+            vides.append(table)   # impossible de lire la table = problème
+
+    if len(vides) == 0:
+        return True, "les 4 tables contiennent des fichiers"
+    return False, "table vide ou introuvable : " + ", ".join(vides)
+
+
+def verifier_spark():
+    # On donne un tout petit calcul à Spark : s'il répond juste, il tourne.
+    try:
+        spark = SparkSession.builder.master("local[2]").appName("EtatServices").getOrCreate()
+        if spark.range(10).count() == 10:
+            return True, "Spark répond"
+        return False, "Spark donne un mauvais résultat"
+    except Exception as erreur:
+        return False, "Spark en panne : " + str(erreur)
+
+def envoyer_mail(noms_en_panne):
+    """Envoie un mail d'alerte, comme un facteur qui dépose une lettre."""
+    mail = EmailMessage()
+    mail["Subject"] = "ALERTE pipeline : " + ", ".join(noms_en_panne)
+    mail["From"] = "pipeline@abassurance.local"
+    mail["To"] = "responsable@abassurance.local"
+    mail.set_content("Problème détecté sur : " + ", ".join(noms_en_panne))
+
+    # On se connecte au "bureau de poste" (Mailpit) et on dépose la lettre
+    with smtplib.SMTP("mailpit", 1025, timeout=5) as serveur:
+        serveur.send_message(mail)
+        
+# ------------------------------------------------------------------
+# On lance toutes les vérifications
+# ------------------------------------------------------------------
+st.title("État des services du pipeline")
+st.caption("Kafka → Hadoop → Spark")
+
+st.button("Revérifier maintenant")   # cliquer relance la page, donc les vérifications
+
+# Une liste de (nom de l'étape, fonction qui la vérifie)
+etapes = [
+    ("Kafka", verifier_kafka),
+    ("Hadoop", verifier_hadoop),
+    ("Streaming", verifier_streaming),
+    ("Spark", verifier_spark),
+]
+
+resultats = []   # on y range (nom, ok, message) pour chaque étape
+for nom, fonction in etapes:
+    ok, message = fonction()
+    resultats.append((nom, ok, message))
+
+
+# ------------------------------------------------------------------
+# On écrit dans les logs
+# ------------------------------------------------------------------
+os.makedirs("logs", exist_ok=True)   # crée le dossier s'il n'existe pas
+date = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+
+# "a" = on AJOUTE à la fin, on n'efface jamais l'historique
+with open(FICHIER_LOG, "a", encoding="utf-8") as fichier:
+    for nom, ok, message in resultats:
+        if ok:
+            niveau = "OK"
+        else:
+            niveau = "ALERTE"
+        fichier.write(date + " | " + niveau + " | " + nom + " | " + message + "\n")
+
+
+# ------------------------------------------------------------------
+# L'alerte : une bannière rouge s'il y a au moins un problème
+# ------------------------------------------------------------------
+noms_en_panne = []
+for nom, ok, message in resultats:
+    if not ok:
+        noms_en_panne.append(nom)
+
+if len(noms_en_panne) > 0:
+    st.error("🚨 ALERTE : problème sur " + ", ".join(noms_en_panne))
+    # Ecrit dans les logs si c'est un nouveau message d'erreur.
+    if st.session_state.get("derniere_alerte") != noms_en_panne:
+        try:
+            envoyer_mail(noms_en_panne)
+            st.session_state["derniere_alerte"] = noms_en_panne
+            st.info("📧 Mail d'alerte envoyé")
+        except Exception as erreur:
+            st.warning("Mail non envoyé : " + str(erreur))
+else:
+    st.success("✅ Tout fonctionne")
+    st.session_state["derniere_alerte"] = []   # tout va bien : on remet le compteur à zéro
+
+
+# ------------------------------------------------------------------
+# Les voyants : 5 cartes côte à côte
+# ------------------------------------------------------------------
+colonnes = st.columns(5)
+
+# Talend en gris : il tourne sur le PC, on ne peut pas le voir depuis Docker
+colonnes[0].markdown("### ⚪ Talend")
+colonnes[0].caption("Non surveillable ici (il tourne hors Docker)")
+
+# zip() = on parcourt 2 listes en parallèle : les colonnes et les résultats
+for colonne, (nom, ok, message) in zip(colonnes[1:], resultats):
+    if ok:
+        voyant = "🟢"
+    else:
+        voyant = "🔴"
+    colonne.markdown("### " + voyant + " " + nom)
+    colonne.caption(message)
+
+
+# ------------------------------------------------------------------
+# L'historique
+# ------------------------------------------------------------------
+with st.expander("Historique des vérifications (logs)"):
+    with open(FICHIER_LOG, "r", encoding="utf-8") as fichier:
+        lignes = fichier.readlines()
+    # On montre les 40 dernières lignes, la plus récente en premier
+    dernieres = lignes[-40:]
+    dernieres.reverse()
+    st.code("".join(dernieres), language="text")

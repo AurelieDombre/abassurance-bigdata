@@ -306,6 +306,7 @@ def tableau_de_bord():
 pg = st.navigation([
     st.Page(tableau_de_bord, title="Tableau de bord", icon="📊", default=True),
     st.Page("pages/Detection_de_fraude.py", title="Détection de fraude", icon="🕵️"),
+    st.Page("pages/Etat_des_services.py", title="État des services", icon="🚦"),
 ])
 
 # L'aiguilleur de train : il envoie vers la page choisie
