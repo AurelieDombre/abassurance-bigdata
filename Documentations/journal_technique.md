@@ -2599,7 +2599,7 @@ Pour ces raisons, les résultats affichés doivent être lus comme des **alertes
 
 ##### US 6.1 : Ne jamais couper les applications existantes
 
-Limite assumée : « Le projet étant une simulation sans système en production, ces mesures sont décrites mais n'ont pas pu être testées en conditions réelles. »
+Limite assumée : Le projet étant une simulation sans système en production, ces mesures sont décrites mais n'ont pas pu être testées en conditions réelles.
 
 Imaginons :
 
