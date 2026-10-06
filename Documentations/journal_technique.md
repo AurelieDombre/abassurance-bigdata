@@ -2609,3 +2609,89 @@ Les anciennes bases (Oracle, SQL Server) ne sont jamais modifiées ni arrêtées
 On peut aussi relancer l'extraction depuis la source, car les checkpoints Spark et les topics Kafka permettent de rejouer les données.
 
 * Tests après chaque étape : après chaque étape (extraction, Kafka, Hadoop), on vérifie que les applications existantes répondent encore, avec des contrôles de comptage.
+
+# US 6.2 : Vérifier la disponibilité des services
+
+## 1. Objectif
+
+Permettre au Responsable Métier de surveiller **en un coup d'œil** chaque étape du parcours des données, afin de détecter rapidement un problème.
+
+Parcours des données : **Talaxie → Kafka → Hadoop → Spark**
+
+Une page « État des services » a été ajoutée au tableau de bord Streamlit (fichier `app/pages/Etat_des_services.py`).
+
+## 2. Ce qui est surveillé
+
+| Étape | Comment on la vérifie | Voyant vert si… |
+| --- | --- | --- |
+| Talaxie | Non surveillé | (gris) Talaxie tourne sur le PC, hors Docker : le tableau de bord ne peut pas le voir |
+| Kafka | Test de connexion sur `kafka:19092` (porte interne Docker) | Kafka répond |
+| Hadoop (HDFS) | Question posée au namenode : combien de datanodes sont en bonne santé ? | Les 2 datanodes sont vivants |
+| Streaming (Kafka → Hadoop) | Lecture du contenu des dossiers `/data/kafka/clients`, `contrats`, `paiements`, `sinistres` | Les 4 tables contiennent des fichiers |
+| Spark | Petit calcul de test (compter de 0 à 9) | Spark renvoie le bon résultat |
+
+## 3. Le cas particulier de Hadoop
+
+La réplication est réglée sur **2** (`dfs_replication=2`) et il y a **2 datanodes** : chaque donnée est stockée en double.
+
+| Datanodes en bonne santé | Voyant | Signification |
+| --- | --- | --- |
+| 2 sur 2 | Vert | Tout va bien, chaque donnée existe en double |
+| 1 sur 2 | Rouge (« dégradé ») | Les données restent lisibles grâce à l'autre datanode, mais il n'y a plus de copie de secours |
+| 0 | Rouge | Les données sont peut-être inaccessibles |
+
+**Détail important :** quand un datanode s'arrête, Hadoop attend environ 10 minutes avant de le déclarer « mort », pour éviter de réagir à une coupure brève. Pour être alerté plus tôt, la page surveille aussi l'état **« stale » (silencieux)**, atteint après environ 30 secondes sans signal.
+
+## 4. Les alertes
+
+- **Alerte visuelle** : une bannière rouge s'affiche en haut de la page avec le nom des étapes en panne.
+- **Alerte par mail** : un mail est envoyé à l'adresse du responsable. Pour la simulation, le serveur de mail est **Mailpit** (service Docker), qui reçoit les mails sans rien envoyer à l'extérieur. Les mails reçus se lisent sur `http://localhost:8025`.
+- **Pas de doublons** : un mail n'est envoyé que si le problème change (pas à chaque rafraîchissement de la page).
+
+## 5. L'historique (logs)
+
+Chaque vérification est écrite dans le fichier `logs/etat_services.log`, une ligne par étape :
+
+```
+2026-10-06 14:32:10 | OK     | Kafka  | Kafka répond
+2026-10-06 14:32:10 | ALERTE | Hadoop | 1 datanode sur 2 : données lisibles grâce à l'autre, mais plus de copie de secours
+```
+
+Le fichier n'est jamais effacé : on ajoute toujours à la suite. Les 40 dernières lignes sont consultables dans la page (zone « Historique des vérifications »). Le dossier `logs` est relié à l'ordinateur par un volume Docker pour que l'historique survive si le container est recréé.
+
+## 6. Comment tester
+
+1. Ouvrir la page « État des services » : tous les voyants doivent être verts.
+2. Arrêter un datanode : `docker stop datanode2`
+3. Attendre environ 40 secondes, puis cliquer sur « Revérifier maintenant ».
+4. Résultat attendu : voyant Hadoop rouge (« 1 datanode sur 2 »), bannière d'alerte, mail visible sur `http://localhost:8025`, ligne `ALERTE` dans les logs. Les chiffres du tableau de bord principal restent affichés, car l'autre datanode prend le relais.
+5. Relancer : `docker start datanode2`. Le voyant redevient vert à la vérification suivante.
+
+**Résultat constaté :** 
+
+![alerte_etat_pipeline.png](images_readme/alerte_etat_pipeline.png)
+
+![mail_mailpit_alerte.png](images_readme/mail_mailpit_alerte.png)
+
+## 7. Correspondance avec les critères de l'US
+
+| Critère | Réalisation |
+| --- | --- |
+| Un tableau de bord de suivi est mis en place et accessible | Page « État des services » avec un voyant par étape |
+| Une alerte automatique est envoyée en cas de problème | Bannière rouge + mail d'alerte (Mailpit) |
+| L'historique des traitements (logs) passés est consultable | Fichier `logs/etat_services.log` affiché dans la page |
+
+## 8. Limites connues
+
+- **Talaxie n'est pas surveillé** : il tourne hors Docker.
+- **La vérification n'a lieu que lorsque la page est ouverte.** Si personne ne la consulte, aucune alerte ne part. En production, la surveillance serait un programme séparé qui tourne en permanence.
+- **Le voyant « Streaming » vérifie que des fichiers existent**, pas que le streaming tourne à cet instant.
+- **Le serveur de mail est simulé** (Mailpit) : aucun mail réel n'est envoyé.
+
+## 9. Évolutions possibles en production
+
+- Surveillance continue, alertes via **Alertmanager** (mail, Slack, SMS).
+- Vrai serveur de mail d'entreprise.
+- Surveillance de Talaxie (état des jobs planifiés).
+- Logs centralisés (par exemple Elasticsearch).
+
