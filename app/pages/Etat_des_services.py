@@ -7,6 +7,9 @@ import socket
 import urllib.request
 from datetime import datetime
 
+import pandas as pd
+import time
+from outils_perf import noter_mesure
 import streamlit as st
 from pyspark.sql import SparkSession
 
@@ -127,7 +130,10 @@ etapes = [
 
 resultats = []   # on y range (nom, ok, message) pour chaque étape
 for nom, fonction in etapes:
+    debut = time.time()                  # top chrono
     ok, message = fonction()
+    duree = time.time() - debut          # temps écoulé = arrivée - départ
+    noter_mesure(nom, duree)             # on l'écrit dans le carnet de chronos
     resultats.append((nom, ok, message))
 
 
@@ -199,3 +205,51 @@ with st.expander("Historique des vérifications (logs)"):
     dernieres = lignes[-40:]
     dernieres.reverse()
     st.code("".join(dernieres), language="text")
+    
+    
+# ------------------------------------------------------------------
+# Les performances (US 6.3)
+# ------------------------------------------------------------------
+st.subheader("Performances du pipeline")
+
+# On ouvre le "carnet de chronos" rempli à chaque vérification
+mesures = pd.read_csv("logs/performances.csv")
+
+# --- Le résumé : pour chaque étape, le plus rapide, la moyenne, le plus lent
+resume = mesures.groupby("etape")["duree_s"].agg(["count", "min", "mean", "max"]).round(2)
+resume.columns = ["Nb de mesures", "Minimum (s)", "Moyenne (s)", "Maximum (s)"]
+st.dataframe(resume)
+
+# --- La détection de ralentissement
+# Règle : la DERNIÈRE mesure est-elle plus de 2 fois la moyenne des précédentes ?
+# C'est comme un coureur qui d'habitude fait 10 minutes et en met soudain 25.
+ralentissements = []
+for etape in mesures["etape"].unique():
+    durees = mesures[mesures["etape"] == etape]["duree_s"].tolist()
+
+    # Il faut au moins 4 mesures pour avoir une "habitude" à comparer
+    if len(durees) < 4:
+        continue
+
+    derniere = durees[-1]
+    precedentes = durees[:-1]
+    moyenne = sum(precedentes) / len(precedentes)
+
+    # On ignore les écarts sous 1 seconde : trop petits pour compter
+    if derniere > 2 * moyenne and derniere > 1:
+        ralentissements.append(
+            etape + " : " + str(round(derniere, 1)) + " s (d'habitude " + str(round(moyenne, 1)) + " s)"
+        )
+
+if len(ralentissements) > 0:
+    st.warning("🐢 Ralentissement détecté : " + " | ".join(ralentissements))
+else:
+    st.success("✅ Aucun ralentissement détecté.")
+
+# --- Un graphique par étape : la courbe des temps dans le temps
+with st.expander("Évolution des temps dans le temps"):
+    mesures["date"] = pd.to_datetime(mesures["date"])
+    for etape in mesures["etape"].unique():
+        st.caption(etape)
+        sous_tableau = mesures[mesures["etape"] == etape]
+        st.line_chart(sous_tableau.set_index("date")["duree_s"])
