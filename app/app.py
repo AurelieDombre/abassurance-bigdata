@@ -9,6 +9,8 @@ from fpdf import FPDF
 from pyspark.sql import SparkSession
 from pyspark.sql import functions as F
 
+from outils_perf import noter_mesure
+
 # Config de la page : une seule fois, tout en haut
 st.set_page_config(page_title="Tableau de bord AbAssurance", layout="wide")
 
@@ -139,6 +141,7 @@ def calculer():
     }
 
     duree = time.time() - debut   # on arrête le chrono
+    noter_mesure("Calcul Spark (dashboard)", duree)
 
     # On range tous les résultats dans un dictionnaire
     resultats = {
