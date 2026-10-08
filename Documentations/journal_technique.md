@@ -1863,6 +1863,9 @@ Première analyse après avoir développé le tableau de bord, l'état de servic
 
 ![sonarQ_analyse_avant_correction.png](images_readme/sonarQ_analyse_avant_correction.png)
 
+Pour relancer le scan `pysonar --sonar-host-url=http://localhost:9000 --sonar-token=token --sonar-project-key=key`
+
+
 ### Les indicateurs principaux
 
 | Indicateur | Ce que ça mesure |
