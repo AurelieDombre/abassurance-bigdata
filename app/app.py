@@ -40,10 +40,10 @@ def lire(spark, nom_table):
 
 
 def en_tableau(resultat_spark):
-    """Transforme un résultat Spark en tableau pandas, pour l'afficher ou l'exporter."""
+    """Transforme un résultat Spark en tableau pandas, pour l'afficher ou l'exporter. collect() = "toutes les lignes;  asDict() = la ligne sous forme de dictionnaire"""
     lignes = []
-    for ligne in resultat_spark.collect():   # collect() = "toutes les lignes"
-        lignes.append(ligne.asDict())        # asDict() = la ligne sous forme de dictionnaire
+    for ligne in resultat_spark.collect():   
+        lignes.append(ligne.asDict())        
     return pd.DataFrame(lignes, columns=resultat_spark.columns)
 
 
