@@ -1879,3 +1879,38 @@ Pour relancer le scan `pysonar --sonar-host-url=http://localhost:9000 --sonar-to
 | **Couverture (Coverage)** | Pourcentage de code exécuté par les tests |
 | **Notes A à E** | Une note pour la fiabilité (bugs), la sécurité (vulnérabilités) et la maintenabilité (Code Smells) |
 | **Quality Gate** | Réussi ou échoué, selon des seuils fixés par SonarQube |
+
+## US 7.3 : Ecreire les tests unitaire
+
+### 1. Objectif
+Tester les fonctions de calcul car les pages Streamlit ne se testent pas facilement : comme Etat_des_services.py affiche la page dès qu'on l'importe, un test qui l'importerait lancerait toute la page. Il vaut mieux tester les fonctions simples qui ne dépendent pas de Streamlit.
+
+### 2. Installation
+
+Installé dans le container pytest et pytest-cov `docker exec -it pyspark-app pip install pytest pytest-cov`
+
+Puis ajouter au requirements.txt
+
+```txt
+pytest==9.1.1
+pytest-cov==7.1.0
+coverage==7.16.2 
+iniconfig==2.3.1 
+pluggy==1.6.0 
+pygments==2.21.0
+```
+
+Les règles de base :
+
+Les tests sont dans un dossier tests/ à la racine du projet.
+Les fichiers s'appellent test_quelquechose.py.
+Les fonctions s'appellent test_quelquechose().
+
+### 3. Lancer les tests
+
+Pour lancer les tests `docker exec -it pyspark-app pytest`.
+
+Pour avoir la couverture et le fichier que SonarQube sait lire `docker exec -it pyspark-app pytest --cov=app --cov-report=term-missing --cov-report=xml`
+
+*term-missing* affiche les lignes non testées.
+*xml* crée *coverage.xml* pour SonarQube.

@@ -3,7 +3,6 @@
 
 import json
 import os
-import socket
 import urllib.request
 from datetime import datetime
 
@@ -16,23 +15,11 @@ from pyspark.sql import SparkSession
 # mails 
 import smtplib
 from email.message import EmailMessage
-
+from outils import (tester_porte, interpreter_datanodes, trouver_pannes,
+                    formater_ligne_log, construire_mail, detecter_ralentissement)
 
 # Le carnet de bord : un simple fichier texte
 FICHIER_LOG = "logs/etat_services.log"
-
-
-# ------------------------------------------------------------------
-# L'outil de base : "frapper à la porte" d'un service
-# ------------------------------------------------------------------
-def tester_porte(nom_machine, port):
-    """Frappe à la porte d'un service. Si quelqu'un ouvre : True, sinon : False."""
-    try:
-        porte = socket.create_connection((nom_machine, port), timeout=3)
-        porte.close()
-        return True
-    except Exception:
-        return False
 
 
 # ------------------------------------------------------------------
@@ -58,15 +45,8 @@ def verifier_hadoop():
         # S'il ne répond pas, tout Hadoop est inutilisable
         return False, "namenode injoignable : " + str(erreur)
     # Les datanodes en bonne santé = vivants moins ceux qui sont silencieux
-    en_bonne_sante = vivants - silencieux
-    
     # On a 2 datanodes et chaque donnée est copiée sur les 2 (réplication = 2)
-    if en_bonne_sante  == 2:
-        return True, "2 datanodes sur 2 vivants : données copiées en double"
-    if en_bonne_sante  == 1:
-        # Un seul est tombé : l'autre a encore une copie de tout, donc rien n'est perdu.
-        return False, "1 datanode sur 2 : données lisibles grâce à l'autre, mais plus de copie de secours"
-    return False, "aucun datanode vivant : les données sont inaccessibles"
+    return interpreter_datanodes(vivants, silencieux)
 
 
 
@@ -100,15 +80,8 @@ def verifier_spark():
     except Exception as erreur:
         return False, "Spark en panne : " + str(erreur)
 
-def envoyer_mail(noms_en_panne):
-    """Envoie un mail d'alerte, comme un facteur qui dépose une lettre."""
-    mail = EmailMessage()
-    mail["Subject"] = "ALERTE pipeline : " + ", ".join(noms_en_panne)
-    mail["From"] = "pipeline@abassurance.local"
-    mail["To"] = "responsable@abassurance.local"
-    mail.set_content("Problème détecté sur : " + ", ".join(noms_en_panne))
-
-    # On se connecte au "bureau de poste" (Mailpit) et on dépose la lettre
+def envoyer_mail(pannes):
+    mail = construire_mail(pannes)
     with smtplib.SMTP("mailpit", 1025, timeout=5) as serveur:
         serveur.send_message(mail)
         
@@ -146,20 +119,13 @@ date = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 # "a" = on AJOUTE à la fin, on n'efface jamais l'historique
 with open(FICHIER_LOG, "a", encoding="utf-8") as fichier:
     for nom, ok, message in resultats:
-        if ok:
-            niveau = "OK"
-        else:
-            niveau = "ALERTE"
-        fichier.write(date + " | " + niveau + " | " + nom + " | " + message + "\n")
+        fichier.write(formater_ligne_log(date, nom, ok, message) + "\n")
 
 
 # ------------------------------------------------------------------
 # L'alerte : une bannière rouge s'il y a au moins un problème
 # ------------------------------------------------------------------
-noms_en_panne = []
-for nom, ok, message in resultats:
-    if not ok:
-        noms_en_panne.append(nom)
+noms_en_panne = trouver_pannes(resultats)
 
 if len(noms_en_panne) > 0:
     st.error("🚨 ALERTE : problème sur " + ", ".join(noms_en_panne))
@@ -231,9 +197,11 @@ for etape in mesures["etape"].unique():
     if len(durees) < 4:
         continue
 
-    derniere = durees[-1]
-    precedentes = durees[:-1]
-    moyenne = sum(precedentes) / len(precedentes)
+    ralenti, derniere, moyenne = detecter_ralentissement(durees)
+    if ralenti:
+        ralentissements.append(
+            etape + " : " + str(round(derniere, 1)) + " s (d'habitude " + str(round(moyenne, 1)) + " s)"
+        )
 
     # On ignore les écarts sous 1 seconde : trop petits pour compter
     if derniere > 2 * moyenne and derniere > 1:
