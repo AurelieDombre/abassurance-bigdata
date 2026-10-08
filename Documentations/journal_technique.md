@@ -2695,3 +2695,26 @@ Le fichier n'est jamais effacé : on ajoute toujours à la suite. Les 40 derniè
 - Surveillance de Talaxie (état des jobs planifiés).
 - Logs centralisés (par exemple Elasticsearch).
 
+#### US 7.1 Configuration de SonarQube
+
+La configuration a été faite lors de la mise en route du projet. Cependant, je ne pouvais pas faire d'analyse sans avoir développer un partie ou la totatlité de la pipeline.
+
+Première analyse après avoir développé le tableau de bord, l'état de service et le modele de prédiction de détection de fraude.
+
+![sonarQ_analyse_avant_correction.png](images_readme/sonarQ_analyse_avant_correction.png)
+
+## Les indicateurs principaux
+
+| Indicateur | Ce que ça mesure | Image |
+| --- | --- | --- |
+| **Bugs** | Code qui risque de planter ou de donner un mauvais résultat |
+| **Vulnérabilités** | Failles de sécurité exploitables (mot de passe écrit dans le code, par exemple) |
+| **Security Hotspots** | Passages sensibles à relire à la main pour décider s'ils sont dangereux |
+| **Code Smells** | Code qui marche mais qui est mal écrit : fonctions trop longues, variables inutilisées, trop complexe |
+| **Dette technique** | Temps estimé pour corriger tous les Code Smells |
+| **Duplications** | Pourcentage de code copié-collé |
+| **Couverture (Coverage)** | Pourcentage de code exécuté par les tests |
+| **Notes A à E** | Une note pour la fiabilité (bugs), la sécurité (vulnérabilités) et la maintenabilité (Code Smells) |
+| **Quality Gate** | Réussi ou échoué, selon des seuils fixés par SonarQube |
+
+
