@@ -9,13 +9,13 @@ Récupération de données suite fusion ABAssurance et AssurePlus, création de 
 Le projet utilise une convention de nommage inspirée de Git Flow afin de faciliter l'organisation du développement et d'identifier rapidement l'objectif de chaque branche.
 
 | Type               | Convention                   | Exemple                         |
-| ------------------ | ----------------------------- | -------------------------------- |
-| Branche principale | `main`                        | `main`                           |
-| Développement      | `develop`                     | `develop`                        |
-| Fonctionnalité     | `feature/<id>-<description>`  | `feature/US1.1-mapping-donnees`  |
-| Correction         | `bugfix/<id>-<description>`   | `bugfix/US8.1-erreur-pipeline`   |
-| Correction urgente | `hotfix/<description>`        | `hotfix/erreur-kafka`            |
-| Version            | `release/<version>`           | `release/1.0.0`                  |
+| ------------------ | ---------------------------- | ------------------------------- |
+| Branche principale | `main`                       | `main`                          |
+| Développement      | `develop`                    | `develop`                       |
+| Fonctionnalité     | `feature/<id>-<description>` | `feature/US1.1-mapping-donnees` |
+| Correction         | `bugfix/<id>-<description>`  | `bugfix/US8.1-erreur-pipeline`  |
+| Correction urgente | `hotfix/<description>`       | `hotfix/erreur-kafka`           |
+| Version            | `release/<version>`          | `release/1.0.0`                 |
 
 Règles :
 
@@ -109,7 +109,7 @@ docker compose up -d
 docker compose ps
 ```
 
-Vérifier que Hadoop est fonctionnel : http://localhost:9870
+Vérifier que Hadoop est fonctionnel : <http://localhost:9870>
 
 Créer un dossier de test :
 
