@@ -2,5 +2,5 @@ projectKey=AbAssurance-bigadata
 serverUrl=http://localhost:9000
 serverVersion=26.9.0.129388
 dashboardUrl=http://localhost:9000/dashboard?id=AbAssurance-bigadata
-ceTaskId=67c67804-52ad-40d1-9528-825629c89f05
-ceTaskUrl=http://localhost:9000/api/ce/task?id=67c67804-52ad-40d1-9528-825629c89f05
+ceTaskId=5757e12d-b1d0-4db9-b15a-6aac99d1f4d5
+ceTaskUrl=http://localhost:9000/api/ce/task?id=5757e12d-b1d0-4db9-b15a-6aac99d1f4d5
