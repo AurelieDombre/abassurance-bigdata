@@ -43,32 +43,32 @@ def generer_rapport_pdf(resultats):
 
     # --- Titre
     pdf.set_font("Helvetica", "B", 16)
-    pdf.cell(0, 10, texte_pdf("Rapport AbAssurance / AssurePlus"), ln=True)
+    pdf.cell(0, 10, texte_pdf("Rapport AbAssurance / AssurePlus"), new_x="LMARGIN", new_y="NEXT")
 
     # --- Date de génération
     pdf.set_font("Helvetica", "", 10)
     date_du_jour = datetime.now().strftime("%d/%m/%Y a %H:%M")
-    pdf.cell(0, 8, texte_pdf("Genere le " + date_du_jour), ln=True)
-    pdf.cell(0, 8, texte_pdf("Temps de traitement Spark : " + str(round(resultats["duree"], 1)) + " secondes"), ln=True)
+    pdf.cell(0, 8, texte_pdf("Genere le " + date_du_jour), new_x="LMARGIN", new_y="NEXT")
+    pdf.cell(0, 8, texte_pdf("Temps de traitement Spark : " + str(round(resultats["duree"], 1)) + " secondes"), new_x="LMARGIN", new_y="NEXT")
     pdf.ln(6)   # ln(6) = saut d'une petite ligne vide, pour aérer
 
     # --- Chiffres clés
     pdf.set_font("Helvetica", "B", 12)
-    pdf.cell(0, 10, texte_pdf("Chiffres cles"), ln=True)
+    pdf.cell(0, 10, texte_pdf("Chiffres cles"), new_x="LMARGIN", new_y="NEXT")
     pdf.set_font("Helvetica", "", 11)
-    pdf.cell(0, 8, texte_pdf("Clients : " + str(resultats["nb_clients"])), ln=True)
-    pdf.cell(0, 8, texte_pdf("Contrats : " + str(resultats["nb_contrats"])), ln=True)
-    pdf.cell(0, 8, texte_pdf("Paiements : " + str(resultats["nb_paiements"])), ln=True)
-    pdf.cell(0, 8, texte_pdf("Sinistres : " + str(resultats["nb_sinistres"])), ln=True)
-    pdf.cell(0, 8, texte_pdf("Montant total estime des sinistres : " + str(round(resultats["total_sinistres"], 2))), ln=True)
+    pdf.cell(0, 8, texte_pdf("Clients : " + str(resultats["nb_clients"])), new_x="LMARGIN", new_y="NEXT")
+    pdf.cell(0, 8, texte_pdf("Contrats : " + str(resultats["nb_contrats"])), new_x="LMARGIN", new_y="NEXT")
+    pdf.cell(0, 8, texte_pdf("Paiements : " + str(resultats["nb_paiements"])), new_x="LMARGIN", new_y="NEXT")
+    pdf.cell(0, 8, texte_pdf("Sinistres : " + str(resultats["nb_sinistres"])), new_x="LMARGIN", new_y="NEXT")
+    pdf.cell(0, 8, texte_pdf("Montant total estime des sinistres : " + str(round(resultats["total_sinistres"], 2))), new_x="LMARGIN", new_y="NEXT")
     pdf.ln(6)
 
     # --- Répartition des contrats par statut
     pdf.set_font("Helvetica", "B", 12)
-    pdf.cell(0, 10, texte_pdf("Contrats par statut"), ln=True)
+    pdf.cell(0, 10, texte_pdf("Contrats par statut"), new_x="LMARGIN", new_y="NEXT")
     pdf.set_font("Helvetica", "", 11)
     for statut, nombre in resultats["contrats_par_statut"].items():
-        pdf.cell(0, 8, texte_pdf(statut + " : " + str(nombre)), ln=True)
+        pdf.cell(0, 8, texte_pdf(statut + " : " + str(nombre)), new_x="LMARGIN", new_y="NEXT")
 
     # pdf.output() renvoie le PDF sous forme de bytes, directement
     # utilisables par le bouton de téléchargement (pas besoin de fichier).
