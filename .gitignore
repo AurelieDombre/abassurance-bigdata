@@ -4,4 +4,9 @@ data/assure_plus
 /.venv
 .idea/
 /.idea
+/logs
+/coverage.xml
+.coverage
+.env
+
 

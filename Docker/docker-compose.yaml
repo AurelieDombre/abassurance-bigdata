@@ -94,6 +94,14 @@ services:
     networks:
       - bigdata
 
+  mailpit:
+    image: axllent/mailpit
+    container_name: mailpit
+    ports:
+      - "8025:8025"     # la page web pour lire les mails reçus (http://localhost:8025)
+    networks:
+      - bigdata
+
   app:
     build:
       context: ..
@@ -103,6 +111,7 @@ services:
       - "8501:8501"
     volumes:
       - ../data:/data
+      - ../logs:/app/logs
     depends_on:
       - namenode
       - datanode
