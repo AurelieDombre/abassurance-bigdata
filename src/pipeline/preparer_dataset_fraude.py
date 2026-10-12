@@ -4,7 +4,7 @@
 # (features) qui pourraient aider à repérer une fraude, et une cible (label)
 # quand on la connaît.
 
-
+import time
 from pyspark.sql import SparkSession
 from pyspark.sql import functions as F
 
@@ -20,6 +20,8 @@ def demarrer_spark():
         .master("local[2]")
         .config("spark.driver.memory", "1g")
         .config("spark.hadoop.fs.defaultFS", "hdfs://namenode:9000")
+        # OPTIMISATION (US 8.3) : 4 morceaux de calcul au lieu de 200 par défaut.
+        .config("spark.sql.shuffle.partitions", "4")
         .getOrCreate()
     )
     
@@ -143,16 +145,24 @@ def ajouter_etiquette_suspect(dataset_entrainement, seuil=70):
 if __name__ == "__main__":
     spark = demarrer_spark()
     
+    # On démarre APRÈS le démarrage de Spark, pour mesurer
+    # le travail du pipeline et pas le temps d'allumer le moteur.
+    debut = time.perf_counter()
+    
+    # Lire et nettoyer
     clients, contrats, paiements, sinistres = lire_nettoyer_tables(spark)
+    
+    
+    # Construire une ligne par sinistre
     paiements_par_contrat = resumer_paiements(paiements)
     dataset = lie_contrat_sinistre(sinistres, contrats, paiements_par_contrat)
     dataset = ecart_debut_contrat_sinistre(dataset)
-    dataset = lignes_coherentes(dataset)
     
     # Garder les lignes cohérentes, en COMPTANT celles qui disparaissent
     nb_avant = dataset.count()
     dataset = lignes_coherentes(dataset)
     print("Lignes écartées par le contrôle :", nb_avant - dataset.count())
+    
     
     # On garde seulement les colonnes utiles pour la suite
     dataset = garder_colonnes_utiles(dataset)
@@ -170,3 +180,6 @@ if __name__ == "__main__":
     dataset_a_predire.write.mode("overwrite").parquet(DOSSIER_SORTIE + "/dataset_fraude_a_predire")
 
     print("Dataset enregistré dans :", DOSSIER_SORTIE)
+    
+    # Arrêt du chrono : durée = heure d'arrivée - heure de départ
+    print("DUREE_PIPELINE_SECONDES :", round(time.perf_counter() - debut, 2))

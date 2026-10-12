@@ -2129,3 +2129,47 @@ Ces deux fonctions dépendent de Hadoop. Elles ne se testent pas en test unitair
 
 * Tester `lire_nettoyer_tables` avec un faux Spark qui renvoie de petites tables, sans passer par HDFS.
 * Déclencher automatiquement les tests à chaque `git push` (intégration continue). Aujourd'hui, ils se relancent en une commande, mais à la main.
+
+## US 8.3 : Optimiser les performances
+
+## Objectif
+
+Réduire le temps de traitement du script de préparation du dataset fraude (`preparer_dataset_fraude.py`), en mesurant la durée avant et après chaque optimisation.
+
+## Méthode de mesure
+
+* Un chronomètre (`time.perf_counter()`) mesure la durée du pipeline, de la lecture des tables HDFS à l'écriture des résultats. Le démarrage de Spark n'est pas compté.
+* Chaque version est lancée **3 fois** dans le conteneur `pyspark-app`, dans la foulée. Une seule mesure peut être faussée par un hasard (un autre programme qui tourne, l'état du disque).
+* On compare les **médianes** (la valeur du milieu), qui ignorent un lancement exceptionnellement lent ou rapide.
+* Le jeu de données est petit : 98 sinistres, dont 37 pour l'entraînement.
+
+## Résultats
+
+| Version | Mesures (s) | Médiane (s) | Écart avec la référence |
+| --- | --- | --- | --- |
+| Référence | 9,30 / 9,04 / 8,95 | 9,04 | n/a |
+| Essai 1 : `cache()` | 15,96 / 16,10 / 15,88 / 15,72 | 15,92 | +6,88 s (+76 %) |
+| Essai 2 : 4 partitions de calcul | 8,64 / 8,63 / 8,17 | 8,63 | −0,41 s (−4,5 %) |
+
+## Essai 1 : le cache (abandonné)
+
+L'idée était de garder le dataset en mémoire pour ne pas refaire le calcul à chaque `count()`, `show()` et écriture. Le résultat est l'inverse de l'attendu : le pipeline est plus lent. Sur 98 lignes, l'opération de mise en mémoire coûte plus cher que le recalcul. Cet essai a été abandonné.
+
+## Essai 2 : réduire les partitions de calcul (retenu)
+
+Par défaut, Spark découpe les jointures et les regroupements en 200 morceaux (`spark.sql.shuffle.partitions`). Pour 98 lignes, c'est démesuré. Le réglage a été ramené à 4 dans `demarrer_spark` :
+
+```python
+.config("spark.sql.shuffle.partitions", "4")
+```
+
+Le gain est de 0,41 s (4,5 %), constant sur les 3 lancements. Le résultat du pipeline est identique (37 lignes d'entraînement, 61 à prédire, 7 suspects pour 30 non suspects) et les 10 tests unitaires passent toujours.
+
+## Limites
+
+* Le gain est faible et mesuré sur seulement 3 lancements.
+* Les volumes réels d'AbAssurance sont sans commune mesure avec ce jeu de données. Le comportement de ces deux optimisations y serait probablement différent : le cache deviendrait sans doute utile, et 4 partitions seraient trop peu. Elles seraient à retester sur de gros volumes.
+
+## Piste non testée
+
+Réduire le nombre de `count()` dans le programme principal : chacun relance tout le calcul.
