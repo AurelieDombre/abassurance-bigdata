@@ -2032,3 +2032,53 @@ pytest --cov=app --cov-report=term-missing --cov-report=xml --junitxml=logs/rapp
 * Tests des transformations Spark (`harmoniser_statuts`, `nettoyer`) avec un mini-Spark local sur quelques lignes inventées.
 * Tests d'intégration lancés dans Docker avec le pipeline complet.
 * Intégration continue avec blocage de la livraison si un test échoue.
+
+## US 7.4 : Atteindre la couverture de test de code minimale
+
+## Objectif
+
+Atteindre une couverture minimale de code de 60 %.
+
+Les tests unitaires ne sont pas écrits sur tout le code, mais sur les fonctions qui contiennent de la logique et des calculs : `app/outils.py` et `src/pipeline/preparer_dataset_fraude.py`.
+
+## Résultats
+
+| Fichier | Nombre de tests | Couverture | Seuil de 60 % |
+| --- | --- | --- | --- |
+| `app/outils.py` | 35 | 100 % | Atteint |
+| `src/pipeline/preparer_dataset_fraude.py` | 10 | 64 % | Atteint |
+
+Couverture globale du projet affichée par SonarQube : 69.5% pour le new code et 14.9% pour le overall. Elle est plus basse, car les autres fichiers (scripts de streaming, génération du dataset, pages Streamlit) n'ont pas de tests unitaires.
+
+![pourcentage_couverture_test_code.png](images_readme/pourcentage_couverture_test_code.png)
+
+## Comment la couverture est mesurée
+
+La couverture est le pourcentage de lignes de code exécutées par au moins un test. L'outil utilisé est `pytest-cov`, et le résultat est envoyé à SonarQube.
+
+* Les tests de `outils.py` tournent directement sur le poste.
+* Les tests de `preparer_dataset_fraude.py` tournent dans le conteneur Docker `pyspark-app`, là où Spark est installé.
+* Chaque exécution produit un rapport XML (`coverage.xml` et `coverage_fraude.xml`). Pour le rapport du conteneur, l'adresse `/app` qu'il contient est remplacée par le dossier réel du projet, afin que SonarQube retrouve les fichiers.
+* Le fichier `.coveragerc` exclut le bloc `if __name__ == "__main__":`. Ce bloc ne fait qu'appeler les fonctions dans l'ordre : la logique est dans les fonctions, qui sont testées.
+
+Tout se relance avec une seule commande :
+
+```shell
+python lancer_tests.py
+```
+
+Le script envoie les fichiers dans le conteneur, lance les deux séries de tests, récupère les rapports et lance l'analyse SonarQube. Il s'arrête dès qu'un test échoue. Le token SonarQube est lu dans un fichier `.env`, qui n'est pas versionné.
+
+## Parties non couvertes
+
+Pour `preparer_dataset_fraude.py`, 36 % du code n'est pas couvert :
+
+* `demarrer_spark` (ligne 18) : elle démarre une session Spark connectée à HDFS.
+* `lire_nettoyer_tables` (lignes 30 à 50) : elle lit les tables Parquet dans HDFS.
+
+Ces deux fonctions dépendent de Hadoop. Elles ne se testent pas en test unitaire simple, mais se vérifient en conditions réelles, en lançant le pipeline.
+
+## Améliorations possibles
+
+* Tester `lire_nettoyer_tables` avec un faux Spark qui renvoie de petites tables, sans passer par HDFS.
+* Déclencher automatiquement les tests à chaque `git push` (intégration continue). Aujourd'hui, ils se relancent en une commande, mais à la main.
