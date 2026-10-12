@@ -1833,6 +1833,53 @@ Le fichier n'est jamais effacé : on ajoute toujours à la suite. Les 40 derniè
 
 ![mail_mailpit_alerte.png](images_readme/mail_mailpit_alerte.png)
 
+## US 6.3 : Mesurer les performances du pipeline
+
+## Objectif
+
+Mesurer le temps de réponse de chaque étape du pipeline, afin de vérifier la fluidité du service et de repérer un éventuel ralentissement.
+
+## Ce qui est mesuré
+
+La page Streamlit « État des services » (`Etat_des_services.py`) vérifie 4 étapes : Kafka, Hadoop, Streaming et Spark. À chaque vérification, chaque étape est chronométrée avec `time.time()` : durée = heure d'arrivée − heure de départ.
+
+Les temps mesurés sont des **temps de réponse des services** : combien de secondes met chaque étape à répondre à la vérification. La durée des traitements eux-mêmes (par exemple `preparer_dataset_fraude.py`) est mesurée dans la US 8.3.
+
+## Où sont les résultats
+
+Chaque mesure est ajoutée à la fin du fichier `logs/performances.csv` par la fonction `noter_mesure` (fichier `outils_perf.py`). Une ligne contient la date, l'étape et la durée en secondes (`duree_s`). Le fichier n'est jamais effacé : il garde tout l'historique.
+
+La page affiche ensuite, dans la section « Performances du pipeline » :
+
+* **un tableau de synthèse** : pour chaque étape, le nombre de mesures, le minimum, la moyenne et le maximum en secondes ;
+* **un message de ralentissement**, orange s'il y en a un, vert sinon ;
+* **un graphique par étape** (« Évolution des temps dans le temps »).
+
+![etat_service_temps.png](images_readme/etat_service_temps.png)
+(Capture prise lors du premier démarrage du pipeline, spark mets un peu de temps à démarrer la première fois)
+
+## Comment un ralentissement est détecté
+
+La fonction `detecter_ralentissement` (dans `app/outils.py`) applique une règle simple :
+
+* il faut au moins **4 mesures** pour une étape, afin d'avoir une « habitude » à comparer ;
+* la **dernière mesure** est comparée à la moyenne des mesures précédentes ;
+* si elle est **plus de 2 fois plus longue**, c'est un ralentissement ;
+* les écarts trop petits (moins d'une seconde) sont ignorés, pour ne pas alerter pour rien.
+
+C'est comme un coureur qui fait d'habitude 10 minutes : s'il en met soudain 25, on le signale.
+
+Exemple : Spark : 2,1 s (d'habitude 0,6 s)
+
+Cette fonction est couverte par 7 tests unitaires : pas assez de mesures, temps stable, ralentissement, petit écart ignoré, seuil exact, facteur personnalisé, amélioration.
+
+## Limites et améliorations possibles
+
+* Les temps mesurés sont ceux des vérifications de services, pas ceux des gros traitements Spark.
+* La première vérification de Spark peut être plus longue que les suivantes, car la session Spark doit démarrer.
+* Le seuil (2 fois la moyenne) est un choix de départ, à ajuster avec l'expérience.
+* Les mesures ne sont prises que lorsque la page est ouverte ou actualisée, pas en continu.
+
 ### 7. Correspondance avec les critères de l'US
 
 | Critère | Réalisation |

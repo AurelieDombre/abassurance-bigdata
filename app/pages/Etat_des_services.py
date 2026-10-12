@@ -203,11 +203,6 @@ for etape in mesures["etape"].unique():
             etape + " : " + str(round(derniere, 1)) + " s (d'habitude " + str(round(moyenne, 1)) + " s)"
         )
 
-    # On ignore les écarts sous 1 seconde : trop petits pour compter
-    if derniere > 2 * moyenne and derniere > 1:
-        ralentissements.append(
-            etape + " : " + str(round(derniere, 1)) + " s (d'habitude " + str(round(moyenne, 1)) + " s)"
-        )
 
 if len(ralentissements) > 0:
     st.warning("🐢 Ralentissement détecté : " + " | ".join(ralentissements))
