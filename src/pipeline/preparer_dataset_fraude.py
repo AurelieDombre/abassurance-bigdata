@@ -104,7 +104,39 @@ def lignes_coherentes(dataset):
     dataset = dataset.filter(F.col("montant_estime") > 0)
     dataset = dataset.filter(F.col("jours_avant_sinistre") >= 0)
     return dataset
- 
+
+def garder_colonnes_utiles(dataset):
+    return dataset.select(
+        "sinistre_id",
+        "contrat_id",
+        "montant_estime",
+        "statut_sinistre",
+        "type_assurance",
+        "prime_annuelle",
+        "jours_avant_sinistre",
+        "nb_paiements",
+        "nb_paiements_echoues",
+        "fraud_score",  # connu seulement pour une partie des sinistres
+    )
+
+
+# Trier les sinistres en deux piles : avec ou sans score de fraude
+def separer_entrainement_a_predire(dataset):
+    # On sépare les sinistres en deux groupes :
+    # - ceux avec un score de fraude connu (pour entraîner le modèle)
+    entrainement = dataset.filter(F.col("fraud_score").isNotNull())
+    a_predire = dataset.filter(F.col("fraud_score").isNull())
+    return entrainement, a_predire
+
+
+# Transformer le score (0-100) en étiquette : suspect (1) ou non (0)
+def ajouter_etiquette_suspect(dataset_entrainement, seuil=70):
+    # On transforme le score (nombre entre 0 et 100) en étiquette simple :
+    # 1 si on considère le sinistre comme suspect, 0 sinon.
+    return dataset_entrainement.withColumn(
+        "est_suspect",
+        F.when(F.col("fraud_score").cast("double") >= seuil, 1).otherwise(0),
+    )
 # ------------------------------------------------------------------
 # PROGRAMME PRINCIPAL
 # ------------------------------------------------------------------
@@ -117,38 +149,16 @@ if __name__ == "__main__":
     dataset = ecart_debut_contrat_sinistre(dataset)
     dataset = lignes_coherentes(dataset)
     
+    # Garder les lignes cohérentes, en COMPTANT celles qui disparaissent
+    nb_avant = dataset.count()
+    dataset = lignes_coherentes(dataset)
+    print("Lignes écartées par le contrôle :", nb_avant - dataset.count())
     
     # On garde seulement les colonnes utiles pour la suite
-    dataset = dataset.select(
-        "sinistre_id",
-        "contrat_id",
-        "montant_estime",
-        "statut_sinistre",
-        "type_assurance",
-        "prime_annuelle",
-        "jours_avant_sinistre",
-        "nb_paiements",
-        "nb_paiements_echoues",
-        "fraud_score",   # connu seulement pour une partie des sinistres
-    )
-    
-    # --- Séparation en 2 groupes :
-    # Les sinistres avec un score de fraude connu serviront à entraîner le modèle.
-    dataset_entrainement = dataset.filter(F.col("fraud_score").isNotNull())
- 
-    # Les sinistres SANS score connu ne peuvent pas servir à l'entraînement,
-    # mais pourront être utilisés plus tard pour tester le modèle.
-    dataset_a_predire = dataset.filter(F.col("fraud_score").isNull())
-    
-    
-    # On transforme le score (nombre entre 0 et 100) en étiquette simple :
-    # 1 si on considère le sinistre comme suspect, 0 sinon.
-    # Seuil fixé à 70 pour commencer : regarder le résultat et
-    # ajuste si besoin.
-    dataset_entrainement = dataset_entrainement.withColumn(
-        "est_suspect",
-        F.when(F.col("fraud_score").cast("double") >= 70, 1).otherwise(0)
-    )
+    dataset = garder_colonnes_utiles(dataset)
+    dataset_entrainement, dataset_a_predire = separer_entrainement_a_predire(dataset)
+    dataset_entrainement = ajouter_etiquette_suspect(dataset_entrainement)
+
     
     print("Lignes utilisables pour l'entraînement :", dataset_entrainement.count())
     print("Lignes sans score connu (à prédire plus tard) :", dataset_a_predire.count())

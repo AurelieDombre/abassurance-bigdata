@@ -1,15 +1,15 @@
 # app.py — Tableau de bord AbAssurance / AssurePlus (US 5.1)
 
 import time
-from datetime import datetime
 
 import pandas as pd
 import streamlit as st
-from fpdf import FPDF
+
 from pyspark.sql import SparkSession
 from pyspark.sql import functions as F
 
 from outils_perf import noter_mesure
+from outils import vers_csv, texte_pdf, generer_rapport_pdf
 
 # Config de la page : une seule fois, tout en haut
 st.set_page_config(page_title="Tableau de bord AbAssurance", layout="wide")
@@ -46,18 +46,6 @@ def en_tableau(resultat_spark):
         lignes.append(ligne.asDict())        
     return pd.DataFrame(lignes, columns=resultat_spark.columns)
 
-
-def vers_csv(tableau_pandas):
-    """Transforme un tableau pandas en texte CSV, prêt à être téléchargé.
-    encoding="utf-8-sig" = ajoute un petit marqueur invisible au début du
-    fichier pour qu'Excel affiche bien les accents (é, è, à...) sans bug."""
-    return tableau_pandas.to_csv(index=False, sep=";").encode("utf-8-sig")
-
-
-def texte_pdf(texte):
-    """fpdf2 (police de base) ne connaît pas tous les caractères Unicode.
-    On remplace ceux qu'il ne sait pas afficher, pour ne jamais planter."""
-    return texte.encode("latin-1", "replace").decode("latin-1")
 
 
 # ------------------------------------------------------------------
@@ -165,49 +153,6 @@ def calculer():
     }
     return resultats
 
-
-# ------------------------------------------------------------------
-# Construction du rapport PDF
-# ------------------------------------------------------------------
-def generer_rapport_pdf(resultats):
-    """Construit un petit rapport PDF avec les chiffres clés.
-    On procède comme pour écrire une page à la main : on pose du texte
-    ligne par ligne, du haut vers le bas."""
-    pdf = FPDF()
-    pdf.add_page()
-
-    # --- Titre
-    pdf.set_font("Helvetica", "B", 16)
-    pdf.cell(0, 10, texte_pdf("Rapport AbAssurance / AssurePlus"), ln=True)
-
-    # --- Date de génération
-    pdf.set_font("Helvetica", "", 10)
-    date_du_jour = datetime.now().strftime("%d/%m/%Y a %H:%M")
-    pdf.cell(0, 8, texte_pdf("Genere le " + date_du_jour), ln=True)
-    pdf.cell(0, 8, texte_pdf("Temps de traitement Spark : " + str(round(resultats["duree"], 1)) + " secondes"), ln=True)
-    pdf.ln(6)   # ln(6) = saut d'une petite ligne vide, pour aérer
-
-    # --- Chiffres clés
-    pdf.set_font("Helvetica", "B", 12)
-    pdf.cell(0, 10, texte_pdf("Chiffres cles"), ln=True)
-    pdf.set_font("Helvetica", "", 11)
-    pdf.cell(0, 8, texte_pdf("Clients : " + str(resultats["nb_clients"])), ln=True)
-    pdf.cell(0, 8, texte_pdf("Contrats : " + str(resultats["nb_contrats"])), ln=True)
-    pdf.cell(0, 8, texte_pdf("Paiements : " + str(resultats["nb_paiements"])), ln=True)
-    pdf.cell(0, 8, texte_pdf("Sinistres : " + str(resultats["nb_sinistres"])), ln=True)
-    pdf.cell(0, 8, texte_pdf("Montant total estime des sinistres : " + str(round(resultats["total_sinistres"], 2))), ln=True)
-    pdf.ln(6)
-
-    # --- Répartition des contrats par statut
-    pdf.set_font("Helvetica", "B", 12)
-    pdf.cell(0, 10, texte_pdf("Contrats par statut"), ln=True)
-    pdf.set_font("Helvetica", "", 11)
-    for statut, nombre in resultats["contrats_par_statut"].items():
-        pdf.cell(0, 8, texte_pdf(statut + " : " + str(nombre)), ln=True)
-
-    # pdf.output() renvoie le PDF sous forme de bytes, directement
-    # utilisables par le bouton de téléchargement (pas besoin de fichier).
-    return bytes(pdf.output())
 
 
 # ------------------------------------------------------------------

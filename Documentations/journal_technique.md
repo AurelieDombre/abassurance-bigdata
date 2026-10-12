@@ -1865,7 +1865,6 @@ Première analyse après avoir développé le tableau de bord, l'état de servic
 
 Pour relancer le scan `pysonar --sonar-host-url=http://localhost:9000 --sonar-token=token --sonar-project-key=key`
 
-
 ### Les indicateurs principaux
 
 | Indicateur | Ce que ça mesure |
@@ -1879,3 +1878,207 @@ Pour relancer le scan `pysonar --sonar-host-url=http://localhost:9000 --sonar-to
 | **Couverture (Coverage)** | Pourcentage de code exécuté par les tests |
 | **Notes A à E** | Une note pour la fiabilité (bugs), la sécurité (vulnérabilités) et la maintenabilité (Code Smells) |
 | **Quality Gate** | Réussi ou échoué, selon des seuils fixés par SonarQube |
+
+## US 7.3 : Ecrire les tests unitaire
+
+### 1. Objectif
+Vérifier automatiquement que les fonctions principales du projet donnent les bons résultats, et pouvoir relancer cette vérification à tout moment (après chaque modification du code, par exemple).
+
+Un test unitaire fonctionne comme un contrôle qualité en usine : on donne à une fonction une entrée dont on connaît la bonne réponse, et on vérifie qu'elle ressort comme prévu.
+
+### 2. Installation
+
+Installé dans le container pytest et pytest-cov `docker exec -it pyspark-app pip install pytest pytest-cov`
+
+Puis ajouter au requirements.txt
+
+```txt
+pytest==9.1.1
+pytest-cov==7.1.0
+coverage==7.16.2 
+iniconfig==2.3.1 
+pluggy==1.6.0 
+pygments==2.21.0
+```
+
+## 3. Outils utilisés
+
+| Outil | Rôle |
+| --- | --- |
+| **pytest** | Lance les tests et affiche lesquels réussissent ou échouent |
+| **pytest-cov** | Mesure la couverture du code par les tests (voir US 7.4) |
+
+Installation : `pip install pytest pytest-cov pandas fpdf2` (ajoutés aussi à `requirements.txt`).
+
+## 4. Organisation du code pour pouvoir tester
+
+Les pages Streamlit affichent le résultat dès qu'on les importe, et les scripts Spark ont besoin de Hadoop : ils ne se testent pas facilement tels quels.
+
+Deux choix d'organisation permettent de les tester quand même :
+
+* Les fonctions qui ne font que du **calcul** pour l'application (elles reçoivent une donnée, elles renvoient un résultat) sont regroupées dans un fichier à part, `app/outils.py`. Les pages l'importent et l'utilisent, et les tests aussi.
+* Dans `src/pipeline/preparer_dataset_fraude.py`, la logique n'est plus écrite directement dans le bloc `if __name__ == "__main__":`. Chaque étape est une **fonction** (résumer les paiements, lier les tables, calculer les écarts, trier les lignes...). Le bloc principal se contente de les appeler dans l'ordre, et les tests appellent ces mêmes fonctions avec un Spark local et de petites tables.
+
+```shell
+abassurance-bigdata/
+├── app/
+│   ├── app.py, outils.py, ...
+│   └── pages/
+├── src/
+│   └── pipeline/
+│       └── preparer_dataset_fraude.py   ← logique découpée en fonctions
+├── tests/
+│   ├── test_outils.py                   ← tests unitaires de l'application
+│   └── test_preparer_dataset_fraude.py  ← tests unitaires du pipeline
+├── pytest.ini                           ← indique à pytest où trouver outils.py
+└── .coveragerc                          ← chemins relatifs + exclusion du bloc de lancement
+```
+
+Les tests du pipeline s'exécutent **dans le conteneur** `pyspark-app` (là où Spark est installé). Le rapport de couverture (`coverage_fraude.xml`) est ensuite copié sur le poste, puis l'adresse `/app` qu'il contient est remplacée par le dossier réel du projet pour que SonarQube retrouve les fichiers.
+
+## 5. Ce qui est testé
+
+### 5.1 Application : 35 tests sur 9 fonctions de `app/outils.py`
+
+| Fonction | Rôle | Nb de tests | Cas vérifiés |
+| --- | --- | --- | --- |
+| `vers_csv` | Tableau → CSV lisible dans Excel | 3 | Marqueur UTF-8, séparateur `;`, pas de colonne numéro |
+| `texte_pdf` | Remplace les caractères inconnus du PDF | 3 | Accents conservés, emoji remplacé, texte vide |
+| `generer_rapport_pdf` | Fabrique le rapport PDF | 2 | Fichier commençant par `%PDF`, cas sans statut |
+| `tester_porte` | Vérifie qu'un service répond | 3 | Service ouvert, port fermé, machine inconnue |
+| `interpreter_datanodes` | Voyant Hadoop (réplication) | 7 | 2/2 vert, 1/2 rouge mais données lisibles, datanode silencieux, 0 datanode, 3e datanode, nombre attendu personnalisé |
+| `trouver_pannes` | Liste les étapes en panne | 4 | Aucune, une, plusieurs, liste vide |
+| `formater_ligne_log` | Ligne du carnet de bord | 2 | Ligne `OK`, ligne `ALERTE` |
+| `construire_mail` | Contenu du mail d'alerte | 4 | Sujet, texte, adresses par défaut et personnalisées |
+| `detecter_ralentissement` | Détection d'un ralentissement | 7 | Pas assez de mesures, temps stable, ralentissement, petit écart ignoré, seuil exact, facteur personnalisé, amélioration |
+
+Les tests de `tester_porte` ouvrent eux-mêmes une porte temporaire sur la machine : ils ne dépendent ni de Docker ni d'Internet.
+
+### 5.2 Pipeline fraude : 10 tests sur 7 fonctions de `preparer_dataset_fraude.py`
+
+| Fonction | Rôle | Nb de tests | Cas vérifiés |
+| --- | --- | --- | --- |
+| `resumer_paiements` | Un total par contrat | 1 | Nombre de paiements et de paiements échoués |
+| `lie_contrat_sinistre` | Rattache contrat et paiements à chaque sinistre | 1 | Jointure `left`, colonnes des 3 tables présentes |
+| `ecart_debut_contrat_sinistre` | Jours entre début du contrat et sinistre | 2 | Écart de 10 jours, dates manquantes (écart vide, valeurs nulles remplacées par 0) |
+| `lignes_coherentes` | Écarte les lignes incohérentes | 3 | Montant nul, écart négatif, jeu vide |
+| `separer_entrainement_a_predire` | Deux piles : score de fraude connu / inconnu | 1 | Un sinistre dans chaque pile |
+| `ajouter_etiquette_suspect` | Score (0-100) → étiquette suspect (1) ou non (0) | 1 | Frontière du seuil (69 → 0, 70 → 1) |
+| `garder_colonnes_utiles` | Garde seulement les colonnes utiles | 1 | Colonne inutile supprimée |
+
+Ces tests utilisent un vrai Spark local avec de petites tables créées dans le test : ils ne dépendent pas de HDFS.
+
+**Bug identifié (voir Dossier 3, Question 3).** Un des tests de `lignes_coherentes` documente un risque : une date vide donne un écart vide, et la ligne est écartée sans message. Le programme principal affiche désormais le nombre de lignes écartées.
+
+**Ce qui n'est pas couvert par les tests unitaires** : `demarrer_spark` et `lire_nettoyer_tables`, qui se branchent sur HDFS. Elles se vérifient en conditions réelles, en lançant le pipeline. Couverture actuelle du fichier : 64 %.
+
+## 6. Comment lancer les tests
+
+Depuis la racine du projet :
+
+```shell
+pytest
+```
+
+Pour obtenir aussi la couverture et un rapport de résultats consultable :
+
+```shell
+(.venv) PS C:\xampp\htdocs\Projets\abassurance-bigdata> pytest
+======================================== test session starts ===========================================
+platform win32 -- Python 3.14.5, pytest-9.1.1, pluggy-1.6.0
+rootdir: C:\xampp\htdocs\Projets\abassurance-bigdata
+configfile: pytest.ini
+testpaths: tests
+plugins: anyio-4.15.1, cov-7.1.0
+collected 35 items                                                                                                                                                                                                  
+
+tests\test_outils.py ...................................     [100%]
+
+=============================== 35 passed in 2.95s ======================================================
+
+```
+
+```shell
+pytest --cov=app --cov-report=term-missing --cov-report=xml --junitxml=logs/rapport_tests.xml
+```
+
+**Résultat constaté :**
+
+![test_outils_terminal_succes.png](images_readme/test_outils_terminal_succes.png)
+
+## 6. Consulter les résultats
+
+* **Dans le terminal** : pytest affiche un point par test réussi et la liste détaillée de ceux qui échouent (avec la ligne fautive et la valeur obtenue).
+* **Dans un fichier** : `logs/rapport_tests.xml` (format JUnit, lisible par la plupart des outils de suivi).
+* **Dans SonarQube** : la couverture produite par les tests (`coverage.xml`) est lue lors de l'analyse (voir US 7.4).
+
+## 7. Correspondance avec les critères de l'US
+
+| Critère | Réalisation |
+| --- | --- |
+| Les composants principaux disposent de tests unitaires | 35 tests sur les 9 fonctions de logique de `outils.py` (export, rapport, surveillance des services, alertes, performances). Voir les limites ci-dessous |
+| Les tests s'exécutent sans erreur | `pytest` : tous les tests réussis |
+| Les résultats des tests sont consultables | Terminal, fichier `logs/rapport_tests.xml`, SonarQube |
+| Les tests peuvent être relancés automatiquement | Commande unique `pytest` et script `lancer_tests.ps1` ; intégration continue décrite pour la production |
+
+## 8. Limites connues
+
+* **Seule la logique pure est testée unitairement.** Les pages Streamlit (affichage) et les traitements Spark (nettoyage, entraînement du modèle) ne sont pas couverts par ces tests. Ils sont vérifiés autrement : par les comptages de l'US 1.4, par les échantillons du tableau de bord (US 5.1) et par les métriques du modèle (US 5.3).
+* **Les `verifier_...` de la page État des services** (Kafka, Hadoop, Spark) nécessitent le réseau Docker : ce sont des tests d'intégration, pas des tests unitaires. Seule la décision prise à partir de leurs résultats (`interpreter_datanodes`, `trouver_pannes`) est testée.
+* **Pas d'intégration continue réelle** : les tests sont lancés à la main ou avec le script, pas automatiquement à chaque modification.
+
+## 9. Évolutions possibles
+
+* Tests des transformations Spark (`harmoniser_statuts`, `nettoyer`) avec un mini-Spark local sur quelques lignes inventées.
+* Tests d'intégration lancés dans Docker avec le pipeline complet.
+* Intégration continue avec blocage de la livraison si un test échoue.
+
+## US 7.4 : Atteindre la couverture de test de code minimale
+
+## Objectif
+
+Atteindre une couverture minimale de code de 60 %.
+
+Les tests unitaires ne sont pas écrits sur tout le code, mais sur les fonctions qui contiennent de la logique et des calculs : `app/outils.py` et `src/pipeline/preparer_dataset_fraude.py`.
+
+## Résultats
+
+| Fichier | Nombre de tests | Couverture | Seuil de 60 % |
+| --- | --- | --- | --- |
+| `app/outils.py` | 35 | 100 % | Atteint |
+| `src/pipeline/preparer_dataset_fraude.py` | 10 | 64 % | Atteint |
+
+Couverture globale du projet affichée par SonarQube : 69.5% pour le new code et 14.9% pour le overall. Elle est plus basse, car les autres fichiers (scripts de streaming, génération du dataset, pages Streamlit) n'ont pas de tests unitaires.
+
+![pourcentage_couverture_test_code.png](images_readme/pourcentage_couverture_test_code.png)
+
+## Comment la couverture est mesurée
+
+La couverture est le pourcentage de lignes de code exécutées par au moins un test. L'outil utilisé est `pytest-cov`, et le résultat est envoyé à SonarQube.
+
+* Les tests de `outils.py` tournent directement sur le poste.
+* Les tests de `preparer_dataset_fraude.py` tournent dans le conteneur Docker `pyspark-app`, là où Spark est installé.
+* Chaque exécution produit un rapport XML (`coverage.xml` et `coverage_fraude.xml`). Pour le rapport du conteneur, l'adresse `/app` qu'il contient est remplacée par le dossier réel du projet, afin que SonarQube retrouve les fichiers.
+* Le fichier `.coveragerc` exclut le bloc `if __name__ == "__main__":`. Ce bloc ne fait qu'appeler les fonctions dans l'ordre : la logique est dans les fonctions, qui sont testées.
+
+Tout se relance avec une seule commande :
+
+```shell
+python lancer_tests.py
+```
+
+Le script envoie les fichiers dans le conteneur, lance les deux séries de tests, récupère les rapports et lance l'analyse SonarQube. Il s'arrête dès qu'un test échoue. Le token SonarQube est lu dans un fichier `.env`, qui n'est pas versionné.
+
+## Parties non couvertes
+
+Pour `preparer_dataset_fraude.py`, 36 % du code n'est pas couvert :
+
+* `demarrer_spark` (ligne 18) : elle démarre une session Spark connectée à HDFS.
+* `lire_nettoyer_tables` (lignes 30 à 50) : elle lit les tables Parquet dans HDFS.
+
+Ces deux fonctions dépendent de Hadoop. Elles ne se testent pas en test unitaire simple, mais se vérifient en conditions réelles, en lançant le pipeline.
+
+## Améliorations possibles
+
+* Tester `lire_nettoyer_tables` avec un faux Spark qui renvoie de petites tables, sans passer par HDFS.
+* Déclencher automatiquement les tests à chaque `git push` (intégration continue). Aujourd'hui, ils se relancent en une commande, mais à la main.
