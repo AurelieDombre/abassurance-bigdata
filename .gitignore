@@ -7,5 +7,6 @@ data/assure_plus
 /logs
 /coverage.xml
 .coverage
+.env
 
 
