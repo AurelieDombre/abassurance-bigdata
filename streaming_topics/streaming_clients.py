@@ -1,7 +1,7 @@
 # streaming_clients.py
 #
 # Objectif : lire en continu les messages du topic Kafka "abassurance.clients.v1"
-# et les écrire dans HDFS (dossier /data/topics/clients), au fur et à mesure
+# et les écrire dans HDFS (dossier /data/kafka/clients), au fur et à mesure
 # qu'ils arrivent.
 #
 # Doc officielle Spark Structured Streaming :
@@ -12,7 +12,7 @@
 
 from pyspark.sql import SparkSession
 from pyspark.sql.functions import from_json, col
-from pyspark.sql.types import StructType, StructField, StringType, DoubleType
+from pyspark.sql.types import StructType, StructField, StringType
 
 
 # ------------------------------------------------------------------

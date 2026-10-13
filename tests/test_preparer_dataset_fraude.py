@@ -5,6 +5,14 @@ Ignorés automatiquement si pyspark n'est pas installé."""
 import pytest
 
 pytest.importorskip("pyspark")
+import os
+
+# Ces tests ont besoin de Spark : ils se lancent dans le conteneur Docker
+# (voir lancer_tests.py). Sur le PC, on les saute au lieu de les faire échouer.
+pytestmark = pytest.mark.skipif(
+    not os.path.exists("/.dockerenv"),
+    reason="Tests Spark : à lancer dans le conteneur pyspark-app",
+)
 
 from pyspark.sql import SparkSession
 
@@ -34,6 +42,24 @@ def test_resumer_paiements(spark):
     assert resultat[0]["nb_paiements"] == 3
     assert resultat[0]["nb_paiements_echoues"] == 2
 
+def test_completer_contrats(spark):
+    contrats = spark.createDataFrame(
+        [
+            ("AB-1", "AUTO", None, 1200.0, None),        # AbAssurance : déjà complet
+            ("AP-1", None, "AUTO_BASIC", None, 100.0),   # AssurePlus : prime mensuelle seule
+            ("AP-2", None, "ASSIST_BASIC", None, 50.0),
+        ],
+        "contrat_id string, type_assurance string, code_produit string, "
+        "prime_annuelle double, prime_mensuelle double",
+    )
+
+    resultat = {r["contrat_id"]: r for r in prep.completer_contrats(contrats).collect()}
+
+    assert resultat["AB-1"]["prime_annuelle"] == 1200.0   # inchangé
+    assert resultat["AP-1"]["prime_annuelle"] == 1200.0   # 100 x 12
+    assert resultat["AP-1"]["type_assurance"] == "AUTO"
+    assert resultat["AP-2"]["type_assurance"] == "ASSISTANCE"
+    
 def test_lie_contrat_sinistre(spark):
     sinistres = spark.createDataFrame(
     [("s1", "c1", 1000.0)],

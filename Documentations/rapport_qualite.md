@@ -32,11 +32,8 @@ Commande pour tout relancer : `python lancer_tests.py`
 ## 4. Points d'attention
 
 * Couverture globale basse : seuls les fichiers qui contiennent de la logique sont testés.
-* [anomalies restantes que tu décides de ne pas corriger, avec la raison]
 * Bug identifié et corrigé : contrats à NULL dans HDFS (US 8.1 et 8.2).
 
 ## 5. Conclusion
 
-* Tests des transformations Spark (`harmoniser_statuts`, `nettoyer`) avec un mini-Spark local sur quelques lignes inventées.
-* Tests d'intégration lancés dans Docker avec le pipeline complet.
-* Intégration continue avec blocage de la livraison si un test échoue.
+Les tests unitaires couvrent la logique des deux fichiers principaux et la chaîne python lancer_tests.py met à jour SonarQube en une commande. Il reste à tester le nettoyage et l'entraînement, et à déclencher cette chaîne automatiquement.

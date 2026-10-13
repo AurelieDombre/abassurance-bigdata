@@ -8,7 +8,7 @@ Le projet utilise **PySpark** comme framework Python principal.
 
 PySpark a été choisi car il permet d'utiliser Apache Spark depuis Python pour effectuer des traitements distribués sur de grands volumes de données. Il est particulièrement adapté à l'architecture du projet, qui repose sur Hadoop pour le stockage et Spark pour le traitement des données.
 
-La version de Python 3.14 est supportée par PySpark 4.2.0 et donc par Apache Spark.
+La version de Python 3.14 est supportée par PySpark 4.2.0 et donc par Apache Spark. Les traitements Spark du projet tournent toutefois dans le conteneur Docker, qui utilise Python 3.12 (voir le README) : c'est là que s'exécutent le pipeline et ses tests.
 
 ### Validation initiale de l'installation
 
@@ -70,7 +70,7 @@ Exemple de mapping des données :
 | `AB_CONTRAT`        | `AP_CONTRACTS`        | `CONTRAT`        |
 | `AB_SINISTRE`       | `AP_CLAIMS`           | `SINISTRE`       |
 | `AB_PAIEMENT`       | `AP_PAYMENTS`         | `PAIEMENT`       |
-| `ab_nom`            | `AP_FULL_NAME`        | `nom / prenom`   |
+| `ab_nom`            | `AP_FULL_NAME`        | `nom_prenom`     |
 | `ab_email`          | `AP_MAIL_ADDRESS`     | `email`          |
 | `ab_telephone`      | `AP_PHONE_NUMBER`     | `telephone`      |
 | `ab_date_naissance` | `AP_BIRTH_DATE`       | `date_naissance` |
@@ -115,6 +115,14 @@ Le modèle de données final comporte trois relations principales :
 * CLIENT — SOUSCRIRE — CONTRAT : relation 1:N. Un client peut souscrire plusieurs contrats, tandis qu'un contrat est rattaché à un seul client.
 * CONTRAT — DECLARER — SINISTRE : relation 1:N. Un contrat peut être associé à plusieurs sinistres, tandis qu'un sinistre est rattaché à un seul contrat.
 * CONTRAT — REGLER — PAIEMENT : relation 1:N. Un contrat peut être associé à plusieurs paiements, tandis qu'un paiement est rattaché à un seul contrat.
+
+### Évolutions du modèle à l'implémentation
+ 
+Le MCD final ci-dessus est le modèle conçu au départ. Deux choix faits pendant l'implémentation s'en écartent :
+ 
+* **`nom` et `prenom` sont fusionnés en un seul champ `nom_prenom`.** AssurePlus ne fournit qu'un nom complet (`AP_FULL_NAME`), alors qu'AbAssurance a deux champs séparés : le champ commun est donc le nom complet (voir « Fusionner les données »).
+* **Les identifiants des clients et des contrats sont des textes préfixés** (`AB-` ou `AP-`, par exemple `AB-000001`), pour qu'un identifiant ne puisse pas être le même dans les deux sources (voir « Fusionner les données », décision sur `client_id`).
+
 
 ## Choix des outils
 
@@ -574,7 +582,7 @@ output_row.ap_loyalty_score = input_row.ap_loyalty_score;
 
 Le rapport d'anomalie confirme que les seules lignes rejetées sont les doublons. Les données incorrectes ont été corrigés.
 
-## Fusionner les données
+## US 2.2 Transformation au format commun : fusionner les données
 
 L'objectif est de transformer les données nettoyées AB_CLIENT (Oracle) et AP_USERS (SQL Server) vers le schéma cible commun client_commun, avec détection et fusion des doublons inter-systèmes (même client existant dans les deux bases)
 
@@ -682,10 +690,11 @@ publiés par Talaxie et les écrivant au format Parquet dans HDFS.
 * Ajout du connecteur spark-sql-kafka-0-10 (et ses dépendances kafka-clients, spark-token-provider-kafka-0-10) téléchargés au build de l'image Docker via curl et chargés dans la SparkSession via spark.jars, la version pyspark installée ne l'incluant pas nativement.
 * Organisation des dossiers HDFS en deux zones : /data/kafka/topic pour les données brutes reçues de Kafka, /data/clean pour les futures données nettoyées (répond au critère 2 : "dossiers organisés brutes/nettoyées").
 * Gestion de checkpoints HDFS dédiés par topic (/data/checkpoints/topic`) pour permettre une reprise sans duplication en cas de redémarrage du job.
+* Lancer les scripts `docker exec -it pyspark-app python streaming_topics/streaming_clients.py`
 
 Incident traversé : un problème de permissions sur le volume Docker du broker Kafka (AccessDeniedException, utilisateur non-root du conteneur vs volume créé par root) a provoqué une perte des topics et de leur contenu ; corrigé via chown sur le volume, topics recréés, données republiées depuis Talaxie.
 
-Le nombre de données stockées correspond au nombre de données extraites au départ (aucune perte) :
+Le nombre de données stockées correspond au nombre de données extraites au départ (aucune perte) : les captures ci-dessous montrent le nombre de lignes de chaque table dans HDFS, et la dernière montre le nombre de messages de chaque topic dans Kafka UI.
 
 Capture d'écran pour client :
 
@@ -1048,9 +1057,9 @@ st.download_button(
 )
 ```
 
----
+Un bug a été identifié pendant cette User Story : il est décrit dans l'US 8.1 (identification), puis corrigé dans l'US 8.2.
 
-J'ai identifier un bug donc je passe directement à ma users storie 8.1 :
+---
 
 ## US 8.1 — Identifier un bug du pipeline
 
@@ -1145,11 +1154,11 @@ Le bug a été localisé en remontant la chaîne, étape par étape, pour élimi
 
 **1. Talaxie : publier un JSON valide**
 
-Faire en sorte qu'une prime vide soit écrite `null` dans le JSON (ou `0`), au lieu de rien. Composant modifié : [À COMPLÉTER].
+Faire en sorte qu'une prime vide soit écrite `null` dans le JSON (ou `0`), au lieu de rien. Composant modifié : job kafka_contrats.
 
 **2. Talaxie : harmoniser les statuts en français**
 
-Ajouter la traduction dans le `tMap` de la fusion (à adapter au nom réel du flux) :
+Ajouter la traduction dans le composant de transformation des contrats. L'expression ci-dessous est écrite dans le style d'un `tMap` ; elle est à adapter au composant réellement utilisé (la fusion utilise un `tJavaRow`, le `tMap` ayant été abandonné, voir l'US 2.2) :
 
 ```java
 "ACTIVE".equals(row1.statut_contrat) ? "ACTIF" :
@@ -1238,7 +1247,7 @@ Le traitement produit ensuite deux jeux de données :
 * `hdfs://namenode:9000/data/clean/dataset_fraude_entrainement`
 * `hdfs://namenode:9000/data/clean/dataset_fraude_a_predire`
 
-Le dictionnaire de données du dataset est disponible dans  /Documentations/dictionnaire_dataset.md
+Le dictionnaire de données du dataset est disponible dans [`dictionnaire_dataset.md`](./dictionnaire_dataset.md).
 
 ---
 
@@ -1484,6 +1493,20 @@ Il sert uniquement à créer la variable cible `est_suspect`.
 
 Le modèle devra apprendre à identifier les sinistres suspects à partir des autres informations disponibles, puis utiliser ces informations pour effectuer ses propres prédictions.
 
+#### Contrats AssurePlus : `prime_annuelle` et `type_assurance` vides (problème identifié)
+
+Les contrats AssurePlus ne fournissent qu'une prime **mensuelle** (`prime_mensuelle`) et un **code produit** (`code_produit`, par exemple `AUTO_BASIC`). Dans les données fusionnées, les 147 contrats AssurePlus ont donc `prime_annuelle` et `type_assurance` vides. Le script de préparation ne convertit pas ces informations : il récupère `prime_annuelle` et `type_assurance` telles quelles depuis la table des contrats.
+
+Conséquence : les 37 sinistres du jeu d'entraînement, tous issus d'AssurePlus, ont ces deux colonnes vides. Lors de l'entraînement (US 5.3), les valeurs vides sont remplacées par `0` : la caractéristique `prime_annuelle` est donc constante sur tout l'entraînement, et le modèle ne peut rien en apprendre. L'arbre appris le confirme : il n'utilise jamais la caractéristique `prime_annuelle`.
+
+Correctif prévu : calculer `prime_annuelle` à partir de `prime_mensuelle` (× 12) et déduire `type_assurance` du code produit (comme le fait déjà la fonction `preparer_contrats` de `nettoyage_donnees_ia.py`, qui n'est pas appelée par le pipeline), puis relancer la préparation et l'entraînement et mettre à jour les chiffres de l'US 5.3
+
+#### Identifiant de sinistre non unique
+ 
+Les identifiants de sinistre des deux sources se chevauchent : AbAssurance va de 1 à 61, AssurePlus de 1 à 37, donc 37 valeurs de `sinistre_id` existent deux fois pour deux sinistres différents. Les clients et les contrats ont des préfixes (`AB-`, `AP-`), pas les sinistres. Le pipeline reste correct grâce à la clé de déduplication (`sinistre_id` et `contrat_id`), mais `sinistre_id` n'est unique qu'avec `contrat_id`.
+
+Décision prise : numéroter les sinistres AssurePlus à la suite de ceux d'AbAssurance (à partir de 62) dans le job Talaxie de transformation des sinistres, pour garder un identifiant entier unique. Les anciens sinistres doivent ensuite être supprimés avant de republier : topic Kafka des sinistres, dossiers HDFS `/data/kafka/sinistres` et `/data/checkpoints/sinistres`. Le décalage de 61 est écrit en dur : il est valable pour ce jeu de données, et devrait être remplacé par un préfixe d'origine sur un projet réel.
+
 ## US 5.3 : Entraîner un modèle de détection de fraude et l'afficher dans le dashboard
 
 ### Objectif
@@ -1497,7 +1520,7 @@ Le modèle apprend sur les sinistres dont le niveau de fraude est connu (AssureP
 ### Fichiers utilisés
 
 * `src/prediction/entrainer_modele_fraude.py` : script qui entraîne, évalue et sauvegarde le modèle, puis calcule les prédictions.
-* `detection_fraude.py` : page du dashboard Streamlit qui affiche les résultats et propose un simulateur.
+* `app/pages/Detection_de_fraude.py` : page du dashboard Streamlit qui affiche les résultats et propose un simulateur.
 
 Les données en entrée sont celles produites par l'US 5.2 :
 

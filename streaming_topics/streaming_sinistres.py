@@ -12,7 +12,7 @@
 
 from pyspark.sql import SparkSession
 from pyspark.sql.functions import from_json, col
-from pyspark.sql.types import StructType, StructField, StringType, IntegerType, FloatType
+from pyspark.sql.types import DoubleType, StructType, StructField, StringType, IntegerType
 
 
 # ------------------------------------------------------------------
@@ -26,7 +26,7 @@ schema_sinistre = StructType([
     StructField("sinistre_id", IntegerType()),
     StructField("contrat_id", StringType()),
     StructField("date_sinistre", StringType()),
-    StructField("montant_estime", FloatType()),
+    StructField("montant_estime", DoubleType()),
     StructField("statut_sinistre", StringType()),
     StructField("description", StringType()),
     StructField("fraud_score", StringType()),
