@@ -16,11 +16,11 @@ Talaxie → Kafka → Spark → Hadoop.
 | `statut_sinistre` | String | Statut du sinistre, harmonisé en français (DECLARE, EN_COURS, CLOTURE, REJETE) | Harmonisation des valeurs AB (déjà en français) et AP (REPORTED/IN_PROGRESS/CLOSED/REJECTED) |
 | `type_assurance` | String | Famille de produit d'assurance (AUTO, HABITATION, SANTE, PROFESSIONNELLE, ASSISTANCE) | AB_CONTRAT.AB_TYPE_ASSURANCE, ou déduit du code produit AssurePlus (AP_PRODUCT_CODE) |
 | `prime_annuelle` | Double | Montant annuel de la prime d'assurance du contrat, en euros | AB_CONTRAT.AB_PRIME_ANNUELLE, ou AP_CONTRACTS.AP_MONTHLY_PREMIUM × 12 |
-| `jours_entre_debut_contrat_et_sinistre` | Entier | Nombre de jours entre la date de début du contrat et la date du sinistre | Calculé (date_sinistre − date_debut) |
+| `jours_avant_sinistre` | Entier | Nombre de jours entre la date de début du contrat et la date du sinistre | Calculé (date_sinistre − date_debut) |
 | `nb_paiements` | Entier | Nombre total de paiements enregistrés sur le contrat | Calculé à partir de AB_PAIEMENT / AP_PAYMENTS |
 | `nb_paiements_echoues` | Entier | Nombre de paiements en échec sur le contrat | Calculé à partir du statut de transaction (ECHOUE) |
 | `fraud_score` | Double | Score de fraude d'origine (0 à 100), fourni uniquement pour les sinistres issus d'AssurePlus | AP_CLAIMS.AP_FRAUD_SCORE |
-| `est_suspect` | Entier (0 ou 1) | Cible (label) du modèle : 1 si `fraud_score` ≥ 70, sinon 0 | Calculé, seuil à ajuster selon la distribution réelle observée |
+
 
 ## Table associée : `dataset_fraude_a_predire` (HDFS, Parquet)
 

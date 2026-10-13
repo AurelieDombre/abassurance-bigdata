@@ -3,9 +3,9 @@
 ## Table CLIENT (`AB_CLIENT` ↔ `AP_USERS`)
 
 | Base AbAssurance | Base AssurePlus | Modèle cible | Remarque |
-|---|---|---|---|
-| `AB_CLIENT_ID` | `AP_USER_ID` | `client_id` | Nouvel identifiant technique généré (les deux ID sources ne sont pas compatibles entre elles) |
-| `AB_NOM` + `AB_PRENOM` | `AP_FULL_NAME` | `nom` / `prenom` | Chez AssurePlus, il faut **splitter** `AP_FULL_NAME` en nom/prénom (règle à définir, ex. premier mot = prénom) |
+| --- | --- | --- | --- |
+| `AB_CLIENT_ID` | `AP_USER_ID` | `client_id` | Ajoute un préfix "AB-" et "AP-"(les deux ID sources ne sont pas compatibles entre elles). |
+| `AB_NOM` + `AB_PRENOM` | `AP_FULL_NAME` | `nom_` / `_prenom` | Chez AssurePlus, il faut **splitter** `AP_FULL_NAME` en nom_prénom |
 | `AB_DATE_NAISSANCE` | `AP_BIRTH_DATE` | `date_naissance` | ⚠️ `AP_BIRTH_DATE` est stocké en texte libre côté source (formats potentiellement incohérents) — à normaliser en date |
 | `AB_EMAIL` | `AP_MAIL_ADDRESS` | `email` | |
 | `AB_TELEPHONE` | `AP_PHONE_NUMBER` | `telephone` | |
@@ -19,7 +19,7 @@
 ## CONTRAT (`AB_CONTRAT` ↔ `AP_CONTRACTS`)
 
 | Base AbAssurance | Base AssurePlus | Modèle cible | Remarque |
-|---|---|---|---|
+| --- | --- | --- | --- |
 | `AB_POLICY_NUMBER` | `AP_CONTRACT_REF` | `contrat_id` | Nouvel identifiant technique généré |
 | `AB_CLIENT_ID` | `AP_USER_ID` | `client_id` (FK) | Clé étrangère vers `CLIENT` |
 | `AB_TYPE_ASSURANCE` | `—` | `type_assurance` | Spécifique AbAssurance (catégorie générique : SANTE, AUTO...) |
@@ -36,7 +36,7 @@
 ## SINISTRE (`AB_SINISTRE` ↔ `AP_CLAIMS`)
 
 | Base AbAssurance | Base AssurePlus | Modèle cible | Remarque |
-|---|---|---|---|
+| --- | --- | --- | --- |
 | `AB_CLAIM_ID` | `AP_SINISTRE_NUM` | `sinistre_id` | Nouvel identifiant technique généré |
 | `AB_POLICY_NUMBER` | `AP_CONTRACT_REF` | `contrat_id` (FK) | Clé étrangère vers `CONTRAT` |
 | `AB_DATE_SINISTRE` | `AP_INCIDENT_DATE` | `date_sinistre` | ⚠️ `AP_INCIDENT_DATE` est stocké en texte (VARCHAR(19)) — à convertir en type date/timestamp |
@@ -48,7 +48,7 @@
 ## PAIEMENT (`AB_PAIEMENT` ↔ `AP_PAYMENTS`)
 
 | Base AbAssurance | Base AssurePlus | Modèle cible | Remarque |
-|---|---|---|---|
+| --- | --- | --- | --- |
 | `AB_PAYMENT_ID` | `AP_PAYMENT_REF` | `paiement_id` | Nouvel identifiant technique généré (`AP_PAYMENT_REF` est un UUID côté source) |
 | `AB_POLICY_NUMBER` | `AP_CONTRACT_REF` | `contrat_id` (FK) | Clé étrangère vers `CONTRAT` |
 | `AB_DATE_PAIEMENT` | `AP_PAYMENT_DATETIME` | `date_paiement` | |
