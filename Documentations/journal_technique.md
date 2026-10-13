@@ -14,7 +14,7 @@ La version de Python 3.14 est supportée par PySpark 4.2.0 et donc par Apache Sp
 
 Test de PySpark dans un container Docker afin de vérifier son installation et son exécution (voir README pour les commandes). Ce test a permis de confirmer que l'environnement Docker était correctement configuré avant de commencer le développement du pipeline.
 
-![Copie-écran-sonarQubeServer.png](images_readme/Copie-écran-sonarQubeServer.png)
+![Copie-écran-sonarQubeServer.png](images/Copie-écran-sonarQubeServer.png)
 
 ## Les modèles conceptuels de données (MCD) d'AssurePlus et AbAssurance
 
@@ -124,7 +124,7 @@ Talend Open Studio ayant été discontinué par Qlik le 31/01/2024 (plus de dist
 
 Preuve de fonctionnement du job de test :
 
-![Talend_test_installation.jpg](images_readme/Talend_test_installation.jpg)
+![Talend_test_installation.jpg](images/Talend_test_installation.jpg)
 
 ### Kafka et Hadoop
 
@@ -132,11 +132,11 @@ Afin de faciliter l'installation, l'environnement a été mis en place via un co
 
 Preuve de fonctionnement — containers up :
 
-![DockerDesktop-capture-container-up.png](images_readme/DockerDesktop-capture-container-up.png)
+![DockerDesktop-capture-container-up.png](images/DockerDesktop-capture-container-up.png)
 
 Preuve de fonctionnement — Hadoop accessible :
 
-![hadoop_test-fonctionnel.png](images_readme/hadoop_test-fonctionnel.png)
+![hadoop_test-fonctionnel.png](images/hadoop_test-fonctionnel.png)
 
 Le dossier nommé `abassurance` créé via la commande de mkdir HDFS est bien visible, confirmant que le NameNode fonctionne correctement.
 
@@ -277,7 +277,7 @@ Les données du dataset ont été générées par un script avec Faker afin de s
 
 Capture d'écran des jobs :
 
-![Capture d'écran jobs abassurance.png](images_readme/Capture%20d'écran%20jobs%20abassurance.png)
+![Capture d'écran jobs abassurance.png](images/Capture%20d'écran%20jobs%20abassurance.png)
 
 ## US 1.3 Extraction SQL Server
 
@@ -285,11 +285,11 @@ Le processus reste le même en utilisant les CSV d'AssurePlus.
 
 Capture d'écran des jobs :
 
-![Capture d'écran jobs assureplus.png](images_readme/Capture%20d'écran%20jobs%20assureplus.png)
+![Capture d'écran jobs assureplus.png](images/Capture%20d'écran%20jobs%20assureplus.png)
 
 Talaxie a repéré des anomalies dans les formats de date de l'export CSV de la table `users`. Le format était `jj/mm/YYYY` au lieu de `YYYY-mm-dd`.
 
-![erreur_format_date_assureplus_users.png](images_readme/erreur_format_date_assureplus_users.png)
+![erreur_format_date_assureplus_users.png](images/erreur_format_date_assureplus_users.png)
 
 ## US 1.4 Contrôle du nombre d'enregistrements
 
@@ -331,7 +331,7 @@ Pour valider concrètement que tUniqRow fonctionne (et pas juste 'zéro doublon 
  ---
 
 Exemple avec le nettoyage de la table client pour abassurance avec l'ajout de 2 doublons (Id 1 et 5) afin de s'assurer que le nettoyage fonctionne.
-![capture_talaxie_job_nettoyage.png](images_readme/capture_talaxie_job_nettoyage.png)
+![capture_talaxie_job_nettoyage.png](images/capture_talaxie_job_nettoyage.png)
 
 Les fichiers d'extraction sont dans ./data/output/ab_assurance_extract_talaxie/ab_assurance_nettoye/ab_assurance_extract_client_clean
 Et pour l'extraction des doublons : ./data\output\doublons\ab_client_doublons.
@@ -592,11 +592,11 @@ L'objectif est de transformer les données nettoyées AB_CLIENT (Oracle) et AP_U
 
 6. Journalisation : tJava déclenché en OnComponentOk, écrivant une ligne récapitulative dans journal_transformation.csv.
 
-![schema_transformation_fusion_donnees.png](images_readme/schema_transformation_fusion_donnees.png)
+![schema_transformation_fusion_donnees.png](images/schema_transformation_fusion_donnees.png)
 
 Le canvas Talaxie :
 
-![Capture_talaxie-transformation-datas.png](images_readme/Capture_talaxie-transformation-datas.png)
+![Capture_talaxie-transformation-datas.png](images/Capture_talaxie-transformation-datas.png)
 
 ### Bugs rencontrés et corrections
 
@@ -618,11 +618,11 @@ Correction : Modification du type de client_id dans le schéma commun (Métadonn
 
 Exemple d'un job pour la transmission des messages dans kafka.
 
-![Capture_job_kafka.png](images_readme/Capture_job_kafka.png)
+![Capture_job_kafka.png](images/Capture_job_kafka.png)
 
 Exemple dans Kafka UI
 
-![Capture_kafka_ui_topics.png](images_readme/Capture_kafka_ui_topics.png)
+![Capture_kafka_ui_topics.png](images/Capture_kafka_ui_topics.png)
 
 La documentation du nombre de lignes et le temps de transmission est dans le fichier [`transmission_kafka.csv`](../data/logs/transmission_kafka.csv).
 
@@ -689,26 +689,26 @@ Le nombre de données stockées correspond au nombre de données extraites au d�
 
 Capture d'écran pour client :
 
-![Capture_terminal_script_clients.png](images_readme/Capture_terminal_script_clients.png)
+![Capture_terminal_script_clients.png](images/Capture_terminal_script_clients.png)
 
 Dans Kafka, il a bien
 
 Capture d'écran pour contrats :
 
-![Capture_terminal_script_contrats.png](images_readme/Capture_terminal_script_contrats.png)
+![Capture_terminal_script_contrats.png](images/Capture_terminal_script_contrats.png)
 
 Capture d'écran pour paiements :
 
-![Capture_terminal_script_paiements.png](images_readme/Capture_terminal_script_paiements.png)
+![Capture_terminal_script_paiements.png](images/Capture_terminal_script_paiements.png)
 
 Capture d'écran pour sinistres :
 
-![Capture_terminal_script_sinistres.png](images_readme/Capture_terminal_script_sinistres.png)
-![Capture_terminal_script_sinistres_nbr_lignes.png](images_readme/Capture_terminal_script_sinistres_nbr_lignes.png)
+![Capture_terminal_script_sinistres.png](images/Capture_terminal_script_sinistres.png)
+![Capture_terminal_script_sinistres_nbr_lignes.png](images/Capture_terminal_script_sinistres_nbr_lignes.png)
 
 Pour chaque topic, le nombre de lignes correspond bien :
 
-![Capture_kafka_ui_topics_messages.png](images_readme/Capture_kafka_ui_topics_messages.png)
+![Capture_kafka_ui_topics_messages.png](images/Capture_kafka_ui_topics_messages.png)
 
 ### Résultat dans Hadoop
 
@@ -733,7 +733,7 @@ drwxr-xr-x   - root supergroup          0 2026-09-23 09:25 /data/kafka/sinistres
 
 Exemple du fichier sinistres :
 
-![resultat_sinistre_stockage.png](images_readme/resultat_sinistre_stockage.png)
+![resultat_sinistre_stockage.png](images/resultat_sinistre_stockage.png)
 
 ## US4.3 Proteger les données sensibles stockées
 
@@ -1058,9 +1058,9 @@ J'ai identifier un bug donc je passe directement à ma users storie 8.1 :
 
 Dans le tableau de bord, le menu déroulant des statuts de contrat est vide : tous les contrats tombent dans l'étiquette « (vide) ».
 
-![menu-deroulant-contrat-vide.png](images_readme/menu-deroulant-contrat-vide.png)
+![menu-deroulant-contrat-vide.png](images/menu-deroulant-contrat-vide.png)
 
-![tableau_streamlit_contrat-vide.png](images_readme/tableau_streamlit_contrat-vide.png)
+![tableau_streamlit_contrat-vide.png](images/tableau_streamlit_contrat-vide.png)
 
 ### Étapes de reproduction
 
@@ -1192,9 +1192,9 @@ Résultat attendu : 446 lignes et 3 statuts (`ACTIF`, `SUSPENDU`, `RESILIE`).
 
 Résultat obtenu :
 
-![menu-deroulant-contrat-ok.png](images_readme/menu-deroulant-contrat-ok.png)
+![menu-deroulant-contrat-ok.png](images/menu-deroulant-contrat-ok.png)
 
-![tableau-streamlit-contrat-ok.png](images_readme/tableau-streamlit-contrat-ok.png)
+![tableau-streamlit-contrat-ok.png](images/tableau-streamlit-contrat-ok.png)
 
 ### Non-régression
 
@@ -1590,6 +1590,10 @@ Une fois l'évaluation faite, le modèle est entraîné une dernière fois sur l
 * la probabilité de la classe « suspect » est extraite dans une colonne `proba_fraude`, et le verdict de l'arbre (0 ou 1) dans une colonne `suspect` ;
 * le résultat est enregistré dans `predictions_fraude` avec `sinistre_id`, `contrat_id` et les cinq caractéristiques, ce qui permet de retrouver chaque sinistre.
 
+#### Limite
+
+Les données sont générées aléatoirement : il n'existe pas de lien réel entre les caractéristiques et la fraude. Le modèle ne peut donc pas apprendre de motif utile, et ses scores (précision 12 %, rappel 29 %) ne sont pas exploitables. Ce modèle démontre la chaîne technique (préparation, entraînement avec validation croisée, sauvegarde, utilisation dans l'application), pas une capacité de détection. Sur des données réelles, le jeu d'entraînement serait bien plus grand et les étiquettes issues d'enquêtes.
+
 ---
 
 #### Page du dashboard « Détection de fraude »
@@ -1684,9 +1688,9 @@ Après l'exécution, `predictions_fraude` et `metriques_fraude` doivent apparaî
 | Sinistres prédits (AbAssurance) | 61 |
 | Sinistres au-dessus du seuil de 0,5 | 0 |
 
-![stat_sinistre_prediction.png](images_readme/stat_sinistre_prediction.png)
+![stat_sinistre_prediction.png](images/stat_sinistre_prediction.png)
 
-![simulateur_sinistre_prediction.png](images_readme/simulateur_sinistre_prediction.png)
+![simulateur_sinistre_prediction.png](images/simulateur_sinistre_prediction.png)
 
 ---
 
@@ -1829,9 +1833,9 @@ Le fichier n'est jamais effacé : on ajoute toujours à la suite. Les 40 derniè
 
 **Résultat constaté :**
 
-![alerte_etat_pipeline.png](images_readme/alerte_etat_pipeline.png)
+![alerte_etat_pipeline.png](images/alerte_etat_pipeline.png)
 
-![mail_mailpit_alerte.png](images_readme/mail_mailpit_alerte.png)
+![mail_mailpit_alerte.png](images/mail_mailpit_alerte.png)
 
 ## US 6.3 : Mesurer les performances du pipeline
 
@@ -1855,7 +1859,7 @@ La page affiche ensuite, dans la section « Performances du pipeline » :
 * **un message de ralentissement**, orange s'il y en a un, vert sinon ;
 * **un graphique par étape** (« Évolution des temps dans le temps »).
 
-![etat_service_temps.png](images_readme/etat_service_temps.png)
+![etat_service_temps.png](images/etat_service_temps.png)
 (Capture prise lors du premier démarrage du pipeline, spark mets un peu de temps à démarrer la première fois)
 
 ## Comment un ralentissement est détecté
@@ -1908,7 +1912,7 @@ La configuration a été faite lors de la mise en route du projet. Cependant, je
 
 Première analyse après avoir développé le tableau de bord, l'état de service et le modèle de prédiction de détection de fraude.
 
-![sonarQ_analyse_avant_correction.png](images_readme/sonarQ_analyse_avant_correction.png)
+![sonarQ_analyse_avant_correction.png](images/sonarQ_analyse_avant_correction.png)
 
 Pour relancer le scan `pysonar --sonar-host-url=http://localhost:9000 --sonar-token=token --sonar-project-key=key`
 
@@ -2051,7 +2055,7 @@ pytest --cov=app --cov-report=term-missing --cov-report=xml --junitxml=logs/rapp
 
 **Résultat constaté :**
 
-![test_outils_terminal_succes.png](images_readme/test_outils_terminal_succes.png)
+![test_outils_terminal_succes.png](images/test_outils_terminal_succes.png)
 
 ## 6. Consulter les résultats
 
@@ -2097,7 +2101,7 @@ Les tests unitaires ne sont pas écrits sur tout le code, mais sur les fonctions
 
 Couverture globale du projet affichée par SonarQube : 69.5% pour le new code et 14.9% pour le overall. Elle est plus basse, car les autres fichiers (scripts de streaming, génération du dataset, pages Streamlit) n'ont pas de tests unitaires.
 
-![pourcentage_couverture_test_code.png](images_readme/pourcentage_couverture_test_code.png)
+![pourcentage_couverture_test_code.png](images/pourcentage_couverture_test_code.png)
 
 ## Comment la couverture est mesurée
 

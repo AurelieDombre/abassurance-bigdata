@@ -18,7 +18,7 @@ Quality Gate : [Passed / Failed]
 | Couverture, ensemble du projet | 0 % | 14,9 % |
 | Couverture, nouveau code | 0 % | 69,5 % |
 
-![dashboard_sonarqube.png](images_readme/dashboard_sonarqube.png)
+![dashboard_sonarqube.png](images/dashboard_sonarqube.png)
 
 ## 3. Tests unitaires
 
