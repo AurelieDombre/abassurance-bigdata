@@ -2,13 +2,52 @@
 
 Ce document détaille les choix techniques, leurs justifications, les problèmes rencontrés et leur résolution, ainsi que l'avancement des User Stories du projet. Pour les instructions d'installation et d'exécution, voir le [`README.md`](./README.md).
 
+## Sommaire
+ 
+Les sections suivent l'ordre dans lequel les User Stories ont été réalisées.
+ 
+| US | Sujet | Section |
+| --- | --- | --- |
+| US 0.1 | Création du dépôt Git et convention de nommage des branches | [README](../README.md#convention-de-nommage-des-branches) |
+| US 0.2 | Choix du framework Python | [Choix du framework Python](#choix-du-framework-python) |
+| US 0.3 | Modèles conceptuels de données (MCD) | [Les modèles conceptuels de données (MCD) d'AssurePlus et AbAssurance](#les-modèles-conceptuels-de-données-mcd-dassureplus-et-abassurance) |
+| US 1.5 | Mapping des schémas AbAssurance / AssurePlus | [Mapping des deux modèles](#mapping-des-deux-modèles) |
+| US 0.4 | Installation des outils (Talaxie, Kafka, Hadoop, Spark) | [Choix des outils](#choix-des-outils) |
+| US 0.4 | Problèmes rencontrés et résolutions pendant l'installation | [Problèmes rencontrés & résolutions](#problèmes-rencontrés--résolutions) |
+| US 1.1 | Inventaire des bases de données et jeu de données de test | [Création d'un dataset](#création-dun-dataset) |
+| US 1.2 | Extraction Oracle | [US 1.2 Extraction Oracle](#us-12-extraction-oracle) |
+| US 1.3 | Extraction SQL Server | [US 1.3 Extraction SQL Server](#us-13-extraction-sql-server) |
+| US 1.4 | Contrôle du nombre d'enregistrements | [US 1.4 Contrôle du nombre d'enregistrements](#us-14-contrôle-du-nombre-denregistrements) |
+| US 2.1 | Nettoyage des données | [US 2.1 Nettoyage des données](#us-21-nettoyage-des-données) |
+| US 2.2 | Transformation au format commun : fusionner les données | [US 2.2 Transformation au format commun : fusionner les données](#us-22-transformation-au-format-commun--fusionner-les-données) |
+| US 3.2 | Publication des données transformées vers Kafka | [US 3.2 — Publication des données transformées vers Kafka](#us-32--publication-des-données-transformées-vers-kafka) |
+| US 3.3 | Synchronisation pendant la phase de transition | [US 3.3 — Synchronisation pendant la phase de transition](#us-33--synchronisation-pendant-la-phase-de-transition) |
+| US 4.1 | Installer l'espace de stockage centralisé | [US 4.1 Installer l'espace de stockage centralisé](#us-41-installer-lespace-de-stockage-centralisé) |
+| US 4.2 | Stocker les données reçues de Kafka dans Hadoop | [US 4.2 — Stocker les données reçues de Kafka dans Hadoop](#us-42--stocker-les-données-reçues-de-kafka-dans-hadoop) |
+| US 4.3 | Protéger les données sensibles stockées | [US 4.3 — Protéger les données sensibles stockées](#us-43--protéger-les-données-sensibles-stockées) |
+| US 5.1 | Analyser les données pour produire des rapports | [US 5.1 Analyser les données pour produire des rapports](#us-51-analyser-les-données-pour-produire-des-rapports) |
+| US 8.1 | Identifier un bug du pipeline | [US 8.1 — Identifier un bug du pipeline](#us-81--identifier-un-bug-du-pipeline) |
+| US 8.2 | Corriger le bug | [US 8.2 — Corriger le bug](#us-82--corriger-le-bug) |
+| US 5.2 | Préparer les données pour la future IA | [US 5.2 : Préparer les données pour la future IA](#us-52--préparer-les-données-pour-la-future-ia) |
+| US 5.3 | Entraîner un modèle de détection de fraude et l'afficher dans le dashboard | [US 5.3 : Entraîner un modèle de détection de fraude et l'afficher dans le dashboard](#us-53--entraîner-un-modèle-de-détection-de-fraude-et-lafficher-dans-le-dashboard) |
+| US 6.1 | Ne jamais couper les applications existantes | [US 6.1 : Ne jamais couper les applications existantes](#us-61--ne-jamais-couper-les-applications-existantes) |
+| US 6.2 | Vérifier la disponibilité des services | [US 6.2 : Vérifier la disponibilité des services](#us-62--vérifier-la-disponibilité-des-services) |
+| US 6.3 | Mesurer les performances du pipeline | [US 6.3 : Mesurer les performances du pipeline](#us-63--mesurer-les-performances-du-pipeline) |
+| US 7.1 | Configuration de SonarQube | [US 7.1 Configuration de SonarQube](#us-71-configuration-de-sonarqube) |
+| US 7.2 | Corriger les anomalies SonarQube | [US 7.2 Corriger les anomalies SonarQube](#us-72-corriger-les-anomalies-sonarqube) |
+| US 7.3 | Écrire les tests unitaires | [US 7.3 : Écrire les tests unitaires](#us-73--écrire-les-tests-unitaires) |
+| US 7.4 | Atteindre la couverture de test de code minimale | [US 7.4 : Atteindre la couverture de test de code minimale](#us-74--atteindre-la-couverture-de-test-de-code-minimale) |
+| US 8.3 | Optimiser les performances | [US 8.3 : Optimiser les performances](#us-83--optimiser-les-performances) |
+ 
+Documents complémentaires : [`mapping_donnees.md`](./mapping_donnees.md), [`regles_nettoyage.md`](./regles_nettoyage.md), [`dictionnaire_dataset.md`](./dictionnaire_dataset.md), [`rapport_qualite.md`](./rapport_qualite.md).
+
 ## Choix du framework Python
 
 Le projet utilise **PySpark** comme framework Python principal.
 
 PySpark a été choisi car il permet d'utiliser Apache Spark depuis Python pour effectuer des traitements distribués sur de grands volumes de données. Il est particulièrement adapté à l'architecture du projet, qui repose sur Hadoop pour le stockage et Spark pour le traitement des données.
 
-La version de Python 3.14 est supportée par PySpark 4.2.0 et donc par Apache Spark.
+La version de Python 3.14 est supportée par PySpark 4.2.0 et donc par Apache Spark. Les traitements Spark du projet tournent toutefois dans le conteneur Docker, qui utilise Python 3.12 (voir le README) : c'est là que s'exécutent le pipeline et ses tests.
 
 ### Validation initiale de l'installation
 
@@ -70,7 +109,7 @@ Exemple de mapping des données :
 | `AB_CONTRAT`        | `AP_CONTRACTS`        | `CONTRAT`        |
 | `AB_SINISTRE`       | `AP_CLAIMS`           | `SINISTRE`       |
 | `AB_PAIEMENT`       | `AP_PAYMENTS`         | `PAIEMENT`       |
-| `ab_nom`            | `AP_FULL_NAME`        | `nom / prenom`   |
+| `ab_nom`            | `AP_FULL_NAME`        | `nom_prenom`     |
 | `ab_email`          | `AP_MAIL_ADDRESS`     | `email`          |
 | `ab_telephone`      | `AP_PHONE_NUMBER`     | `telephone`      |
 | `ab_date_naissance` | `AP_BIRTH_DATE`       | `date_naissance` |
@@ -115,6 +154,14 @@ Le modèle de données final comporte trois relations principales :
 * CLIENT — SOUSCRIRE — CONTRAT : relation 1:N. Un client peut souscrire plusieurs contrats, tandis qu'un contrat est rattaché à un seul client.
 * CONTRAT — DECLARER — SINISTRE : relation 1:N. Un contrat peut être associé à plusieurs sinistres, tandis qu'un sinistre est rattaché à un seul contrat.
 * CONTRAT — REGLER — PAIEMENT : relation 1:N. Un contrat peut être associé à plusieurs paiements, tandis qu'un paiement est rattaché à un seul contrat.
+
+### Évolutions du modèle à l'implémentation
+ 
+Le MCD final ci-dessus est le modèle conçu au départ. Deux choix faits pendant l'implémentation s'en écartent :
+ 
+* **`nom` et `prenom` sont fusionnés en un seul champ `nom_prenom`.** AssurePlus ne fournit qu'un nom complet (`AP_FULL_NAME`), alors qu'AbAssurance a deux champs séparés : le champ commun est donc le nom complet (voir « Fusionner les données »).
+* **Les identifiants des clients et des contrats sont des textes préfixés** (`AB-` ou `AP-`, par exemple `AB-000001`), pour qu'un identifiant ne puisse pas être le même dans les deux sources (voir « Fusionner les données », décision sur `client_id`).
+
 
 ## Choix des outils
 
@@ -574,7 +621,7 @@ output_row.ap_loyalty_score = input_row.ap_loyalty_score;
 
 Le rapport d'anomalie confirme que les seules lignes rejetées sont les doublons. Les données incorrectes ont été corrigés.
 
-## Fusionner les données
+## US 2.2 Transformation au format commun : fusionner les données
 
 L'objectif est de transformer les données nettoyées AB_CLIENT (Oracle) et AP_USERS (SQL Server) vers le schéma cible commun client_commun, avec détection et fusion des doublons inter-systèmes (même client existant dans les deux bases)
 
@@ -682,10 +729,11 @@ publiés par Talaxie et les écrivant au format Parquet dans HDFS.
 * Ajout du connecteur spark-sql-kafka-0-10 (et ses dépendances kafka-clients, spark-token-provider-kafka-0-10) téléchargés au build de l'image Docker via curl et chargés dans la SparkSession via spark.jars, la version pyspark installée ne l'incluant pas nativement.
 * Organisation des dossiers HDFS en deux zones : /data/kafka/topic pour les données brutes reçues de Kafka, /data/clean pour les futures données nettoyées (répond au critère 2 : "dossiers organisés brutes/nettoyées").
 * Gestion de checkpoints HDFS dédiés par topic (/data/checkpoints/topic`) pour permettre une reprise sans duplication en cas de redémarrage du job.
+* Lancer les scripts `docker exec -it pyspark-app python streaming_topics/streaming_clients.py`
 
 Incident traversé : un problème de permissions sur le volume Docker du broker Kafka (AccessDeniedException, utilisateur non-root du conteneur vs volume créé par root) a provoqué une perte des topics et de leur contenu ; corrigé via chown sur le volume, topics recréés, données republiées depuis Talaxie.
 
-Le nombre de données stockées correspond au nombre de données extraites au départ (aucune perte) :
+Le nombre de données stockées correspond au nombre de données extraites au départ (aucune perte) : les captures ci-dessous montrent le nombre de lignes de chaque table dans HDFS, et la dernière montre le nombre de messages de chaque topic dans Kafka UI.
 
 Capture d'écran pour client :
 
@@ -1048,9 +1096,9 @@ st.download_button(
 )
 ```
 
----
+Un bug a été identifié pendant cette User Story : il est décrit dans l'US 8.1 (identification), puis corrigé dans l'US 8.2.
 
-J'ai identifier un bug donc je passe directement à ma users storie 8.1 :
+---
 
 ## US 8.1 — Identifier un bug du pipeline
 
@@ -1145,11 +1193,11 @@ Le bug a été localisé en remontant la chaîne, étape par étape, pour élimi
 
 **1. Talaxie : publier un JSON valide**
 
-Faire en sorte qu'une prime vide soit écrite `null` dans le JSON (ou `0`), au lieu de rien. Composant modifié : [À COMPLÉTER].
+Faire en sorte qu'une prime vide soit écrite `null` dans le JSON (ou `0`), au lieu de rien. Composant modifié : job kafka_contrats.
 
 **2. Talaxie : harmoniser les statuts en français**
 
-Ajouter la traduction dans le `tMap` de la fusion (à adapter au nom réel du flux) :
+Ajouter la traduction dans le composant de transformation des contrats. L'expression ci-dessous est écrite dans le style d'un `tMap` ; elle est à adapter au composant réellement utilisé (la fusion utilise un `tJavaRow`, le `tMap` ayant été abandonné, voir l'US 2.2) :
 
 ```java
 "ACTIVE".equals(row1.statut_contrat) ? "ACTIF" :
@@ -1238,7 +1286,7 @@ Le traitement produit ensuite deux jeux de données :
 * `hdfs://namenode:9000/data/clean/dataset_fraude_entrainement`
 * `hdfs://namenode:9000/data/clean/dataset_fraude_a_predire`
 
-Le dictionnaire de données du dataset est disponible dans  /Documentations/dictionnaire_dataset.md
+Le dictionnaire de données du dataset est disponible dans [`dictionnaire_dataset.md`](./dictionnaire_dataset.md).
 
 ---
 
@@ -1484,6 +1532,20 @@ Il sert uniquement à créer la variable cible `est_suspect`.
 
 Le modèle devra apprendre à identifier les sinistres suspects à partir des autres informations disponibles, puis utiliser ces informations pour effectuer ses propres prédictions.
 
+#### Contrats AssurePlus : `prime_annuelle` et `type_assurance` vides (problème identifié)
+
+Les contrats AssurePlus ne fournissent qu'une prime **mensuelle** (`prime_mensuelle`) et un **code produit** (`code_produit`, par exemple `AUTO_BASIC`). Dans les données fusionnées, les 147 contrats AssurePlus ont donc `prime_annuelle` et `type_assurance` vides. Le script de préparation ne convertit pas ces informations : il récupère `prime_annuelle` et `type_assurance` telles quelles depuis la table des contrats.
+
+Conséquence : les 37 sinistres du jeu d'entraînement, tous issus d'AssurePlus, ont ces deux colonnes vides. Lors de l'entraînement (US 5.3), les valeurs vides sont remplacées par `0` : la caractéristique `prime_annuelle` est donc constante sur tout l'entraînement, et le modèle ne peut rien en apprendre. L'arbre appris le confirme : il n'utilise jamais la caractéristique `prime_annuelle`.
+
+Correctif prévu : calculer `prime_annuelle` à partir de `prime_mensuelle` (× 12) et déduire `type_assurance` du code produit (comme le fait déjà la fonction `preparer_contrats` de `nettoyage_donnees_ia.py`, qui n'est pas appelée par le pipeline), puis relancer la préparation et l'entraînement et mettre à jour les chiffres de l'US 5.3
+
+#### Identifiant de sinistre non unique
+ 
+Les identifiants de sinistre des deux sources se chevauchent : AbAssurance va de 1 à 61, AssurePlus de 1 à 37, donc 37 valeurs de `sinistre_id` existent deux fois pour deux sinistres différents. Les clients et les contrats ont des préfixes (`AB-`, `AP-`), pas les sinistres. Le pipeline reste correct grâce à la clé de déduplication (`sinistre_id` et `contrat_id`), mais `sinistre_id` n'est unique qu'avec `contrat_id`.
+
+Décision prise : numéroter les sinistres AssurePlus à la suite de ceux d'AbAssurance (à partir de 62) dans le job Talaxie de transformation des sinistres, pour garder un identifiant entier unique. Les anciens sinistres doivent ensuite être supprimés avant de republier : topic Kafka des sinistres, dossiers HDFS `/data/kafka/sinistres` et `/data/checkpoints/sinistres`. Le décalage de 61 est écrit en dur : il est valable pour ce jeu de données, et devrait être remplacé par un préfixe d'origine sur un projet réel.
+
 ## US 5.3 : Entraîner un modèle de détection de fraude et l'afficher dans le dashboard
 
 ### Objectif
@@ -1497,7 +1559,7 @@ Le modèle apprend sur les sinistres dont le niveau de fraude est connu (AssureP
 ### Fichiers utilisés
 
 * `src/prediction/entrainer_modele_fraude.py` : script qui entraîne, évalue et sauvegarde le modèle, puis calcule les prédictions.
-* `detection_fraude.py` : page du dashboard Streamlit qui affiche les résultats et propose un simulateur.
+* `app/pages/Detection_de_fraude.py` : page du dashboard Streamlit qui affiche les résultats et propose un simulateur.
 
 Les données en entrée sont celles produites par l'US 5.2 :
 
@@ -1590,7 +1652,7 @@ Une fois l'évaluation faite, le modèle est entraîné une dernière fois sur l
 * la probabilité de la classe « suspect » est extraite dans une colonne `proba_fraude`, et le verdict de l'arbre (0 ou 1) dans une colonne `suspect` ;
 * le résultat est enregistré dans `predictions_fraude` avec `sinistre_id`, `contrat_id` et les cinq caractéristiques, ce qui permet de retrouver chaque sinistre.
 
-#### Limite
+### Lecture des résultats
 
 Les données sont générées aléatoirement : il n'existe pas de lien réel entre les caractéristiques et la fraude. Le modèle ne peut donc pas apprendre de motif utile, et ses scores (précision 12 %, rappel 29 %) ne sont pas exploitables. Ce modèle démontre la chaîne technique (préparation, entraînement avec validation croisée, sauvegarde, utilisation dans l'application), pas une capacité de détection. Sur des données réelles, le jeu d'entraînement serait bien plus grand et les étiquettes issues d'enquêtes.
 
@@ -1729,24 +1791,11 @@ Ce n'était pas un bug de la page : elle cherchait des résultats que le script 
 ### Limites du modèle
 
 Cette US met en place la chaîne complète (données, modèle, dashboard), mais les résultats ne doivent pas être pris pour des certitudes.
-
-#### Un jeu d'entraînement très petit
-
 Le modèle apprend sur **37 sinistres, dont 7 suspects**. Avec si peu de cas positifs, un seul suspect mal classé fait varier le rappel d'environ 14 points (1 sur 7), et chaque pli de test ne contient que 1 ou 2 suspects. Les indicateurs affichés sont donc très instables et ne servent qu'à donner un ordre de grandeur.
-
-#### Un modèle entraîné sur une source et appliqué à une autre
-
 Le modèle apprend sur AssurePlus mais prédit sur AbAssurance. Si les deux assureurs ont des habitudes différentes (montants moyens, délais de déclaration, primes), les règles apprises peuvent ne pas se transposer correctement. C'est la limite la plus importante du projet.
 
-#### Aucune vérité pour valider les prédictions
-
 Les 61 sinistres d'AbAssurance n'ont pas de `fraud_score`. Il est donc impossible de savoir si les prédictions sont justes : les métriques affichées mesurent uniquement la qualité sur AssurePlus.
-
-#### Un seuil de suspicion arbitraire
-
 La cible `est_suspect` repose sur le seuil `fraud_score >= 70`, défini sans analyse de la distribution des scores (limite déjà identifiée dans l'US 5.2). Changer ce seuil changerait les données d'entraînement et donc le modèle.
-
-#### Des probabilités peu nuancées
 
 Avec un arbre de profondeur 3, le modèle ne peut produire qu'un petit nombre de valeurs de probabilité différentes (une par feuille). Le curseur de seuil du dashboard produit donc des paliers, plutôt qu'un classement fin des sinistres.
 
@@ -1836,6 +1885,28 @@ Le fichier n'est jamais effacé : on ajoute toujours à la suite. Les 40 derniè
 ![alerte_etat_pipeline.png](images/alerte_etat_pipeline.png)
 
 ![mail_mailpit_alerte.png](images/mail_mailpit_alerte.png)
+
+### 7. Correspondance avec les critères de l'US
+
+| Critère | Réalisation |
+| --- | --- |
+| Un tableau de bord de suivi est mis en place et accessible | Page « État des services » avec un voyant par étape |
+| Une alerte automatique est envoyée en cas de problème | Bannière rouge + mail d'alerte (Mailpit) |
+| L'historique des traitements (logs) passés est consultable | Fichier `logs/etat_services.log` affiché dans la page |
+
+### 8. Limites connues
+
+* **Talaxie n'est pas surveillé** : il tourne hors Docker.
+* **La vérification n'a lieu que lorsque la page est ouverte.** Si personne ne la consulte, aucune alerte ne part. En production, la surveillance serait un programme séparé qui tourne en permanence.
+* **Le voyant « Streaming » vérifie que des fichiers existent**, pas que le streaming tourne à cet instant.
+* **Le serveur de mail est simulé** (Mailpit) : aucun mail réel n'est envoyé.
+
+### 9. Évolutions possibles en production
+
+* Surveillance continue, alertes via **Alertmanager** (mail, Slack, SMS).
+* Vrai serveur de mail d'entreprise.
+* Surveillance de Talaxie (état des jobs planifiés).
+* Logs centralisés (par exemple Elasticsearch).
 
 ## US 6.3 : Mesurer les performances du pipeline
 
@@ -1930,9 +2001,38 @@ Pour relancer le scan `pysonar --sonar-host-url=http://localhost:9000 --sonar-to
 | **Notes A à E** | Une note pour la fiabilité (bugs), la sécurité (vulnérabilités) et la maintenabilité (Code Smells) |
 | **Quality Gate** | Réussi ou échoué, selon des seuils fixés par SonarQube |
 
+## US 7.2 Corriger les anomalies SonarQube
+
+### Objectif
+
+Corriger les anomalies les plus importantes détectées par la première analyse (US 7.1), puis vérifier par une nouvelle analyse qu'elles ont diminué et que le code fonctionne toujours.
+
+### Anomalies détectées et après correction
+
+| Catégorie | Nombre d'anomalies | Correction |
+| --- | --- |
+| Sécurité | 51 | 0 |
+| Fiabilité | 1 | 0 |
+| Maintenabilité | 8 | 0 |
+
+Avant correction 
+
+![sonarQ_analyse_avant_correction.png](images/sonarQ_analyse_avant_correction.png)
+
+Après correction 
+
+![new-code_coverage.png](images/new-code_coverage.png)
+
+![overall_code_coverage.png](images/overall_code_coverage.png)
+
+### Vérification que le code fonctionne toujours
+
+Les tests unitaires sont relancés après les corrections (voir les US 7.3 et 7.4) pour vérifier qu'aucune fonction n'a été cassée.
+
 ## US 7.3 : Ecrire les tests unitaire
 
 ### 1. Objectif
+
 Vérifier automatiquement que les fonctions principales du projet donnent les bons résultats, et pouvoir relancer cette vérification à tout moment (après chaque modification du code, par exemple).
 
 Un test unitaire fonctionne comme un contrôle qualité en usine : on donne à une fonction une entrée dont on connaît la bonne réponse, et on vérifie qu'elle ressort comme prévu.
@@ -2088,9 +2188,9 @@ pytest --cov=app --cov-report=term-missing --cov-report=xml --junitxml=logs/rapp
 
 ## Objectif
 
-Atteindre une couverture minimale de code de 60 %.
-
-Les tests unitaires ne sont pas écrits sur tout le code, mais sur les fonctions qui contiennent de la logique et des calculs : `app/outils.py` et `src/pipeline/preparer_dataset_fraude.py`.
+Atteindre une couverture minimale de 60 % sur les fichiers qui contiennent de la logique et des calculs : `app/outils.py` et `src/pipeline/preparer_dataset_fraude.py`.
+ 
+Les tests unitaires ne sont pas écrits sur tout le code : les pages Streamlit, les scripts de streaming et le générateur de données dépendent de l'affichage, de Kafka ou de HDFS.
 
 ## Résultats
 
@@ -2098,8 +2198,15 @@ Les tests unitaires ne sont pas écrits sur tout le code, mais sur les fonctions
 | --- | --- | --- | --- |
 | `app/outils.py` | 35 | 100 % | Atteint |
 | `src/pipeline/preparer_dataset_fraude.py` | 10 | 64 % | Atteint |
-
-Couverture globale du projet affichée par SonarQube : 69.5% pour le new code et 14.9% pour le overall. Elle est plus basse, car les autres fichiers (scripts de streaming, génération du dataset, pages Streamlit) n'ont pas de tests unitaires.
+ 
+Couverture affichée par SonarQube pour l'ensemble du projet :
+ 
+| Mesure | Couverture |
+| --- | --- |
+| Nouveau code (*New Code*) | 69,5 % |
+| Ensemble du projet (*Overall Code*) | 14,9 % |
+ 
+Le chiffre global est bas, car la majorité des fichiers (scripts de streaming, génération du dataset, pages Streamlit) n'ont pas de tests unitaires. Les tests sont concentrés sur les deux fichiers qui contiennent de la logique.
 
 ![pourcentage_couverture_test_code.png](images/pourcentage_couverture_test_code.png)
 

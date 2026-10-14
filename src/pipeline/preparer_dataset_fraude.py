@@ -51,6 +51,36 @@ def lire_nettoyer_tables(spark):
 
     return clients, contrats, paiements, sinistres
 
+# ------------------------------------------------------------------
+# Compléter les contrats AssurePlus (prime et type d'assurance)
+# ------------------------------------------------------------------
+def completer_contrats(contrats):
+    # Prime annuelle : AssurePlus ne donne qu'une prime MENSUELLE.
+    #    On la multiplie par 12, comme convertir un loyer mensuel en loyer
+    #    annuel pour pouvoir le comparer avec celui d'AbAssurance.
+    contrats = contrats.withColumn(
+        "prime_annuelle",
+        F.coalesce(
+            F.col("prime_annuelle").cast("double"),
+            F.col("prime_mensuelle").cast("double") * 12,
+        ),
+    )
+
+    # Type d'assurance : s'il est vide, on le déduit du code produit
+    #    (AUTO_BASIC -> AUTO : on garde le mot avant le "_").
+    contrats = contrats.withColumn(
+        "type_assurance",
+        F.coalesce(F.col("type_assurance"), F.split(F.col("code_produit"), "_")[0]),
+    )
+
+    # ASSIST est une abréviation : on écrit le mot complet
+    contrats = contrats.withColumn(
+        "type_assurance",
+        F.when(F.col("type_assurance") == "ASSIST", "ASSISTANCE").otherwise(
+            F.col("type_assurance")
+        ),
+    )
+    return contrats
 
 # ------------------------------------------------------------------
 # Résumer les paiements, un seul total par contrat
@@ -100,7 +130,7 @@ def ecart_debut_contrat_sinistre(dataset):
     return dataset
 
 # ------------------------------------------------------------------
-# ÉTAPE 5 : garder seulement les lignes avec des valeurs cohérentes
+# Garder seulement les lignes avec des valeurs cohérentes
 # ------------------------------------------------------------------
 def lignes_coherentes(dataset):
     dataset = dataset.filter(F.col("montant_estime") > 0)

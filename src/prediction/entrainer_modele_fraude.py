@@ -21,7 +21,7 @@ CHEMIN_MODELE = "hdfs://namenode:9000/data/models/modele_fraude"
 # nombres, communs aux deux sources (AbAssurance et AssurePlus).
 COLONNES = ["montant_estime", "prime_annuelle", "jours_avant_sinistre",
             "nb_paiements", "nb_paiements_echoues"]
-# On coupe les 37 lignes en 5 paquets (les 5 plis), d'environ 7 ou 8 lignes chacun. Parce que si on entraînes le modèle sur 37 sinistres 
+# On coupe les 37 lignes en 5 paquets (les 5 plis), d'environ 7 ou 8 lignes chacun. Parce que si on entraîne le modèle sur 37 sinistres 
 # puis qu'on le testes sur ces mêmes 37, il peut les avoir appris par cœur.
 NB_PLIS = 5
 
@@ -63,7 +63,7 @@ def evaluer(train):
     faux_negatifs = 0     # suspects que le modèle a manqués
     
     for pli in range(NB_PLIS):
-        # On entraine sur 4 plis et on test sur le plis restant.
+        # On entraine sur 4 plis et on teste sur le plis restant.
         modele = construire_pipeline().fit(train.filter(F.col("pli") != pli))
         test = modele.transform(train.filter(F.col("pli") == pli))
         

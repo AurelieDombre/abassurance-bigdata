@@ -220,6 +220,8 @@ Fichiers dans le dossier `script_test_installation`.
 python -m venv .venv
 .venv\Scripts\activate
 pip install -r Docker/requirements.txt
+python essaie-pyspark.py
+
 ```
 
 PySpark 4.2.0 est installé avec les dépendances du projet (`Docker/requirements.txt`).
