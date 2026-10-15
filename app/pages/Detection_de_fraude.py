@@ -2,6 +2,10 @@
 
 import pandas as pd
 import streamlit as st
+from auth import exiger_role
+
+# Page réservée aux administrateurs (même si quelqu'un tape l'URL directement)
+exiger_role("admin")
 from pyspark.sql import SparkSession
 from pyspark.ml import PipelineModel
 from pyspark.ml.functions import vector_to_array

@@ -14,3 +14,4 @@ coverage_fraude.xml
 .scannerwork/
 data/ab_assurance
 data/assure_plus
+Docker/auth.env

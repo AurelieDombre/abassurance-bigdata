@@ -11,8 +11,8 @@ Récupération de données suite fusion ABAssurance et AssurePlus, création de 
 | Dépôt Git final | ⚠ à compléter |
 | Dépôt 1 (première correction) | ⚠ à compléter |
 | Application en ligne | ⚠ à compléter |
-| Compte admin (login / mot de passe) | ⚠ à compléter |
-| Compte user (login / mot de passe) | ⚠ à compléter |
+| Compte admin (login / mot de passe) | Aurelie / <mdp_admin_demo> |
+| Compte user (login / mot de passe)  | Lilou / <mdp_user_demo> |
 | Journal technique | [Documentations/journal_technique.md](./Documentations/journal_technique.md) |
 | Rapport de qualité | [Documentations/rapport_qualite.md](./Documentations/rapport_qualite.md) |
 

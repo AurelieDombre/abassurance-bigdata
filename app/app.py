@@ -1,5 +1,6 @@
 # app.py — Tableau de bord AbAssurance / AssurePlus (US 5.1)
 
+import os
 import time
 
 import pandas as pd
@@ -10,11 +11,19 @@ from pyspark.sql import functions as F
 
 from outils_perf import noter_mesure
 from outils import vers_csv, texte_pdf, generer_rapport_pdf
+from auth import exiger_connexion, bouton_deconnexion
+from outils_auth import pages_autorisees
 
 # Config de la page : une seule fois, tout en haut
 st.set_page_config(page_title="Tableau de bord AbAssurance", layout="wide")
 
-DOSSIER_HDFS = "hdfs://namenode:9000/data/kafka"
+# Où lire les tables Parquet :
+#  - en local (docker compose)  : HDFS, valeur par défaut ;
+#  - en ligne (Hugging Face)    : fichiers du dépôt, via SOURCE_DONNEES=file:///app/data_demo
+DOSSIER_HDFS = os.environ.get("SOURCE_DONNEES", "hdfs://namenode:9000/data/kafka")
+
+# Connexion obligatoire avant tout le reste (Spark, données, pages)
+exiger_connexion()
 
 
 # ------------------------------------------------------------------
@@ -24,14 +33,15 @@ DOSSIER_HDFS = "hdfs://namenode:9000/data/kafka"
 #  @st.cache_resource permet à Streamlit de garder l'objet en mémoire, ne pas le recrée pas à chaque clic.
 @st.cache_resource
 def demarrer_spark():
-    spark = (
+    constructeur = (
         SparkSession.builder.appName("DashboardAbAssurance")
         .master("local[2]")                    # on utilise 2 cœurs seulement
         .config("spark.driver.memory", "1g")   # et 1 Go de mémoire maximum
-        .config("spark.hadoop.fs.defaultFS", "hdfs://namenode:9000")
-        .getOrCreate()
     )
-    return spark
+    # Le système de fichiers par défaut n'est HDFS que si les données sont dans HDFS
+    if DOSSIER_HDFS.startswith("hdfs://"):
+        constructeur = constructeur.config("spark.hadoop.fs.defaultFS", "hdfs://namenode:9000")
+    return constructeur.getOrCreate()
 
 
 def lire(spark, nom_table):
@@ -162,7 +172,7 @@ def tableau_de_bord():
     # Cette fonction est la "salle" du tableau de bord : elle ne s'exécute
     # que si l'utilisateur clique sur cette page dans le menu.
     st.title("Tableau de bord AbAssurance / AssurePlus")
-    st.caption("Données lues dans Hadoop et calculées avec Spark.")
+    st.caption("Données lues dans Hadoop (ou dans les fichiers de démo en ligne) et calculées avec Spark.")
 
     # Un bouton dans le menu de gauche pour vider la mémoire et tout recalculer
     if st.sidebar.button("Recalculer depuis Hadoop"):
@@ -251,11 +261,15 @@ def tableau_de_bord():
 # ------------------------------------------------------------------
 # Le panneau d'affichage (le menu de la sidebar)
 # ------------------------------------------------------------------
-pg = st.navigation([
-    st.Page(tableau_de_bord, title="Tableau de bord", icon="📊", default=True),
-    st.Page("pages/Detection_de_fraude.py", title="Détection de fraude", icon="🕵️"),
-    st.Page("pages/Etat_des_services.py", title="État des services", icon="🚦"),
-])
+# Les pages visibles dépendent du rôle : admin = tout, user = tableau de bord seulement.
+toutes_les_pages = {
+    "dashboard": st.Page(tableau_de_bord, title="Tableau de bord", icon="📊", default=True),
+    "fraude": st.Page("pages/Detection_de_fraude.py", title="Détection de fraude", icon="🕵️"),
+    "services": st.Page("pages/Etat_des_services.py", title="État des services", icon="🚦"),
+}
+role = st.session_state["role"]
+pg = st.navigation([toutes_les_pages[cle] for cle in pages_autorisees(role)])
+bouton_deconnexion()
 
 # L'aiguilleur de train : il envoie vers la page choisie
 pg.run()

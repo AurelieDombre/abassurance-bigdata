@@ -10,6 +10,10 @@ import pandas as pd
 import time
 from outils_perf import noter_mesure
 import streamlit as st
+from auth import exiger_role
+
+# Page réservée aux administrateurs (même si quelqu'un tape l'URL directement)
+exiger_role("admin")
 from pyspark.sql import SparkSession
 
 # mails 
