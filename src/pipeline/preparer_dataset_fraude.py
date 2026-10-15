@@ -4,7 +4,7 @@
 # (features) qui pourraient aider à repérer une fraude, et une cible (label)
 # quand on la connaît.
 
-
+import time
 from pyspark.sql import SparkSession
 from pyspark.sql import functions as F
 
@@ -20,6 +20,8 @@ def demarrer_spark():
         .master("local[2]")
         .config("spark.driver.memory", "1g")
         .config("spark.hadoop.fs.defaultFS", "hdfs://namenode:9000")
+        # OPTIMISATION (US 8.3) : 4 morceaux de calcul au lieu de 200 par défaut.
+        .config("spark.sql.shuffle.partitions", "4")
         .getOrCreate()
     )
     
@@ -49,6 +51,36 @@ def lire_nettoyer_tables(spark):
 
     return clients, contrats, paiements, sinistres
 
+# ------------------------------------------------------------------
+# Compléter les contrats AssurePlus (prime et type d'assurance)
+# ------------------------------------------------------------------
+def completer_contrats(contrats):
+    # Prime annuelle : AssurePlus ne donne qu'une prime MENSUELLE.
+    #    On la multiplie par 12, comme convertir un loyer mensuel en loyer
+    #    annuel pour pouvoir le comparer avec celui d'AbAssurance.
+    contrats = contrats.withColumn(
+        "prime_annuelle",
+        F.coalesce(
+            F.col("prime_annuelle").cast("double"),
+            F.col("prime_mensuelle").cast("double") * 12,
+        ),
+    )
+
+    # Type d'assurance : s'il est vide, on le déduit du code produit
+    #    (AUTO_BASIC -> AUTO : on garde le mot avant le "_").
+    contrats = contrats.withColumn(
+        "type_assurance",
+        F.coalesce(F.col("type_assurance"), F.split(F.col("code_produit"), "_")[0]),
+    )
+
+    # ASSIST est une abréviation : on écrit le mot complet
+    contrats = contrats.withColumn(
+        "type_assurance",
+        F.when(F.col("type_assurance") == "ASSIST", "ASSISTANCE").otherwise(
+            F.col("type_assurance")
+        ),
+    )
+    return contrats
 
 # ------------------------------------------------------------------
 # Résumer les paiements, un seul total par contrat
@@ -98,7 +130,7 @@ def ecart_debut_contrat_sinistre(dataset):
     return dataset
 
 # ------------------------------------------------------------------
-# ÉTAPE 5 : garder seulement les lignes avec des valeurs cohérentes
+# Garder seulement les lignes avec des valeurs cohérentes
 # ------------------------------------------------------------------
 def lignes_coherentes(dataset):
     dataset = dataset.filter(F.col("montant_estime") > 0)
@@ -143,16 +175,24 @@ def ajouter_etiquette_suspect(dataset_entrainement, seuil=70):
 if __name__ == "__main__":
     spark = demarrer_spark()
     
+    # On démarre APRÈS le démarrage de Spark, pour mesurer
+    # le travail du pipeline et pas le temps d'allumer le moteur.
+    debut = time.perf_counter()
+    
+    # Lire et nettoyer
     clients, contrats, paiements, sinistres = lire_nettoyer_tables(spark)
+    
+    
+    # Construire une ligne par sinistre
     paiements_par_contrat = resumer_paiements(paiements)
     dataset = lie_contrat_sinistre(sinistres, contrats, paiements_par_contrat)
     dataset = ecart_debut_contrat_sinistre(dataset)
-    dataset = lignes_coherentes(dataset)
     
     # Garder les lignes cohérentes, en COMPTANT celles qui disparaissent
     nb_avant = dataset.count()
     dataset = lignes_coherentes(dataset)
     print("Lignes écartées par le contrôle :", nb_avant - dataset.count())
+    
     
     # On garde seulement les colonnes utiles pour la suite
     dataset = garder_colonnes_utiles(dataset)
@@ -170,3 +210,6 @@ if __name__ == "__main__":
     dataset_a_predire.write.mode("overwrite").parquet(DOSSIER_SORTIE + "/dataset_fraude_a_predire")
 
     print("Dataset enregistré dans :", DOSSIER_SORTIE)
+    
+    # Arrêt du chrono : durée = heure d'arrivée - heure de départ
+    print("DUREE_PIPELINE_SECONDES :", round(time.perf_counter() - debut, 2))
