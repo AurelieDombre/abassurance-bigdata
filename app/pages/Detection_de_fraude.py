@@ -113,7 +113,13 @@ st.metric("Sinistres signalés", f"{len(a_surveiller)} sur {len(predictions)}")
 if a_surveiller.empty:
     st.info("Aucun sinistre n'atteint ce seuil.")
 else:
-    st.dataframe(a_surveiller, hide_index=True)
+    st.dataframe(
+        a_surveiller,
+        hide_index=True,
+        column_config={
+        "proba_fraude": st.column_config.NumberColumn("Probabilité de fraude", format="percent")
+        },
+    )
     st.download_button(
         label="Télécharger la liste (CSV)",
         # utf-8-sig + séparateur « ; » = s'ouvre correctement dans Excel en français
