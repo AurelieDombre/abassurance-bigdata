@@ -27,10 +27,10 @@ Ce document décrit, table par table, comment les colonnes des deux bases source
 | `AB_POLICY_NUMBER` | `AP_CONTRACT_REF` | `contrat_id` | Référence conservée telle quelle : elle est déjà préfixée dans les sources (`AB-000001`, `AP-000001`). Aucun identifiant n'est généré. |
 | `AB_CLIENT_ID` | `AP_USER_ID` | `client_id` (FK) | Clé étrangère vers `CLIENT`. Le même préfixe `AB-` ou `AP-` est ajouté, pour correspondre au `client_id` de la table CLIENT. |
 | `AB_TYPE_ASSURANCE` | `—` | `type_assurance` | Spécifique AbAssurance (catégorie générique : SANTE, AUTO...). Vide pour AssurePlus dans les données fusionnées. |
-| `—` | `AP_PRODUCT_CODE` | `code_produit` | Spécifique AssurePlus (code produit commercial : `AUTO_BASIC`...). Nomenclature différente, non fusionnée avec `type_assurance` dans les données fusionnées. Pour le jeu de données IA, la famille de produit doit être déduite de ce code (correctif prévu, voir `dictionnaire_dataset.md`). |
+| `—` | `AP_PRODUCT_CODE` | `code_produit` | Spécifique AssurePlus (code produit commercial : `AUTO_BASIC`...). Nomenclature différente, non fusionnée avec `type_assurance` dans les données fusionnées. Pour le jeu de données IA, la famille de produit est déduite de ce code par completer_contrats (voir dictionnaire_dataset.md). Le code produit reste vide pour AbAssurance|
 | `AB_DATE_DEBUT` | `AP_START_DATE` | `date_debut` | |
 | `AB_DATE_FIN` | `AP_END_DATE` | `date_fin` | |
-| `AB_PRIME_ANNUELLE` | `—` | `prime_annuelle` | Spécifique AbAssurance. Vide pour AssurePlus dans les données fusionnées. |
+| `AB_PRIME_ANNUELLE` | `—` | `prime_annuelle` | Spécifique AbAssurance. / par 12 pour AssurePlus dans les données fusionnées. |
 | `—` | `AP_MONTHLY_PREMIUM` | `prime_mensuelle` | Spécifique AssurePlus : les deux colonnes cohabitent (fréquences de facturation différentes selon la source). Pour le jeu de données IA, une prime annuelle doit être calculée (`prime_mensuelle` × 12) quand elle est vide (correctif prévu, voir `dictionnaire_dataset.md`). |
 | `AB_STATUT_CONTRAT` | `AP_CONTRACT_STATE` | `statut_contrat` | Les deux sources alimentent la **même colonne** : il n'y a pas de colonne `etat_contrat` dans les données fusionnées. AbAssurance : `ACTIF/RESILIE/SUSPENDU`. AssurePlus : `ACTIVE/TERMINATED/SUSPENDED`, à traduire en français (`ACTIF/RESILIE/SUSPENDU`) : dans Talaxie (correctif de l'US 8.2) et, en sécurité, par `harmoniser_statuts` dans Spark. |
 | `AB_AGENCE_ID` | `—` | `agence_id` | Spécifique AbAssurance (réseau d'agences physiques). |
@@ -40,7 +40,7 @@ Ce document décrit, table par table, comment les colonnes des deux bases source
 
 | Base AbAssurance | Base AssurePlus | Modèle cible | Remarque |
 | --- | --- | --- | --- |
-| `AB_CLAIM_ID` | `AP_SINISTRE_NUM` | `sinistre_id` | Numéro d'origine conservé (entier). ⚠️ Les deux numérotations se suivent (AbAssurance de 1 à 61, AssurePlus de 62 à 98). |
+| `AB_CLAIM_ID` | `AP_SINISTRE_NUM` | `sinistre_id` | Numéro d'origine conservé pour AbAssurance (1 à 61). Les sinistres AssurePlus sont numérotés à partir de 62 (62 à 98) dans le fichier fusionné, pour que l'identifiant soit unique sur l'ensemble des deux sources. |
 | `AB_POLICY_NUMBER` | `AP_CONTRACT_REF` | `contrat_id` (FK) | Clé étrangère vers `CONTRAT`. |
 | `AB_DATE_SINISTRE` | `AP_INCIDENT_DATE` | `date_sinistre` | ⚠️ `AP_INCIDENT_DATE` est stocké en texte (`VARCHAR(19)`) côté source : converti en date/horodatage par Spark (`to_timestamp`) lors de la préparation. |
 | `AB_MONTANT_ESTIME` | `AP_ESTIMATED_AMOUNT` | `montant_estime` | |
@@ -66,7 +66,9 @@ Ce document décrit, table par table, comment les colonnes des deux bases source
 | Préfixes `AB-` / `AP-` des clients | Talaxie (job de fusion) |
 | Formats de dates, e-mails, téléphones, valeurs vides | Talaxie (routine `DataCleaning`) |
 | Traduction des statuts (client, contrat, sinistre, transaction) | Spark (`harmoniser_statuts`), et Talaxie pour les contrats (US 8.2) |
-| Prime annuelle et type d'assurance pour AssurePlus | Spark (préparation du jeu de données IA) : correctif prévu, pas encore appliqué |
+| Prime annuelle et prime mensuelle | Fichiers fusionnés (les deux colonnes sont renseignées pour tous les contrats) |
+| Type d'assurance des contrats AssurePlus | Spark (`completer_contrats`, déduit du code produit) |
+| Numéros de sinistres AssurePlus (à partir de 62) | Fichier fusionné des sinistres |
 | Modes de paiement | Pas encore appliquée |
 
 ---

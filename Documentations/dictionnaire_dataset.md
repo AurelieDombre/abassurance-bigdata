@@ -14,12 +14,12 @@ Une ligne par sinistre dont le score de fraude est connu (sinistres d'origine As
 
 | Colonne | Type | Description | Origine |
 | --- | --- | --- | --- |
-| `sinistre_id` | Entier | Numéro du sinistre | AB_SINISTRE.AB_CLAIM_ID / AP_CLAIMS.AP_SINISTRE_NUM |
+| `sinistre_id` | Entier | Identifiant unique du sinistre : de 1 à 61 pour AbAssurance, de 62 à 98 pour AssurePlus | AB_SINISTRE.AB_CLAIM_ID / AP_CLAIMS.AP_SINISTRE_NUM (numéros d'AssurePlus décalés de 61) |
 | `contrat_id` | Texte | Identifiant du contrat concerné par le sinistre (`AB-000001`, `AP-000001`...) | AB_CONTRAT.AB_POLICY_NUMBER / AP_CONTRACTS.AP_CONTRACT_REF |
 | `montant_estime` | Décimal | Montant estimé du sinistre, en euros | AB_SINISTRE.AB_MONTANT_ESTIME / AP_CLAIMS.AP_ESTIMATED_AMOUNT |
 | `statut_sinistre` | Texte | Statut du sinistre, harmonisé en français (DECLARE, EN_COURS, CLOTURE, REJETE) | Harmonisation des valeurs AB (déjà en français) et AP (REPORTED/IN_PROGRESS/CLOSED/REJECTED) |
-| `type_assurance` | Texte | Famille de produit d'assurance (AUTO, HABITATION, SANTE, PROFESSIONNELLE, ASSISTANCE) | AB_CONTRAT.AB_TYPE_ASSURANCE, ou déduit du code produit AssurePlus (AP_PRODUCT_CODE) : voir la note ci-dessous |
-| `prime_annuelle` | Décimal | Montant annuel de la prime d'assurance du contrat, en euros | AB_CONTRAT.AB_PRIME_ANNUELLE, ou AP_CONTRACTS.AP_MONTHLY_PREMIUM × 12 : voir la note ci-dessous |
+| `type_assurance` | Texte | Famille de produit d'assurance (AUTO, HABITATION, SANTE, PROFESSIONNELLE, ASSISTANCE) | AB_CONTRAT.AB_TYPE_ASSURANCE, ou déduit du code produit AssurePlus (AP_PRODUCT_CODE) |
+| `prime_annuelle` | Décimal | Montant annuel de la prime d'assurance du contrat, en euros | AB_CONTRAT.AB_PRIME_ANNUELLE, ou AP_CONTRACTS.AP_MONTHLY_PREMIUM × 12 |
 | `jours_avant_sinistre` | Entier | Nombre de jours entre la date de début du contrat et la date du sinistre | Calculé (date_sinistre − date_debut) |
 | `nb_paiements` | Entier | Nombre total de paiements enregistrés sur le contrat (0 si aucun) | Calculé à partir de AB_PAIEMENT / AP_PAYMENTS |
 | `nb_paiements_echoues` | Entier | Nombre de paiements en échec sur le contrat (0 si aucun) | Calculé à partir du statut de transaction (ECHOUE) |

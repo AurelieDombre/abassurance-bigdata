@@ -15,17 +15,17 @@ Quality Gate : [Passed / Failed]
 | Sécurité (issues) | 51 | 0 |
 | Fiabilité (issues) | 1 | 0 |
 | Maintenabilité (issues) | 8 | 0 |
-| Couverture, ensemble du projet | 0 % | 14,9 % |
-| Couverture, nouveau code | 0 % | 69,5 % |
-
-![dashboard_sonarqube.png](images/dashboard_sonarqube.png)
+| Couverture, ensemble du projet | 0 % | 23,5 % |
+| Couverture, nouveau code | 0 % | 69,8 % |
 
 ## 3. Tests unitaires
 
 | Fichier | Tests | Résultat | Couverture |
 | --- | --- | --- | --- |
 | `app/outils.py` | 35 | tous réussis | 100 % |
-| `src/pipeline/preparer_dataset_fraude.py` | 10 | tous réussis | 64 % |
+| `app/outils_perf.py` | 5 | tous réussis | 100 % |
+| `src/pipeline/nettoyage_donnees_ia.py` | 13 | tous réussis | 100 % |
+| `src/pipeline/preparer_dataset_fraude.py` | 11 | tous réussis | 68 % |
 
 Commande pour tout relancer : `python lancer_tests.py`
 

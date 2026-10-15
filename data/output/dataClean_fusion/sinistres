@@ -66,7 +66,7 @@ sinistre_id;contrat_id;date_sinistre;montant_estime;statut_sinistre;description;
 "65";"AP-000017";"2024-12-29 00:23:10";"4189.14";"CLOSED";"Vehicule immobilise suite a une panne moteur.";"65.3"
 "66";"AP-000023";"2026-03-15 23:08:10";"9803.02";"IN_PROGRESS";"Vehicule immobilise suite a une panne moteur.";"28.68"
 "67";"AP-000027";"2026-04-09 09:20:15";"275.23";"IN_PROGRESS";"Bris de glace suite a un impact de gravillon sur autoroute.";"42.02"
-"68";"AP-000030";"2026-04-06 18:46:07";"8766.02";"REPORTED";"Vehicule immobilise suite a une panne moteur.";"48.12"`
+"68";"AP-000030";"2026-04-06 18:46:07";"8766.02";"REPORTED";"Vehicule immobilise suite a une panne moteur.";"48.12"
 "69";"AP-000036";"2026-08-06 13:13:25";"322.77";"CLOSED";"Demande d'assistance suite a une crevaison sur autoroute.";"32.07"
 "70";"AP-000037";"2024-10-26 03:28:31";"3469.24";"REJECTED";"Vehicule immobilise suite a une panne moteur.";"11.05"
 "71";"AP-000041";"2026-02-17 15:21:21";"8729.55";"REJECTED";"Vehicule vole sur un parking a Saint Pénélope dans la nuit.";"19.31"

@@ -1540,12 +1540,6 @@ Conséquence : les 37 sinistres du jeu d'entraînement, tous issus d'AssurePlus,
 
 Correctif prévu : calculer `prime_annuelle` à partir de `prime_mensuelle` (× 12) et déduire `type_assurance` du code produit (comme le fait déjà la fonction `preparer_contrats` de `nettoyage_donnees_ia.py`, qui n'est pas appelée par le pipeline), puis relancer la préparation et l'entraînement et mettre à jour les chiffres de l'US 5.3
 
-#### Identifiant de sinistre non unique
- 
-Les identifiants de sinistre des deux sources se chevauchent : AbAssurance va de 1 à 61, AssurePlus de 1 à 37, donc 37 valeurs de `sinistre_id` existent deux fois pour deux sinistres différents. Les clients et les contrats ont des préfixes (`AB-`, `AP-`), pas les sinistres. Le pipeline reste correct grâce à la clé de déduplication (`sinistre_id` et `contrat_id`), mais `sinistre_id` n'est unique qu'avec `contrat_id`.
-
-Décision prise : numéroter les sinistres AssurePlus à la suite de ceux d'AbAssurance (à partir de 62) dans le job Talaxie de transformation des sinistres, pour garder un identifiant entier unique. Les anciens sinistres doivent ensuite être supprimés avant de republier : topic Kafka des sinistres, dossiers HDFS `/data/kafka/sinistres` et `/data/checkpoints/sinistres`. Le décalage de 61 est écrit en dur : il est valable pour ce jeu de données, et devrait être remplacé par un préfixe d'origine sur un projet réel.
-
 ## US 5.3 : Entraîner un modèle de détection de fraude et l'afficher dans le dashboard
 
 ### Objectif
@@ -1654,7 +1648,7 @@ Une fois l'évaluation faite, le modèle est entraîné une dernière fois sur l
 
 ### Lecture des résultats
 
-Les données sont générées aléatoirement : il n'existe pas de lien réel entre les caractéristiques et la fraude. Le modèle ne peut donc pas apprendre de motif utile, et ses scores (précision 12 %, rappel 29 %) ne sont pas exploitables. Ce modèle démontre la chaîne technique (préparation, entraînement avec validation croisée, sauvegarde, utilisation dans l'application), pas une capacité de détection. Sur des données réelles, le jeu d'entraînement serait bien plus grand et les étiquettes issues d'enquêtes.
+Les données sont générées aléatoirement : il n'existe pas de lien réel entre les caractéristiques et la fraude. Le modèle ne peut donc pas apprendre de motif utile, et ses scores (précision 8 %, rappel 14 %) ne sont pas exploitables. Sur 37 sinistres dont 7 suspects, le hasard donnerait déjà une précision d'environ 19 % (7 sur 37) : le modèle fait moins bien que le hasard. Un rappel de 14 % correspond à un seul suspect retrouvé sur les 7. Ce modèle démontre la chaîne technique (préparation, entraînement avec validation croisée, sauvegarde, utilisation dans l'application), pas une capacité de détection. Sur des données réelles, le jeu d'entraînement serait bien plus grand et les étiquettes issues d'enquêtes.
 
 ---
 
@@ -1688,39 +1682,46 @@ docker cp src/prediction/entrainer_modele_fraude.py pyspark-app:/app/src/predict
 Successfully copied 9.22kB to pyspark-app:/app/src/prediction/entrainer_modele_fraude.py
 
 # 2. Exécuter l'entraînement
+# 2. Exécuter l'entraînement
 docker exec -it pyspark-app python /app/src/prediction/entrainer_modele_fraude.py
 
 Entraînement :  37 lignes dont 7 suspects
-26/10/02 15:25:26 WARN SparkStringUtils: Truncated the string representation of a plan since it was too large. This behavior can be adjusted by setting 
-26/10/02 15:25:30 WARN DecisionTreeMetadata: DecisionTree reducing maxBins from 32 to 30 (= number of training instances)
-26/10/02 15:25:36 WARN DecisionTreeMetadata: DecisionTree reducing maxBins from 32 to 29 (= number of training instances)
-26/10/02 15:25:41 WARN DecisionTreeMetadata: DecisionTree reducing maxBins from 32 to 29 (= number of training instances)
-26/10/02 15:25:46 WARN DecisionTreeMetadata: DecisionTree reducing maxBins from 32 to 30 (= number of training instances)
-26/10/02 15:25:51 WARN DecisionTreeMetadata: DecisionTree reducing maxBins from 32 to 30 (= number of training instances)
-Précision (suspects) : 0.12                                                     
-Rappel (suspects)    : 0.29
-Règles apprises (feature 0 = montant_estime, 1 = prime_annuelle, etc.) :        
-DecisionTreeClassificationModel: uid=DecisionTreeClassifier_482c0a03bd94, depth=3, numNodes=7, numClasses=2, numFeatures=5
-  If (feature 4 <= 0.5)
-   Predict: 0.0
-  Else (feature 4 > 0.5)
-   If (feature 4 <= 2.5)
-    If (feature 3 <= 1.5)
-     Predict: 0.0
-    Else (feature 3 > 1.5)
-     Predict: 1.0
-   Else (feature 4 > 2.5)
+Précision (suspects) : 0.08
+Rappel (suspects)    : 0.14
+Règles apprises (feature 0 = montant_estime, 1 = prime_annuelle, etc.) :
+DecisionTreeClassificationModel: uid=DecisionTreeClassifier_084c9c325c18, depth=3, numNodes=11, numClasses=2, numFeatures=5
+  If (feature 1 <= 1012.5)
+   If (feature 0 <= 809.0900268554688)
     Predict: 0.0
+   Else (feature 0 > 809.0900268554688)
+    If (feature 4 <= 2.5)
+     Predict: 1.0
+    Else (feature 4 > 2.5)
+     Predict: 0.0
+  Else (feature 1 > 1012.5)
+   If (feature 0 <= 3456.405029296875)
+    If (feature 1 <= 2111.3999999999996)
+     Predict: 0.0
+    Else (feature 1 > 2111.3999999999996)
+     Predict: 1.0
+   Else (feature 0 > 3456.405029296875)
+    Predict: 0.0
+
 Modèle sauvegardé : hdfs://namenode:9000/data/models/modele_fraude
+Prédictions enregistrées : 61
 
 Le raisonnement :
-Question 1 : le client a-t-il 0 paiement échoué ?
- ├─ OUI → pas suspect
- └─ NON → Question 2 : a-t-il 1 ou 2 paiements échoués ?
-           ├─ OUI → Question 3 : a-t-il au moins 2 paiements au total ?
-           │         ├─ NON (0 ou 1) → pas suspect
-           │         └─ OUI → SUSPECT
-           └─ NON (3 échoués ou plus) → pas suspect
+Question 1 : la prime annuelle est-elle de 1 012,50 € ou moins ?
+ ├─ OUI → Question 2 : le montant estimé dépasse-t-il 809,09 € ?
+ │         ├─ NON → pas suspect
+ │         └─ OUI → Question 3 : le contrat a-t-il 2 paiements échoués ou moins ?
+ │                   ├─ OUI → SUSPECT
+ │                   └─ NON (3 ou plus) → pas suspect
+ └─ NON (prime supérieure à 1 012,50 €) → Question 2 : le montant estimé est-il de 3 456,41 € ou moins ?
+           ├─ OUI → Question 3 : la prime dépasse-t-elle 2 111,40 € ?
+           │         ├─ OUI → SUSPECT
+           │         └─ NON → pas suspect
+           └─ NON (montant supérieur à 3 456,41 €) → pas suspect
 
 # 3. Vérifier les fichiers produits dans HDFS
 docker exec namenode hdfs dfs -ls /data/clean/
@@ -1745,10 +1746,10 @@ Après l'exécution, `predictions_fraude` et `metriques_fraude` doivent apparaî
 | --- | -------: |
 | Sinistres d'entraînement | 37 |
 | dont suspects | 7 |
-| Précision (suspects) | 12% |
-| Rappel (suspects) | 29% |
+| Précision (suspects) | 8 % |
+| Rappel (suspects) | 14 % |
 | Sinistres prédits (AbAssurance) | 61 |
-| Sinistres au-dessus du seuil de 0,5 | 0 |
+| Sinistres au-dessus du seuil de 0,5 | 25 |
 
 ![stat_sinistre_prediction.png](images/stat_sinistre_prediction.png)
 
@@ -2015,11 +2016,11 @@ Corriger les anomalies les plus importantes détectées par la première analyse
 | Fiabilité | 1 | 0 |
 | Maintenabilité | 8 | 0 |
 
-Avant correction 
+Avant correction
 
 ![sonarQ_analyse_avant_correction.png](images/sonarQ_analyse_avant_correction.png)
 
-Après correction 
+Après correction
 
 ![new-code_coverage.png](images/new-code_coverage.png)
 
@@ -2073,23 +2074,29 @@ Deux choix d'organisation permettent de les tester quand même :
 ```shell
 abassurance-bigdata/
 ├── app/
-│   ├── app.py, outils.py, ...
+│   ├── app.py, outils.py, outils_perf.py, ...
 │   └── pages/
 ├── src/
 │   └── pipeline/
-│       └── preparer_dataset_fraude.py   ← logique découpée en fonctions
+│       ├── preparer_dataset_fraude.py   ← logique découpée en fonctions
+│       └── nettoyage_donnees_ia.py      ← nettoyage et harmonisation des données
 ├── tests/
 │   ├── test_outils.py                   ← tests unitaires de l'application
-│   └── test_preparer_dataset_fraude.py  ← tests unitaires du pipeline
+│   ├── test_outils_perf.py              ← tests du carnet de chronos
+│   ├── test_preparer_dataset_fraude.py  ← tests unitaires du pipeline
+│   └── test_nettoyage_donnees_ia.py     ← tests du nettoyage
 ├── pytest.ini                           ← indique à pytest où trouver outils.py
-└── .coveragerc                          ← chemins relatifs + exclusion du bloc de lancement
+├── .coveragerc                          ← exclusion du bloc de lancement du calcul de couverture
+├── sonar-project.properties             ← réglages de l'analyse SonarQube
+└── lancer_tests.py                      ← tests, couverture et analyse en une commande
+
 ```
 
 Les tests du pipeline s'exécutent **dans le conteneur** `pyspark-app` (là où Spark est installé). Le rapport de couverture (`coverage_fraude.xml`) est ensuite copié sur le poste, puis l'adresse `/app` qu'il contient est remplacée par le dossier réel du projet pour que SonarQube retrouve les fichiers.
 
 ## 5. Ce qui est testé
 
-### 5.1 Application : 35 tests sur 9 fonctions de `app/outils.py`
+### 5.1 Application : 40 tests sur 10 fonctions de `app/outils.py` et `app/outils_perf.py`
 
 | Fonction | Rôle | Nb de tests | Cas vérifiés |
 | --- | --- | --- | --- |
@@ -2102,14 +2109,16 @@ Les tests du pipeline s'exécutent **dans le conteneur** `pyspark-app` (là où 
 | `formater_ligne_log` | Ligne du carnet de bord | 2 | Ligne `OK`, ligne `ALERTE` |
 | `construire_mail` | Contenu du mail d'alerte | 4 | Sujet, texte, adresses par défaut et personnalisées |
 | `detecter_ralentissement` | Détection d'un ralentissement | 7 | Pas assez de mesures, temps stable, ralentissement, petit écart ignoré, seuil exact, facteur personnalisé, amélioration |
+| `noter_mesure` | Ajoute une mesure de temps dans le carnet de chronos | 5 | Fichier et titres créés, étape et durée écrites, titres écrits une seule fois, anciennes mesures conservées, durée arrondie à 3 décimales |
 
-Les tests de `tester_porte` ouvrent eux-mêmes une porte temporaire sur la machine : ils ne dépendent ni de Docker ni d'Internet.
+Ces tests utilisent un dossier temporaire créé par pytest : le vrai fichier `logs/performances.csv` n'est jamais touché.
 
 ### 5.2 Pipeline fraude : 10 tests sur 7 fonctions de `preparer_dataset_fraude.py`
 
 | Fonction | Rôle | Nb de tests | Cas vérifiés |
 | --- | --- | --- | --- |
 | `resumer_paiements` | Un total par contrat | 1 | Nombre de paiements et de paiements échoués |
+| `completer_contrats` | Complète la prime annuelle et le type d'assurance | 1 | Prime mensuelle × 12 pour AssurePlus, type déduit du code produit, `ASSIST` devient `ASSISTANCE`, contrat AbAssurance inchangé |
 | `lie_contrat_sinistre` | Rattache contrat et paiements à chaque sinistre | 1 | Jointure `left`, colonnes des 3 tables présentes |
 | `ecart_debut_contrat_sinistre` | Jours entre début du contrat et sinistre | 2 | Écart de 10 jours, dates manquantes (écart vide, valeurs nulles remplacées par 0) |
 | `lignes_coherentes` | Écarte les lignes incohérentes | 3 | Montant nul, écart négatif, jeu vide |
@@ -2121,41 +2130,66 @@ Ces tests utilisent un vrai Spark local avec de petites tables créées dans le 
 
 **Bug identifié (voir Dossier 3, Question 3).** Un des tests de `lignes_coherentes` documente un risque : une date vide donne un écart vide, et la ligne est écartée sans message. Le programme principal affiche désormais le nombre de lignes écartées.
 
-**Ce qui n'est pas couvert par les tests unitaires** : `demarrer_spark` et `lire_nettoyer_tables`, qui se branchent sur HDFS. Elles se vérifient en conditions réelles, en lançant le pipeline. Couverture actuelle du fichier : 64 %.
+**Ce qui n'est pas couvert par les tests unitaires** : `demarrer_spark` (ligne 18) et `lire_nettoyer_tables` (lignes 32 à 52), qui se branchent sur HDFS. Elles se vérifient en conditions réelles, en lançant le pipeline. Couverture actuelle du fichier : 68 %.
+
+#### 5.3 Nettoyage : 13 tests sur 7 fonctions de `nettoyage_donnees_ia.py
+
+| Fonction | Rôle | Nb de tests | Cas vérifiés |
+| --- | --- | --- | --- |
+| `nettoyer` | Enlève les espaces et transforme les textes vides en `null` | 3 | Espaces supprimés, texte vide ou fait d'espaces devenu `null`, nombres inchangés |
+| `harmoniser_statuts` | Traduit les statuts anglais en français | 5 | Clients, contrats, sinistres, transactions (par exemple `FAILED` → `ECHOUE`), table sans colonne de statut. Un statut déjà en français, vide ou inconnu n'est pas modifié |
+| `lire_fichier` | Lit un CSV séparé par des points-virgules | 1 | Deux colonnes, accents conservés |
+| `preparer_clients` | Nettoyage complet de la table clients | 1 | Doublon supprimé, espaces enlevés, statuts traduits |
+| `preparer_contrats` | Nettoyage complet des contrats | 1 | Famille de produit, prime mensuelle × 12, durée du contrat, doublon supprimé, statuts traduits |
+| `preparer_paiements` | Résumé des paiements par contrat | 1 | Nombre, total payé, paiements échoués, doublon non compté |
+| `preparer_sinistres` | Résumé des sinistres par contrat | 1 | Nombre, total estimé, sinistres rejetés, doublon non compté |
+
+Ces tests tournent dans le conteneur, comme ceux du pipeline. Couverture du fichier : 100 %.
+
+Les fonctions `preparer_*` ne sont appelées par aucun script du pipeline actuel (le script de préparation applique `nettoyer` et `harmoniser_statuts` lui-même). Elles sont testées pour garantir leur logique en cas de réutilisation.
 
 ## 6. Comment lancer les tests
 
-Depuis la racine du projet :
+Deux commandes, selon l'endroit où les tests s'exécutent. Les tests de `outils.py` et `outils_perf.py` tournent directement sur le poste, ceux du pipeline et du nettoyage ont besoin de Spark et tournent dans le conteneur `pyspark-app`.
 
 ```shell
-pytest
+# Tests de la logique de l'application, sur le poste (depuis la racine du projet)
+pytest tests/test_outils.py tests/test_outils_perf.py
+ 
+# Chaîne complète : tests du pipeline dans le conteneur, tests de l'application,
+# couverture, puis analyse SonarQube (voir l'US 7.4)
+python lancer_tests.py
 ```
 
 Pour obtenir aussi la couverture et un rapport de résultats consultable :
 
 ```shell
-(.venv) PS C:\xampp\htdocs\Projets\abassurance-bigdata> pytest
+(.venv) PS C:\xampp\htdocs\Projets\abassurance-bigdata> python lancer_tests.py 
+
+================================ tests coverage ================================
+_______________ coverage: platform linux, python 3.12.14-final-0 _______________
+
+Name                                      Stmts   Miss  Cover   Missing
+-----------------------------------------------------------------------
+src/pipeline/nettoyage_donnees_ia.py         45      0   100%
+src/pipeline/preparer_dataset_fraude.py      56     18    68%   18, 32-52
+-----------------------------------------------------------------------
+TOTAL                                       101     18    82%
+Coverage XML written to file /app/coverage_fraude.xml
+======================== 24 passed, 1 warning in 17.80s ========================
+
 ======================================== test session starts ===========================================
-platform win32 -- Python 3.14.5, pytest-9.1.1, pluggy-1.6.0
-rootdir: C:\xampp\htdocs\Projets\abassurance-bigdata
-configfile: pytest.ini
-testpaths: tests
-plugins: anyio-4.15.1, cov-7.1.0
-collected 35 items                                                                                                                                                                                                  
-
-tests\test_outils.py ...................................     [100%]
-
-=============================== 35 passed in 2.95s ======================================================
+Name                 Stmts   Miss  Cover   Missing
+--------------------------------------------------
+app\app.py             106    106     0%   3-261
+app\outils.py           74      0   100%
+app\outils_perf.py      11      0   100%
+--------------------------------------------------
+TOTAL                  191    106    45%
+Coverage XML written to file coverage.xml
+==================================================================================================================== 40 passed in 3.76s ==============================================
 
 ```
-
-```shell
-pytest --cov=app --cov-report=term-missing --cov-report=xml --junitxml=logs/rapport_tests.xml
-```
-
-**Résultat constaté :**
-
-![test_outils_terminal_succes.png](images/test_outils_terminal_succes.png)
 
 ## 6. Consulter les résultats
 
@@ -2167,20 +2201,18 @@ pytest --cov=app --cov-report=term-missing --cov-report=xml --junitxml=logs/rapp
 
 | Critère | Réalisation |
 | --- | --- |
-| Les composants principaux disposent de tests unitaires | 35 tests sur les 9 fonctions de logique de `outils.py` (export, rapport, surveillance des services, alertes, performances). Voir les limites ci-dessous |
-| Les tests s'exécutent sans erreur | `pytest` : tous les tests réussis |
+| Les composants principaux disposent de tests unitaires | 64 tests : 35 sur `outils.py`, 5 sur `outils_perf.py`, 11 sur `preparer_dataset_fraude.py` et 13 sur `nettoyage_donnees_ia.py`. Voir les limites ci-dessous |
+| Les tests s'exécutent sans erreur | `pytest tests/test_outils.py tests/test_outils_perf.py` sur le poste (40 tests réussis) et `python lancer_tests.py` pour les 24 tests Spark dans le conteneur (tous réussis) |
 | Les résultats des tests sont consultables | Terminal, fichier `logs/rapport_tests.xml`, SonarQube |
 | Les tests peuvent être relancés automatiquement | Commande unique `pytest` et script `lancer_tests.ps1` ; intégration continue décrite pour la production |
 
 ## 8. Limites connues
 
-* **Seule la logique pure est testée unitairement.** Les pages Streamlit (affichage) et les traitements Spark (nettoyage, entraînement du modèle) ne sont pas couverts par ces tests. Ils sont vérifiés autrement : par les comptages de l'US 1.4, par les échantillons du tableau de bord (US 5.1) et par les métriques du modèle (US 5.3).
-* **Les `verifier_...` de la page État des services** (Kafka, Hadoop, Spark) nécessitent le réseau Docker : ce sont des tests d'intégration, pas des tests unitaires. Seule la décision prise à partir de leurs résultats (`interpreter_datanodes`, `trouver_pannes`) est testée.
-* **Pas d'intégration continue réelle** : les tests sont lancés à la main ou avec le script, pas automatiquement à chaque modification.
+**Seule une partie du code est testée unitairement.** La logique de `outils.py` et `outils_perf.py`, le nettoyage et les fonctions de `preparer_dataset_fraude.py` sont couverts. Les pages Streamlit (affichage), les scripts de streaming et l'entraînement du modèle ne le sont pas. Ils sont vérifiés autrement : par les comptages de l'US 1.4, par les échantillons du tableau de bord (US 5.1) et par les métriques du modèle (US 5.3).
 
 ## 9. Évolutions possibles
 
-* Tests des transformations Spark (`harmoniser_statuts`, `nettoyer`) avec un mini-Spark local sur quelques lignes inventées.
+* Tests des fonctions de `entrainer_modele_fraude.py` qui ne dépendent pas de HDFS (préparation des colonnes, construction du pipeline).
 * Tests d'intégration lancés dans Docker avec le pipeline complet.
 * Intégration continue avec blocage de la livraison si un test échoue.
 
@@ -2188,8 +2220,8 @@ pytest --cov=app --cov-report=term-missing --cov-report=xml --junitxml=logs/rapp
 
 ## Objectif
 
-Atteindre une couverture minimale de 60 % sur les fichiers qui contiennent de la logique et des calculs : `app/outils.py` et `src/pipeline/preparer_dataset_fraude.py`.
- 
+Atteindre une couverture minimale de 60 % sur les fichiers qui contiennent de la logique et des calculs : `app/outils.py`, `app/outils_perf.py`, `src/pipeline/nettoyage_donnees_ia.py` et `src/pipeline/preparer_dataset_fraude.py`.
+
 Les tests unitaires ne sont pas écrits sur tout le code : les pages Streamlit, les scripts de streaming et le générateur de données dépendent de l'affichage, de Kafka ou de HDFS.
 
 ## Résultats
@@ -2197,16 +2229,18 @@ Les tests unitaires ne sont pas écrits sur tout le code : les pages Streamlit, 
 | Fichier | Nombre de tests | Couverture | Seuil de 60 % |
 | --- | --- | --- | --- |
 | `app/outils.py` | 35 | 100 % | Atteint |
-| `src/pipeline/preparer_dataset_fraude.py` | 10 | 64 % | Atteint |
- 
+| `app/outils_perf.py` | 5 | 100 % | Atteint |
+| `src/pipeline/nettoyage_donnees_ia.py` | 13 | 100 % | Atteint |
+| `src/pipeline/preparer_dataset_fraude.py` | 11 | 68 % | Atteint |
+
 Couverture affichée par SonarQube pour l'ensemble du projet :
- 
+
 | Mesure | Couverture |
 | --- | --- |
-| Nouveau code (*New Code*) | 69,5 % |
-| Ensemble du projet (*Overall Code*) | 14,9 % |
- 
-Le chiffre global est bas, car la majorité des fichiers (scripts de streaming, génération du dataset, pages Streamlit) n'ont pas de tests unitaires. Les tests sont concentrés sur les deux fichiers qui contiennent de la logique.
+| Nouveau code (*New Code*) | 69,8 % |
+| Ensemble du projet (*Overall Code*) | 25,5 % |
+
+Le chiffre global est plus bas que ceux des fichiers testés, car la majorité des autres fichiers (scripts de streaming, génération du dataset, pages Streamlit, entraînement du modèle) n'ont pas de tests unitaires. Le rapport produit sur le poste contient aussi `app/app.py` (l'interface Streamlit, 106 lignes) à 0 %, ce qui ramène la couverture du dossier `app` à 45 %.
 
 ![pourcentage_couverture_test_code.png](images/pourcentage_couverture_test_code.png)
 
@@ -2214,8 +2248,8 @@ Le chiffre global est bas, car la majorité des fichiers (scripts de streaming, 
 
 La couverture est le pourcentage de lignes de code exécutées par au moins un test. L'outil utilisé est `pytest-cov`, et le résultat est envoyé à SonarQube.
 
-* Les tests de `outils.py` tournent directement sur le poste.
-* Les tests de `preparer_dataset_fraude.py` tournent dans le conteneur Docker `pyspark-app`, là où Spark est installé.
+* Les tests de `outils.py` et `outils_perf.py` tournent directement sur le poste.
+* Les tests de `preparer_dataset_fraude.py` et `nettoyage_donnees_ia.py` tournent dans le conteneur Docker `pyspark-app`, là où Spark est installé. Ils sont lancés dans **une seule commande** pytest, pour que le rapport de couverture (`coverage_fraude.xml`) contienne les deux fichiers : chaque lancement de pytest réécrit son rapport en entier.
 * Chaque exécution produit un rapport XML (`coverage.xml` et `coverage_fraude.xml`). Pour le rapport du conteneur, l'adresse `/app` qu'il contient est remplacée par le dossier réel du projet, afin que SonarQube retrouve les fichiers.
 * Le fichier `.coveragerc` exclut le bloc `if __name__ == "__main__":`. Ce bloc ne fait qu'appeler les fonctions dans l'ordre : la logique est dans les fonctions, qui sont testées.
 
@@ -2229,16 +2263,17 @@ Le script envoie les fichiers dans le conteneur, lance les deux séries de tests
 
 ## Parties non couvertes
 
-Pour `preparer_dataset_fraude.py`, 36 % du code n'est pas couvert :
+Pour `preparer_dataset_fraude.py`, 32 % du code n'est pas couvert :
 
 * `demarrer_spark` (ligne 18) : elle démarre une session Spark connectée à HDFS.
-* `lire_nettoyer_tables` (lignes 30 à 50) : elle lit les tables Parquet dans HDFS.
+* `lire_nettoyer_tables` (lignes 32 à 52) : elle lit les tables Parquet dans HDFS.
 
 Ces deux fonctions dépendent de Hadoop. Elles ne se testent pas en test unitaire simple, mais se vérifient en conditions réelles, en lançant le pipeline.
 
 ## Améliorations possibles
 
 * Tester `lire_nettoyer_tables` avec un faux Spark qui renvoie de petites tables, sans passer par HDFS.
+* Tester les fonctions de `entrainer_modele_fraude.py` qui ne dépendent pas de HDFS.
 * Déclencher automatiquement les tests à chaque `git push` (intégration continue). Aujourd'hui, ils se relancent en une commande, mais à la main.
 
 ## US 8.3 : Optimiser les performances

@@ -1,0 +1,1004 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="0" failures="6" skipped="0" tests="41" time="73.646" timestamp="2026-10-09T16:49:00.548919+02:00" hostname="DESKTOP-NPVBOL4"><testcase classname="tests.test_outils" name="test_vers_csv_commence_marqueur_excel" time="0.021" /><testcase classname="tests.test_outils" name="test_vers_csv_utilise_point_virgule_accents" time="0.002" /><testcase classname="tests.test_outils" name="test_vers_csv_n_ajoute_pas_de_colonne_numero" time="0.003" /><testcase classname="tests.test_outils" name="test_texte_pdf_garde_accents" time="0.001" /><testcase classname="tests.test_outils" name="test_texte_pdf_remplace_caracteres_inconnus" time="0.001" /><testcase classname="tests.test_outils" name="test_texte_pdf_texte_vide" time="0.001" /><testcase classname="tests.test_outils" name="test_rapport_pdf_est_un_vrai_pdf" time="0.005" /><testcase classname="tests.test_outils" name="test_rapport_pdf_sans_aucun_statut_ne_plante_pas" time="0.001" /><testcase classname="tests.test_outils" name="test_serveur_repond" time="0.004" /><testcase classname="tests.test_outils" name="test_serveur_repond_pas" time="2.059" /><testcase classname="tests.test_outils" name="test_serveur_inconnue_reponse" time="0.027" /><testcase classname="tests.test_outils" name="test_hadoop_2_datanodes_sur_2_vert" time="0.002" /><testcase classname="tests.test_outils" name="test_hadoop_datanode_1_sur_2_rouge" time="0.002" /><testcase classname="tests.test_outils" name="test_hadoop_datanode_silencieux" time="0.002" /><testcase classname="tests.test_outils" name="test_hadoop_aucun_datanode_rouge" time="0.002" /><testcase classname="tests.test_outils" name="test_hadoop_deux_silencieux_inaccessibles" time="0.002" /><testcase classname="tests.test_outils" name="test_hadoop_ajout_datanodes" time="0.002" /><testcase classname="tests.test_outils" name="test_hadoop_nombre_attendu_personnalise" time="0.001" /><testcase classname="tests.test_outils" name="test_trouver_pannes_succes" time="0.000" /><testcase classname="tests.test_outils" name="test_trouver_pannes_une_panne" time="0.000" /><testcase classname="tests.test_outils" name="test_trouver_pannes_plusieurs_etapes_panne_ordre" time="0.000" /><testcase classname="tests.test_outils" name="test_trouver_pannes_liste_vide" time="0.001" /><testcase classname="tests.test_outils" name="test_ligne_log_etape_ok" time="0.001" /><testcase classname="tests.test_outils" name="test_ligne_log_etape_panne" time="0.001" /><testcase classname="tests.test_outils" name="test_mail_sujet_contient_services_panne" time="0.009" /><testcase classname="tests.test_outils" name="test_mail_texte_contient_services_panne" time="0.002" /><testcase classname="tests.test_outils" name="test_mail_adresses_par_defaut" time="0.001" /><testcase classname="tests.test_outils" name="test_mail_adresses_personnalisees" time="0.002" /><testcase classname="tests.test_outils" name="test_ralentissement_mesures" time="0.001" /><testcase classname="tests.test_outils" name="test_ralentissement_temps_stable" time="0.001" /><testcase classname="tests.test_outils" name="test_ralentissement_detecte_derniere_depasse_moyenne" time="0.001" /><testcase classname="tests.test_outils" name="test_ralentissement_ignore_ecarts_sous_seconde" time="0.001" /><testcase classname="tests.test_outils" name="test_ralentissement_exactement_2_fois_moyenne" time="0.001" /><testcase classname="tests.test_outils" name="test_ralentissement_facteur_personnalise" time="0.001" /><testcase classname="tests.test_outils" name="test_ralentissement_amelioration" time="0.000" /><testcase classname="tests.test_preparer_dataset_fraude" name="test_resumer_paiements" time="17.840"><failure message="py4j.protocol.Py4JJavaError: An error occurred while calling o67.collectToPython.&#10;: org.apache.spark.SparkException: Job aborted due to stage failure: Task 0 in stage 0.0 failed 1 times, most recent failure: Lost task 0.0 in stage 0.0 (TID 0) (DESKTOP-NPVBOL4.mshome.net executor driver): org.apache.spark.SparkException: Python worker failed to connect back.&#13;&#10;&#09;at org.apache.spark.api.python.PythonWorkerFactory.createSimpleWorker(PythonWorkerFactory.scala:303)&#13;&#10;&#09;at org.apache.spark.api.python.PythonWorkerFactory.create(PythonWorkerFactory.scala:154)&#13;&#10;&#09;at org.apache.spark.SparkEnv.createPythonWorker(SparkEnv.scala:182)&#13;&#10;&#09;at org.apache.spark.api.python.BasePythonRunner.compute(PythonRunner.scala:330)&#13;&#10;&#09;at org.apache.spark.api.python.PythonRDD.compute(PythonRDD.scala:73)&#13;&#10;&#09;at org.apache.spark.rdd.RDD.computeOrReadCheckpoint(RDD.scala:374)&#13;&#10;&#09;at org.apache.spark.rdd.RDD.iterator(RDD.scala:338)&#13;&#10;&#09;at org.apache.spark.rdd.MapPartitionsRDD.compute(MapPartitionsRDD.scala:57)&#13;&#10;&#09;at org.apache.spark.rdd.RDD.computeOrReadCheckpoint(RDD.scala:374)&#13;&#10;&#09;at org.apache.spark.rdd.RDD.iterator(RDD.scala:338)&#13;&#10;&#09;at org.apache.spark.rdd.MapPartitionsRDD.compute(MapPartitionsRDD.scala:57)&#13;&#10;&#09;at org.apache.spark.rdd.RDD.computeOrReadCheckpoint(RDD.scala:374)&#13;&#10;&#09;at org.apache.spark.rdd.RDD.iterator(RDD.scala:338)&#13;&#10;&#09;at org.apache.spark.rdd.MapPartitionsRDD.compute(MapPartitionsRDD.scala:57)&#13;&#10;&#09;at org.apache.spark.rdd.RDD.computeOrReadCheckpoint(RDD.scala:374)&#13;&#10;&#09;at org.apache.spark.rdd.RDD.iterator(RDD.scala:338)&#13;&#10;&#09;at org.apache.spark.rdd.MapPartitionsRDD.compute(MapPartitionsRDD.scala:57)&#13;&#10;&#09;at org.apache.spark.rdd.RDD.computeOrReadCheckpoint(RDD.scala:374)&#13;&#10;&#09;at org.apache.spark.rdd.RDD.iterator(RDD.scala:338)&#13;&#10;&#09;at org.apache.spark.rdd.MapPartitionsRDD.compute(MapPartitionsRDD.scala:57)&#13;&#10;&#09;at org.apache.spark.rdd.RDD.computeOrReadCheckpoint(RDD.scala:374)&#13;&#10;&#09;at org.apache.spark.rdd.RDD.iterator(RDD.scala:338)&#13;&#10;&#09;at org.apache.spark.scheduler.ShuffleMapTask.runTask(ShuffleMapTask.scala:107)&#13;&#10;&#09;at org.apache.spark.scheduler.ShuffleMapTask.runTask(ShuffleMapTask.scala:54)&#13;&#10;&#09;at org.apache.spark.TaskContext.runTaskWithListeners(TaskContext.scala:206)&#13;&#10;&#09;at org.apache.spark.scheduler.Task.run(Task.scala:147)&#13;&#10;&#09;at org.apache.spark.executor.Executor$TaskRunner.$anonfun$run$4(Executor.scala:894)&#13;&#10;&#09;at org.apache.spark.util.SparkErrorUtils.tryWithSafeFinally(SparkErrorUtils.scala:86)&#13;&#10;&#09;at org.apache.spark.util.SparkErrorUtils.tryWithSafeFinally$(SparkErrorUtils.scala:83)&#13;&#10;&#09;at org.apache.spark.util.Utils$.tryWithSafeFinally(Utils.scala:97)&#13;&#10;&#09;at org.apache.spark.executor.Executor$TaskRunner.run(Executor.scala:897)&#13;&#10;&#09;at java.base/java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1144)&#13;&#10;&#09;at java.base/java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:642)&#13;&#10;&#09;at java.base/java.lang.Thread.run(Thread.java:1583)&#13;&#10;Caused by: java.net.SocketTimeoutException: Timed out while waiting for the Python worker to connect back&#13;&#10;&#09;at org.apache.spark.api.python.PythonWorkerFactory.createSimpleWorker(PythonWorkerFactory.scala:285)&#13;&#10;&#09;... 33 more&#13;&#10;&#10;Driver stacktrace:&#13;&#10;&#09;at org.apache.spark.scheduler.DAGScheduler.$anonfun$abortStage$3(DAGScheduler.scala:3318)&#13;&#10;&#09;at scala.Option.getOrElse(Option.scala:201)&#13;&#10;&#09;at org.apache.spark.scheduler.DAGScheduler.$anonfun$abortStage$2(DAGScheduler.scala:3318)&#13;&#10;&#09;at org.apache.spark.scheduler.DAGScheduler.$anonfun$abortStage$2$adapted(DAGScheduler.scala:3310)&#13;&#10;&#09;at scala.collection.immutable.List.foreach(List.scala:323)&#13;&#10;&#09;at org.apache.spark.scheduler.DAGScheduler.abortStage(DAGScheduler.scala:3310)&#13;&#10;&#09;at org.apache.spark.scheduler.DAGScheduler.$anonfun$handleTaskSetFailed$1(DAGScheduler.scala:1363)&#13;&#10;&#09;at org.apache.spark.scheduler.DAGScheduler.$anonfun$handleTaskSetFailed$1$adapted(DAGScheduler.scala:1363)&#13;&#10;&#09;at scala.Option.foreach(Option.scala:437)&#13;&#10;&#09;at org.apache.spark.scheduler.DAGScheduler.handleTaskSetFailed(DAGScheduler.scala:1363)&#13;&#10;&#09;at org.apache.spark.scheduler.DAGSchedulerEventProcessLoop.doOnReceive(DAGScheduler.scala:3589)&#13;&#10;&#09;at org.apache.spark.scheduler.DAGSchedulerEventProcessLoop.onReceive(DAGScheduler.scala:3517)&#13;&#10;&#09;at org.apache.spark.scheduler.DAGSchedulerEventProcessLoop.onReceive(DAGScheduler.scala:3506)&#13;&#10;&#09;at org.apache.spark.util.EventLoop$$anon$1.run(EventLoop.scala:50)&#13;&#10;Caused by: org.apache.spark.SparkException: Python worker failed to connect back.&#13;&#10;&#09;at org.apache.spark.api.python.PythonWorkerFactory.createSimpleWorker(PythonWorkerFactory.scala:303)&#13;&#10;&#09;at org.apache.spark.api.python.PythonWorkerFactory.create(PythonWorkerFactory.scala:154)&#13;&#10;&#09;at org.apache.spark.SparkEnv.createPythonWorker(SparkEnv.scala:182)&#13;&#10;&#09;at org.apache.spark.api.python.BasePythonRunner.compute(PythonRunner.scala:330)&#13;&#10;&#09;at org.apache.spark.api.python.PythonRDD.compute(PythonRDD.scala:73)&#13;&#10;&#09;at org.apache.spark.rdd.RDD.computeOrReadCheckpoint(RDD.scala:374)&#13;&#10;&#09;at org.apache.spark.rdd.RDD.iterator(RDD.scala:338)&#13;&#10;&#09;at org.apache.spark.rdd.MapPartitionsRDD.compute(MapPartitionsRDD.scala:57)&#13;&#10;&#09;at org.apache.spark.rdd.RDD.computeOrReadCheckpoint(RDD.scala:374)&#13;&#10;&#09;at org.apache.spark.rdd.RDD.iterator(RDD.scala:338)&#13;&#10;&#09;at org.apache.spark.rdd.MapPartitionsRDD.compute(MapPartitionsRDD.scala:57)&#13;&#10;&#09;at org.apache.spark.rdd.RDD.computeOrReadCheckpoint(RDD.scala:374)&#13;&#10;&#09;at org.apache.spark.rdd.RDD.iterator(RDD.scala:338)&#13;&#10;&#09;at org.apache.spark.rdd.MapPartitionsRDD.compute(MapPartitionsRDD.scala:57)&#13;&#10;&#09;at org.apache.spark.rdd.RDD.computeOrReadCheckpoint(RDD.scala:374)&#13;&#10;&#09;at org.apache.spark.rdd.RDD.iterator(RDD.scala:338)&#13;&#10;&#09;at org.apache.spark.rdd.MapPartitionsRDD.compute(MapPartitionsRDD.scala:57)&#13;&#10;&#09;at org.apache.spark.rdd.RDD.computeOrReadCheckpoint(RDD.scala:374)&#13;&#10;&#09;at org.apache.spark.rdd.RDD.iterator(RDD.scala:338)&#13;&#10;&#09;at org.apache.spark.rdd.MapPartitionsRDD.compute(MapPartitionsRDD.scala:57)&#13;&#10;&#09;at org.apache.spark.rdd.RDD.computeOrReadCheckpoint(RDD.scala:374)&#13;&#10;&#09;at org.apache.spark.rdd.RDD.iterator(RDD.scala:338)&#13;&#10;&#09;at org.apache.spark.scheduler.ShuffleMapTask.runTask(ShuffleMapTask.scala:107)&#13;&#10;&#09;at org.apache.spark.scheduler.ShuffleMapTask.runTask(ShuffleMapTask.scala:54)&#13;&#10;&#09;at org.apache.spark.TaskContext.runTaskWithListeners(TaskContext.scala:206)&#13;&#10;&#09;at org.apache.spark.scheduler.Task.run(Task.scala:147)&#13;&#10;&#09;at org.apache.spark.executor.Executor$TaskRunner.$anonfun$run$4(Executor.scala:894)&#13;&#10;&#09;at org.apache.spark.util.SparkErrorUtils.tryWithSafeFinally(SparkErrorUtils.scala:86)&#13;&#10;&#09;at org.apache.spark.util.SparkErrorUtils.tryWithSafeFinally$(SparkErrorUtils.scala:83)&#13;&#10;&#09;at org.apache.spark.util.Utils$.tryWithSafeFinally(Utils.scala:97)&#13;&#10;&#09;at org.apache.spark.executor.Executor$TaskRunner.run(Executor.scala:897)&#13;&#10;&#09;at java.base/java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1144)&#13;&#10;&#09;at java.base/java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:642)&#13;&#10;&#09;at java.base/java.lang.Thread.run(Thread.java:1583)&#13;&#10;Caused by: java.net.SocketTimeoutException: Timed out while waiting for the Python worker to connect back&#13;&#10;&#09;at org.apache.spark.api.python.PythonWorkerFactory.createSimpleWorker(PythonWorkerFactory.scala:285)&#13;&#10;&#09;... 33 more">spark = &lt;pyspark.sql.session.SparkSession object at 0x000002AEFD5C8AD0&gt;
+
+    def test_resumer_paiements(spark):
+        paiements = spark.createDataFrame(
+        [
+            ("p1", "c1", "ECHOUE"),
+            ("p2", "c1", "REUSSI"),
+            ("p3", "c1", "ECHOUE"),
+        ],
+            "paiement_id string, contrat_id string, statut_transaction string",
+        )
+    
+&gt;       resultat = prep.resumer_paiements(paiements).collect()
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests\test_preparer_dataset_fraude.py:30: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+.venv\Lib\site-packages\pyspark\sql\classic\dataframe.py:503: in collect
+    sock_info = self._jdf.collectToPython()
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv\Lib\site-packages\py4j\java_gateway.py:1362: in __call__
+    return_value = get_return_value(
+.venv\Lib\site-packages\pyspark\errors\exceptions\captured.py:251: in deco
+    return f(*a, **kw)
+           ^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+answer = 'xro68', gateway_client = &lt;py4j.clientserver.JavaClient object at 0x000002AEBD443230&gt;, target_id = 'o67', name = 'collectToPython'
+
+    def get_return_value(answer, gateway_client, target_id=None, name=None):
+        """Converts an answer received from the Java gateway into a Python object.
+    
+        For example, string representation of integers are converted to Python
+        integer, string representation of objects are converted to JavaObject
+        instances, etc.
+    
+        :param answer: the string returned by the Java gateway
+        :param gateway_client: the gateway client used to communicate with the Java
+            Gateway. Only necessary if the answer is a reference (e.g., object,
+            list, map)
+        :param target_id: the name of the object from which the answer comes from
+            (e.g., *object1* in `object1.hello()`). Optional.
+        :param name: the name of the member from which the answer comes from
+            (e.g., *hello* in `object1.hello()`). Optional.
+        """
+        if is_error(answer)[0]:
+            if len(answer) &gt; 1:
+                type = answer[1]
+                value = OUTPUT_CONVERTER[type](answer[2:], gateway_client)
+                if answer[1] == REFERENCE_TYPE:
+&gt;                   raise Py4JJavaError(
+                        "An error occurred while calling {0}{1}{2}.\n".
+                        format(target_id, ".", name), value)
+E                   py4j.protocol.Py4JJavaError: An error occurred while calling o67.collectToPython.
+E                   : org.apache.spark.SparkException: Job aborted due to stage failure: Task 0 in stage 0.0 failed 1 times, most recent failure: Lost task 0.0 in stage 0.0 (TID 0) (DESKTOP-NPVBOL4.mshome.net executor driver): org.apache.spark.SparkException: Python worker failed to connect back.
+E                   	at org.apache.spark.api.python.PythonWorkerFactory.createSimpleWorker(PythonWorkerFactory.scala:303)
+E                   	at org.apache.spark.api.python.PythonWorkerFactory.create(PythonWorkerFactory.scala:154)
+E                   	at org.apache.spark.SparkEnv.createPythonWorker(SparkEnv.scala:182)
+E                   	at org.apache.spark.api.python.BasePythonRunner.compute(PythonRunner.scala:330)
+E                   	at org.apache.spark.api.python.PythonRDD.compute(PythonRDD.scala:73)
+E                   	at org.apache.spark.rdd.RDD.computeOrReadCheckpoint(RDD.scala:374)
+E                   	at org.apache.spark.rdd.RDD.iterator(RDD.scala:338)
+E                   	at org.apache.spark.rdd.MapPartitionsRDD.compute(MapPartitionsRDD.scala:57)
+E                   	at org.apache.spark.rdd.RDD.computeOrReadCheckpoint(RDD.scala:374)
+E                   	at org.apache.spark.rdd.RDD.iterator(RDD.scala:338)
+E                   	at org.apache.spark.rdd.MapPartitionsRDD.compute(MapPartitionsRDD.scala:57)
+E                   	at org.apache.spark.rdd.RDD.computeOrReadCheckpoint(RDD.scala:374)
+E                   	at org.apache.spark.rdd.RDD.iterator(RDD.scala:338)
+E                   	at org.apache.spark.rdd.MapPartitionsRDD.compute(MapPartitionsRDD.scala:57)
+E                   	at org.apache.spark.rdd.RDD.computeOrReadCheckpoint(RDD.scala:374)
+E                   	at org.apache.spark.rdd.RDD.iterator(RDD.scala:338)
+E                   	at org.apache.spark.rdd.MapPartitionsRDD.compute(MapPartitionsRDD.scala:57)
+E                   	at org.apache.spark.rdd.RDD.computeOrReadCheckpoint(RDD.scala:374)
+E                   	at org.apache.spark.rdd.RDD.iterator(RDD.scala:338)
+E                   	at org.apache.spark.rdd.MapPartitionsRDD.compute(MapPartitionsRDD.scala:57)
+E                   	at org.apache.spark.rdd.RDD.computeOrReadCheckpoint(RDD.scala:374)
+E                   	at org.apache.spark.rdd.RDD.iterator(RDD.scala:338)
+E                   	at org.apache.spark.scheduler.ShuffleMapTask.runTask(ShuffleMapTask.scala:107)
+E                   	at org.apache.spark.scheduler.ShuffleMapTask.runTask(ShuffleMapTask.scala:54)
+E                   	at org.apache.spark.TaskContext.runTaskWithListeners(TaskContext.scala:206)
+E                   	at org.apache.spark.scheduler.Task.run(Task.scala:147)
+E                   	at org.apache.spark.executor.Executor$TaskRunner.$anonfun$run$4(Executor.scala:894)
+E                   	at org.apache.spark.util.SparkErrorUtils.tryWithSafeFinally(SparkErrorUtils.scala:86)
+E                   	at org.apache.spark.util.SparkErrorUtils.tryWithSafeFinally$(SparkErrorUtils.scala:83)
+E                   	at org.apache.spark.util.Utils$.tryWithSafeFinally(Utils.scala:97)
+E                   	at org.apache.spark.executor.Executor$TaskRunner.run(Executor.scala:897)
+E                   	at java.base/java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1144)
+E                   	at java.base/java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:642)
+E                   	at java.base/java.lang.Thread.run(Thread.java:1583)
+E                   Caused by: java.net.SocketTimeoutException: Timed out while waiting for the Python worker to connect back
+E                   	at org.apache.spark.api.python.PythonWorkerFactory.createSimpleWorker(PythonWorkerFactory.scala:285)
+E                   	... 33 more
+E                   
+E                   Driver stacktrace:
+E                   	at org.apache.spark.scheduler.DAGScheduler.$anonfun$abortStage$3(DAGScheduler.scala:3318)
+E                   	at scala.Option.getOrElse(Option.scala:201)
+E                   	at org.apache.spark.scheduler.DAGScheduler.$anonfun$abortStage$2(DAGScheduler.scala:3318)
+E                   	at org.apache.spark.scheduler.DAGScheduler.$anonfun$abortStage$2$adapted(DAGScheduler.scala:3310)
+E                   	at scala.collection.immutable.List.foreach(List.scala:323)
+E                   	at org.apache.spark.scheduler.DAGScheduler.abortStage(DAGScheduler.scala:3310)
+E                   	at org.apache.spark.scheduler.DAGScheduler.$anonfun$handleTaskSetFailed$1(DAGScheduler.scala:1363)
+E                   	at org.apache.spark.scheduler.DAGScheduler.$anonfun$handleTaskSetFailed$1$adapted(DAGScheduler.scala:1363)
+E                   	at scala.Option.foreach(Option.scala:437)
+E                   	at org.apache.spark.scheduler.DAGScheduler.handleTaskSetFailed(DAGScheduler.scala:1363)
+E                   	at org.apache.spark.scheduler.DAGSchedulerEventProcessLoop.doOnReceive(DAGScheduler.scala:3589)
+E                   	at org.apache.spark.scheduler.DAGSchedulerEventProcessLoop.onReceive(DAGScheduler.scala:3517)
+E                   	at org.apache.spark.scheduler.DAGSchedulerEventProcessLoop.onReceive(DAGScheduler.scala:3506)
+E                   	at org.apache.spark.util.EventLoop$$anon$1.run(EventLoop.scala:50)
+E                   Caused by: org.apache.spark.SparkException: Python worker failed to connect back.
+E                   	at org.apache.spark.api.python.PythonWorkerFactory.createSimpleWorker(PythonWorkerFactory.scala:303)
+E                   	at org.apache.spark.api.python.PythonWorkerFactory.create(PythonWorkerFactory.scala:154)
+E                   	at org.apache.spark.SparkEnv.createPythonWorker(SparkEnv.scala:182)
+E                   	at org.apache.spark.api.python.BasePythonRunner.compute(PythonRunner.scala:330)
+E                   	at org.apache.spark.api.python.PythonRDD.compute(PythonRDD.scala:73)
+E                   	at org.apache.spark.rdd.RDD.computeOrReadCheckpoint(RDD.scala:374)
+E                   	at org.apache.spark.rdd.RDD.iterator(RDD.scala:338)
+E                   	at org.apache.spark.rdd.MapPartitionsRDD.compute(MapPartitionsRDD.scala:57)
+E                   	at org.apache.spark.rdd.RDD.computeOrReadCheckpoint(RDD.scala:374)
+E                   	at org.apache.spark.rdd.RDD.iterator(RDD.scala:338)
+E                   	at org.apache.spark.rdd.MapPartitionsRDD.compute(MapPartitionsRDD.scala:57)
+E                   	at org.apache.spark.rdd.RDD.computeOrReadCheckpoint(RDD.scala:374)
+E                   	at org.apache.spark.rdd.RDD.iterator(RDD.scala:338)
+E                   	at org.apache.spark.rdd.MapPartitionsRDD.compute(MapPartitionsRDD.scala:57)
+E                   	at org.apache.spark.rdd.RDD.computeOrReadCheckpoint(RDD.scala:374)
+E                   	at org.apache.spark.rdd.RDD.iterator(RDD.scala:338)
+E                   	at org.apache.spark.rdd.MapPartitionsRDD.compute(MapPartitionsRDD.scala:57)
+E                   	at org.apache.spark.rdd.RDD.computeOrReadCheckpoint(RDD.scala:374)
+E                   	at org.apache.spark.rdd.RDD.iterator(RDD.scala:338)
+E                   	at org.apache.spark.rdd.MapPartitionsRDD.compute(MapPartitionsRDD.scala:57)
+E                   	at org.apache.spark.rdd.RDD.computeOrReadCheckpoint(RDD.scala:374)
+E                   	at org.apache.spark.rdd.RDD.iterator(RDD.scala:338)
+E                   	at org.apache.spark.scheduler.ShuffleMapTask.runTask(ShuffleMapTask.scala:107)
+E                   	at org.apache.spark.scheduler.ShuffleMapTask.runTask(ShuffleMapTask.scala:54)
+E                   	at org.apache.spark.TaskContext.runTaskWithListeners(TaskContext.scala:206)
+E                   	at org.apache.spark.scheduler.Task.run(Task.scala:147)
+E                   	at org.apache.spark.executor.Executor$TaskRunner.$anonfun$run$4(Executor.scala:894)
+E                   	at org.apache.spark.util.SparkErrorUtils.tryWithSafeFinally(SparkErrorUtils.scala:86)
+E                   	at org.apache.spark.util.SparkErrorUtils.tryWithSafeFinally$(SparkErrorUtils.scala:83)
+E                   	at org.apache.spark.util.Utils$.tryWithSafeFinally(Utils.scala:97)
+E                   	at org.apache.spark.executor.Executor$TaskRunner.run(Executor.scala:897)
+E                   	at java.base/java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1144)
+E                   	at java.base/java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:642)
+E                   	at java.base/java.lang.Thread.run(Thread.java:1583)
+E                   Caused by: java.net.SocketTimeoutException: Timed out while waiting for the Python worker to connect back
+E                   	at org.apache.spark.api.python.PythonWorkerFactory.createSimpleWorker(PythonWorkerFactory.scala:285)
+E                   	... 33 more
+
+.venv\Lib\site-packages\py4j\protocol.py:327: Py4JJavaError</failure></testcase><testcase classname="tests.test_preparer_dataset_fraude" name="test_lie_contrat_sinistre" time="10.374"><failure message="py4j.protocol.Py4JJavaError: An error occurred while calling o121.collectToPython.&#10;: org.apache.spark.SparkException: Job aborted due to stage failure: Task 0 in stage 1.0 failed 1 times, most recent failure: Lost task 0.0 in stage 1.0 (TID 1) (DESKTOP-NPVBOL4.mshome.net executor driver): org.apache.spark.SparkException: Python worker failed to connect back.&#13;&#10;&#09;at org.apache.spark.api.python.PythonWorkerFactory.createSimpleWorker(PythonWorkerFactory.scala:303)&#13;&#10;&#09;at org.apache.spark.api.python.PythonWorkerFactory.create(PythonWorkerFactory.scala:154)&#13;&#10;&#09;at org.apache.spark.SparkEnv.createPythonWorker(SparkEnv.scala:182)&#13;&#10;&#09;at org.apache.spark.api.python.BasePythonRunner.compute(PythonRunner.scala:330)&#13;&#10;&#09;at org.apache.spark.api.python.PythonRDD.compute(PythonRDD.scala:73)&#13;&#10;&#09;at org.apache.spark.rdd.RDD.computeOrReadCheckpoint(RDD.scala:374)&#13;&#10;&#09;at org.apache.spark.rdd.RDD.iterator(RDD.scala:338)&#13;&#10;&#09;at org.apache.spark.rdd.MapPartitionsRDD.compute(MapPartitionsRDD.scala:57)&#13;&#10;&#09;at org.apache.spark.rdd.RDD.computeOrReadCheckpoint(RDD.scala:374)&#13;&#10;&#09;at org.apache.spark.rdd.RDD.iterator(RDD.scala:338)&#13;&#10;&#09;at org.apache.spark.rdd.MapPartitionsRDD.compute(MapPartitionsRDD.scala:57)&#13;&#10;&#09;at org.apache.spark.rdd.RDD.computeOrReadCheckpoint(RDD.scala:374)&#13;&#10;&#09;at org.apache.spark.rdd.RDD.iterator(RDD.scala:338)&#13;&#10;&#09;at org.apache.spark.rdd.MapPartitionsRDD.compute(MapPartitionsRDD.scala:57)&#13;&#10;&#09;at org.apache.spark.rdd.RDD.computeOrReadCheckpoint(RDD.scala:374)&#13;&#10;&#09;at org.apache.spark.rdd.RDD.iterator(RDD.scala:338)&#13;&#10;&#09;at org.apache.spark.rdd.MapPartitionsRDD.compute(MapPartitionsRDD.scala:57)&#13;&#10;&#09;at org.apache.spark.rdd.RDD.computeOrReadCheckpoint(RDD.scala:374)&#13;&#10;&#09;at org.apache.spark.rdd.RDD.iterator(RDD.scala:338)&#13;&#10;&#09;at org.apache.spark.rdd.MapPartitionsRDD.compute(MapPartitionsRDD.scala:57)&#13;&#10;&#09;at org.apache.spark.rdd.RDD.computeOrReadCheckpoint(RDD.scala:374)&#13;&#10;&#09;at org.apache.spark.rdd.RDD.iterator(RDD.scala:338)&#13;&#10;&#09;at org.apache.spark.scheduler.ShuffleMapTask.runTask(ShuffleMapTask.scala:107)&#13;&#10;&#09;at org.apache.spark.scheduler.ShuffleMapTask.runTask(ShuffleMapTask.scala:54)&#13;&#10;&#09;at org.apache.spark.TaskContext.runTaskWithListeners(TaskContext.scala:206)&#13;&#10;&#09;at org.apache.spark.scheduler.Task.run(Task.scala:147)&#13;&#10;&#09;at org.apache.spark.executor.Executor$TaskRunner.$anonfun$run$4(Executor.scala:894)&#13;&#10;&#09;at org.apache.spark.util.SparkErrorUtils.tryWithSafeFinally(SparkErrorUtils.scala:86)&#13;&#10;&#09;at org.apache.spark.util.SparkErrorUtils.tryWithSafeFinally$(SparkErrorUtils.scala:83)&#13;&#10;&#09;at org.apache.spark.util.Utils$.tryWithSafeFinally(Utils.scala:97)&#13;&#10;&#09;at org.apache.spark.executor.Executor$TaskRunner.run(Executor.scala:897)&#13;&#10;&#09;at java.base/java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1144)&#13;&#10;&#09;at java.base/java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:642)&#13;&#10;&#09;at java.base/java.lang.Thread.run(Thread.java:1583)&#13;&#10;Caused by: java.net.SocketTimeoutException: Timed out while waiting for the Python worker to connect back&#13;&#10;&#09;at org.apache.spark.api.python.PythonWorkerFactory.createSimpleWorker(PythonWorkerFactory.scala:285)&#13;&#10;&#09;... 33 more&#13;&#10;&#10;Driver stacktrace:&#13;&#10;&#09;at org.apache.spark.scheduler.DAGScheduler.$anonfun$abortStage$3(DAGScheduler.scala:3318)&#13;&#10;&#09;at scala.Option.getOrElse(Option.scala:201)&#13;&#10;&#09;at org.apache.spark.scheduler.DAGScheduler.$anonfun$abortStage$2(DAGScheduler.scala:3318)&#13;&#10;&#09;at org.apache.spark.scheduler.DAGScheduler.$anonfun$abortStage$2$adapted(DAGScheduler.scala:3310)&#13;&#10;&#09;at scala.collection.immutable.List.foreach(List.scala:323)&#13;&#10;&#09;at org.apache.spark.scheduler.DAGScheduler.abortStage(DAGScheduler.scala:3310)&#13;&#10;&#09;at org.apache.spark.scheduler.DAGScheduler.$anonfun$handleTaskSetFailed$1(DAGScheduler.scala:1363)&#13;&#10;&#09;at org.apache.spark.scheduler.DAGScheduler.$anonfun$handleTaskSetFailed$1$adapted(DAGScheduler.scala:1363)&#13;&#10;&#09;at scala.Option.foreach(Option.scala:437)&#13;&#10;&#09;at org.apache.spark.scheduler.DAGScheduler.handleTaskSetFailed(DAGScheduler.scala:1363)&#13;&#10;&#09;at org.apache.spark.scheduler.DAGSchedulerEventProcessLoop.doOnReceive(DAGScheduler.scala:3589)&#13;&#10;&#09;at org.apache.spark.scheduler.DAGSchedulerEventProcessLoop.onReceive(DAGScheduler.scala:3517)&#13;&#10;&#09;at org.apache.spark.scheduler.DAGSchedulerEventProcessLoop.onReceive(DAGScheduler.scala:3506)&#13;&#10;&#09;at org.apache.spark.util.EventLoop$$anon$1.run(EventLoop.scala:50)&#13;&#10;Caused by: org.apache.spark.SparkException: Python worker failed to connect back.&#13;&#10;&#09;at org.apache.spark.api.python.PythonWorkerFactory.createSimpleWorker(PythonWorkerFactory.scala:303)&#13;&#10;&#09;at org.apache.spark.api.python.PythonWorkerFactory.create(PythonWorkerFactory.scala:154)&#13;&#10;&#09;at org.apache.spark.SparkEnv.createPythonWorker(SparkEnv.scala:182)&#13;&#10;&#09;at org.apache.spark.api.python.BasePythonRunner.compute(PythonRunner.scala:330)&#13;&#10;&#09;at org.apache.spark.api.python.PythonRDD.compute(PythonRDD.scala:73)&#13;&#10;&#09;at org.apache.spark.rdd.RDD.computeOrReadCheckpoint(RDD.scala:374)&#13;&#10;&#09;at org.apache.spark.rdd.RDD.iterator(RDD.scala:338)&#13;&#10;&#09;at org.apache.spark.rdd.MapPartitionsRDD.compute(MapPartitionsRDD.scala:57)&#13;&#10;&#09;at org.apache.spark.rdd.RDD.computeOrReadCheckpoint(RDD.scala:374)&#13;&#10;&#09;at org.apache.spark.rdd.RDD.iterator(RDD.scala:338)&#13;&#10;&#09;at org.apache.spark.rdd.MapPartitionsRDD.compute(MapPartitionsRDD.scala:57)&#13;&#10;&#09;at org.apache.spark.rdd.RDD.computeOrReadCheckpoint(RDD.scala:374)&#13;&#10;&#09;at org.apache.spark.rdd.RDD.iterator(RDD.scala:338)&#13;&#10;&#09;at org.apache.spark.rdd.MapPartitionsRDD.compute(MapPartitionsRDD.scala:57)&#13;&#10;&#09;at org.apache.spark.rdd.RDD.computeOrReadCheckpoint(RDD.scala:374)&#13;&#10;&#09;at org.apache.spark.rdd.RDD.iterator(RDD.scala:338)&#13;&#10;&#09;at org.apache.spark.rdd.MapPartitionsRDD.compute(MapPartitionsRDD.scala:57)&#13;&#10;&#09;at org.apache.spark.rdd.RDD.computeOrReadCheckpoint(RDD.scala:374)&#13;&#10;&#09;at org.apache.spark.rdd.RDD.iterator(RDD.scala:338)&#13;&#10;&#09;at org.apache.spark.rdd.MapPartitionsRDD.compute(MapPartitionsRDD.scala:57)&#13;&#10;&#09;at org.apache.spark.rdd.RDD.computeOrReadCheckpoint(RDD.scala:374)&#13;&#10;&#09;at org.apache.spark.rdd.RDD.iterator(RDD.scala:338)&#13;&#10;&#09;at org.apache.spark.scheduler.ShuffleMapTask.runTask(ShuffleMapTask.scala:107)&#13;&#10;&#09;at org.apache.spark.scheduler.ShuffleMapTask.runTask(ShuffleMapTask.scala:54)&#13;&#10;&#09;at org.apache.spark.TaskContext.runTaskWithListeners(TaskContext.scala:206)&#13;&#10;&#09;at org.apache.spark.scheduler.Task.run(Task.scala:147)&#13;&#10;&#09;at org.apache.spark.executor.Executor$TaskRunner.$anonfun$run$4(Executor.scala:894)&#13;&#10;&#09;at org.apache.spark.util.SparkErrorUtils.tryWithSafeFinally(SparkErrorUtils.scala:86)&#13;&#10;&#09;at org.apache.spark.util.SparkErrorUtils.tryWithSafeFinally$(SparkErrorUtils.scala:83)&#13;&#10;&#09;at org.apache.spark.util.Utils$.tryWithSafeFinally(Utils.scala:97)&#13;&#10;&#09;at org.apache.spark.executor.Executor$TaskRunner.run(Executor.scala:897)&#13;&#10;&#09;at java.base/java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1144)&#13;&#10;&#09;at java.base/java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:642)&#13;&#10;&#09;at java.base/java.lang.Thread.run(Thread.java:1583)&#13;&#10;Caused by: java.net.SocketTimeoutException: Timed out while waiting for the Python worker to connect back&#13;&#10;&#09;at org.apache.spark.api.python.PythonWorkerFactory.createSimpleWorker(PythonWorkerFactory.scala:285)&#13;&#10;&#09;... 33 more">spark = &lt;pyspark.sql.session.SparkSession object at 0x000002AEFD5C8AD0&gt;
+
+    def test_lie_contrat_sinistre(spark):
+        sinistres = spark.createDataFrame(
+        [("s1", "c1", 1000.0)],
+        "sinistre_id string, contrat_id string, montant_estime double",
+        )
+    
+        contrats = spark.createDataFrame(
+            [("c1", "auto")],
+            "contrat_id string, type_assurance string",
+        )
+    
+        paiements = spark.createDataFrame(
+            [("c1", 2, 1)],
+            "contrat_id string, nb_paiements long, nb_paiements_echoues long",
+        )
+    
+        resultat = prep.lie_contrat_sinistre(
+            sinistres, contrats, paiements
+&gt;       ).collect()
+          ^^^^^^^^^
+
+tests\test_preparer_dataset_fraude.py:55: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+.venv\Lib\site-packages\pyspark\sql\classic\dataframe.py:503: in collect
+    sock_info = self._jdf.collectToPython()
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv\Lib\site-packages\py4j\java_gateway.py:1362: in __call__
+    return_value = get_return_value(
+.venv\Lib\site-packages\pyspark\errors\exceptions\captured.py:251: in deco
+    return f(*a, **kw)
+           ^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+answer = 'xro122', gateway_client = &lt;py4j.clientserver.JavaClient object at 0x000002AEBD443230&gt;, target_id = 'o121', name = 'collectToPython'
+
+    def get_return_value(answer, gateway_client, target_id=None, name=None):
+        """Converts an answer received from the Java gateway into a Python object.
+    
+        For example, string representation of integers are converted to Python
+        integer, string representation of objects are converted to JavaObject
+        instances, etc.
+    
+        :param answer: the string returned by the Java gateway
+        :param gateway_client: the gateway client used to communicate with the Java
+            Gateway. Only necessary if the answer is a reference (e.g., object,
+            list, map)
+        :param target_id: the name of the object from which the answer comes from
+            (e.g., *object1* in `object1.hello()`). Optional.
+        :param name: the name of the member from which the answer comes from
+            (e.g., *hello* in `object1.hello()`). Optional.
+        """
+        if is_error(answer)[0]:
+            if len(answer) &gt; 1:
+                type = answer[1]
+                value = OUTPUT_CONVERTER[type](answer[2:], gateway_client)
+                if answer[1] == REFERENCE_TYPE:
+&gt;                   raise Py4JJavaError(
+                        "An error occurred while calling {0}{1}{2}.\n".
+                        format(target_id, ".", name), value)
+E                   py4j.protocol.Py4JJavaError: An error occurred while calling o121.collectToPython.
+E                   : org.apache.spark.SparkException: Job aborted due to stage failure: Task 0 in stage 1.0 failed 1 times, most recent failure: Lost task 0.0 in stage 1.0 (TID 1) (DESKTOP-NPVBOL4.mshome.net executor driver): org.apache.spark.SparkException: Python worker failed to connect back.
+E                   	at org.apache.spark.api.python.PythonWorkerFactory.createSimpleWorker(PythonWorkerFactory.scala:303)
+E                   	at org.apache.spark.api.python.PythonWorkerFactory.create(PythonWorkerFactory.scala:154)
+E                   	at org.apache.spark.SparkEnv.createPythonWorker(SparkEnv.scala:182)
+E                   	at org.apache.spark.api.python.BasePythonRunner.compute(PythonRunner.scala:330)
+E                   	at org.apache.spark.api.python.PythonRDD.compute(PythonRDD.scala:73)
+E                   	at org.apache.spark.rdd.RDD.computeOrReadCheckpoint(RDD.scala:374)
+E                   	at org.apache.spark.rdd.RDD.iterator(RDD.scala:338)
+E                   	at org.apache.spark.rdd.MapPartitionsRDD.compute(MapPartitionsRDD.scala:57)
+E                   	at org.apache.spark.rdd.RDD.computeOrReadCheckpoint(RDD.scala:374)
+E                   	at org.apache.spark.rdd.RDD.iterator(RDD.scala:338)
+E                   	at org.apache.spark.rdd.MapPartitionsRDD.compute(MapPartitionsRDD.scala:57)
+E                   	at org.apache.spark.rdd.RDD.computeOrReadCheckpoint(RDD.scala:374)
+E                   	at org.apache.spark.rdd.RDD.iterator(RDD.scala:338)
+E                   	at org.apache.spark.rdd.MapPartitionsRDD.compute(MapPartitionsRDD.scala:57)
+E                   	at org.apache.spark.rdd.RDD.computeOrReadCheckpoint(RDD.scala:374)
+E                   	at org.apache.spark.rdd.RDD.iterator(RDD.scala:338)
+E                   	at org.apache.spark.rdd.MapPartitionsRDD.compute(MapPartitionsRDD.scala:57)
+E                   	at org.apache.spark.rdd.RDD.computeOrReadCheckpoint(RDD.scala:374)
+E                   	at org.apache.spark.rdd.RDD.iterator(RDD.scala:338)
+E                   	at org.apache.spark.rdd.MapPartitionsRDD.compute(MapPartitionsRDD.scala:57)
+E                   	at org.apache.spark.rdd.RDD.computeOrReadCheckpoint(RDD.scala:374)
+E                   	at org.apache.spark.rdd.RDD.iterator(RDD.scala:338)
+E                   	at org.apache.spark.scheduler.ShuffleMapTask.runTask(ShuffleMapTask.scala:107)
+E                   	at org.apache.spark.scheduler.ShuffleMapTask.runTask(ShuffleMapTask.scala:54)
+E                   	at org.apache.spark.TaskContext.runTaskWithListeners(TaskContext.scala:206)
+E                   	at org.apache.spark.scheduler.Task.run(Task.scala:147)
+E                   	at org.apache.spark.executor.Executor$TaskRunner.$anonfun$run$4(Executor.scala:894)
+E                   	at org.apache.spark.util.SparkErrorUtils.tryWithSafeFinally(SparkErrorUtils.scala:86)
+E                   	at org.apache.spark.util.SparkErrorUtils.tryWithSafeFinally$(SparkErrorUtils.scala:83)
+E                   	at org.apache.spark.util.Utils$.tryWithSafeFinally(Utils.scala:97)
+E                   	at org.apache.spark.executor.Executor$TaskRunner.run(Executor.scala:897)
+E                   	at java.base/java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1144)
+E                   	at java.base/java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:642)
+E                   	at java.base/java.lang.Thread.run(Thread.java:1583)
+E                   Caused by: java.net.SocketTimeoutException: Timed out while waiting for the Python worker to connect back
+E                   	at org.apache.spark.api.python.PythonWorkerFactory.createSimpleWorker(PythonWorkerFactory.scala:285)
+E                   	... 33 more
+E                   
+E                   Driver stacktrace:
+E                   	at org.apache.spark.scheduler.DAGScheduler.$anonfun$abortStage$3(DAGScheduler.scala:3318)
+E                   	at scala.Option.getOrElse(Option.scala:201)
+E                   	at org.apache.spark.scheduler.DAGScheduler.$anonfun$abortStage$2(DAGScheduler.scala:3318)
+E                   	at org.apache.spark.scheduler.DAGScheduler.$anonfun$abortStage$2$adapted(DAGScheduler.scala:3310)
+E                   	at scala.collection.immutable.List.foreach(List.scala:323)
+E                   	at org.apache.spark.scheduler.DAGScheduler.abortStage(DAGScheduler.scala:3310)
+E                   	at org.apache.spark.scheduler.DAGScheduler.$anonfun$handleTaskSetFailed$1(DAGScheduler.scala:1363)
+E                   	at org.apache.spark.scheduler.DAGScheduler.$anonfun$handleTaskSetFailed$1$adapted(DAGScheduler.scala:1363)
+E                   	at scala.Option.foreach(Option.scala:437)
+E                   	at org.apache.spark.scheduler.DAGScheduler.handleTaskSetFailed(DAGScheduler.scala:1363)
+E                   	at org.apache.spark.scheduler.DAGSchedulerEventProcessLoop.doOnReceive(DAGScheduler.scala:3589)
+E                   	at org.apache.spark.scheduler.DAGSchedulerEventProcessLoop.onReceive(DAGScheduler.scala:3517)
+E                   	at org.apache.spark.scheduler.DAGSchedulerEventProcessLoop.onReceive(DAGScheduler.scala:3506)
+E                   	at org.apache.spark.util.EventLoop$$anon$1.run(EventLoop.scala:50)
+E                   Caused by: org.apache.spark.SparkException: Python worker failed to connect back.
+E                   	at org.apache.spark.api.python.PythonWorkerFactory.createSimpleWorker(PythonWorkerFactory.scala:303)
+E                   	at org.apache.spark.api.python.PythonWorkerFactory.create(PythonWorkerFactory.scala:154)
+E                   	at org.apache.spark.SparkEnv.createPythonWorker(SparkEnv.scala:182)
+E                   	at org.apache.spark.api.python.BasePythonRunner.compute(PythonRunner.scala:330)
+E                   	at org.apache.spark.api.python.PythonRDD.compute(PythonRDD.scala:73)
+E                   	at org.apache.spark.rdd.RDD.computeOrReadCheckpoint(RDD.scala:374)
+E                   	at org.apache.spark.rdd.RDD.iterator(RDD.scala:338)
+E                   	at org.apache.spark.rdd.MapPartitionsRDD.compute(MapPartitionsRDD.scala:57)
+E                   	at org.apache.spark.rdd.RDD.computeOrReadCheckpoint(RDD.scala:374)
+E                   	at org.apache.spark.rdd.RDD.iterator(RDD.scala:338)
+E                   	at org.apache.spark.rdd.MapPartitionsRDD.compute(MapPartitionsRDD.scala:57)
+E                   	at org.apache.spark.rdd.RDD.computeOrReadCheckpoint(RDD.scala:374)
+E                   	at org.apache.spark.rdd.RDD.iterator(RDD.scala:338)
+E                   	at org.apache.spark.rdd.MapPartitionsRDD.compute(MapPartitionsRDD.scala:57)
+E                   	at org.apache.spark.rdd.RDD.computeOrReadCheckpoint(RDD.scala:374)
+E                   	at org.apache.spark.rdd.RDD.iterator(RDD.scala:338)
+E                   	at org.apache.spark.rdd.MapPartitionsRDD.compute(MapPartitionsRDD.scala:57)
+E                   	at org.apache.spark.rdd.RDD.computeOrReadCheckpoint(RDD.scala:374)
+E                   	at org.apache.spark.rdd.RDD.iterator(RDD.scala:338)
+E                   	at org.apache.spark.rdd.MapPartitionsRDD.compute(MapPartitionsRDD.scala:57)
+E                   	at org.apache.spark.rdd.RDD.computeOrReadCheckpoint(RDD.scala:374)
+E                   	at org.apache.spark.rdd.RDD.iterator(RDD.scala:338)
+E                   	at org.apache.spark.scheduler.ShuffleMapTask.runTask(ShuffleMapTask.scala:107)
+E                   	at org.apache.spark.scheduler.ShuffleMapTask.runTask(ShuffleMapTask.scala:54)
+E                   	at org.apache.spark.TaskContext.runTaskWithListeners(TaskContext.scala:206)
+E                   	at org.apache.spark.scheduler.Task.run(Task.scala:147)
+E                   	at org.apache.spark.executor.Executor$TaskRunner.$anonfun$run$4(Executor.scala:894)
+E                   	at org.apache.spark.util.SparkErrorUtils.tryWithSafeFinally(SparkErrorUtils.scala:86)
+E                   	at org.apache.spark.util.SparkErrorUtils.tryWithSafeFinally$(SparkErrorUtils.scala:83)
+E                   	at org.apache.spark.util.Utils$.tryWithSafeFinally(Utils.scala:97)
+E                   	at org.apache.spark.executor.Executor$TaskRunner.run(Executor.scala:897)
+E                   	at java.base/java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1144)
+E                   	at java.base/java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:642)
+E                   	at java.base/java.lang.Thread.run(Thread.java:1583)
+E                   Caused by: java.net.SocketTimeoutException: Timed out while waiting for the Python worker to connect back
+E                   	at org.apache.spark.api.python.PythonWorkerFactory.createSimpleWorker(PythonWorkerFactory.scala:285)
+E                   	... 33 more
+
+.venv\Lib\site-packages\py4j\protocol.py:327: Py4JJavaError</failure></testcase><testcase classname="tests.test_preparer_dataset_fraude" name="test_ecart_debut_contrat_sinistre" time="10.274"><failure message="py4j.protocol.Py4JJavaError: An error occurred while calling o157.collectToPython.&#10;: org.apache.spark.SparkException: Job aborted due to stage failure: Task 0 in stage 4.0 failed 1 times, most recent failure: Lost task 0.0 in stage 4.0 (TID 3) (DESKTOP-NPVBOL4.mshome.net executor driver): org.apache.spark.SparkException: Python worker failed to connect back.&#13;&#10;&#09;at org.apache.spark.api.python.PythonWorkerFactory.createSimpleWorker(PythonWorkerFactory.scala:303)&#13;&#10;&#09;at org.apache.spark.api.python.PythonWorkerFactory.create(PythonWorkerFactory.scala:154)&#13;&#10;&#09;at org.apache.spark.SparkEnv.createPythonWorker(SparkEnv.scala:182)&#13;&#10;&#09;at org.apache.spark.api.python.BasePythonRunner.compute(PythonRunner.scala:330)&#13;&#10;&#09;at org.apache.spark.api.python.PythonRDD.compute(PythonRDD.scala:73)&#13;&#10;&#09;at org.apache.spark.rdd.RDD.computeOrReadCheckpoint(RDD.scala:374)&#13;&#10;&#09;at org.apache.spark.rdd.RDD.iterator(RDD.scala:338)&#13;&#10;&#09;at org.apache.spark.rdd.MapPartitionsRDD.compute(MapPartitionsRDD.scala:57)&#13;&#10;&#09;at org.apache.spark.rdd.RDD.computeOrReadCheckpoint(RDD.scala:374)&#13;&#10;&#09;at org.apache.spark.rdd.RDD.iterator(RDD.scala:338)&#13;&#10;&#09;at org.apache.spark.rdd.MapPartitionsRDD.compute(MapPartitionsRDD.scala:57)&#13;&#10;&#09;at org.apache.spark.rdd.RDD.computeOrReadCheckpoint(RDD.scala:374)&#13;&#10;&#09;at org.apache.spark.rdd.RDD.iterator(RDD.scala:338)&#13;&#10;&#09;at org.apache.spark.rdd.MapPartitionsRDD.compute(MapPartitionsRDD.scala:57)&#13;&#10;&#09;at org.apache.spark.rdd.RDD.computeOrReadCheckpoint(RDD.scala:374)&#13;&#10;&#09;at org.apache.spark.rdd.RDD.iterator(RDD.scala:338)&#13;&#10;&#09;at org.apache.spark.rdd.MapPartitionsRDD.compute(MapPartitionsRDD.scala:57)&#13;&#10;&#09;at org.apache.spark.rdd.RDD.computeOrReadCheckpoint(RDD.scala:374)&#13;&#10;&#09;at org.apache.spark.rdd.RDD.iterator(RDD.scala:338)&#13;&#10;&#09;at org.apache.spark.rdd.MapPartitionsRDD.compute(MapPartitionsRDD.scala:57)&#13;&#10;&#09;at org.apache.spark.rdd.RDD.computeOrReadCheckpoint(RDD.scala:374)&#13;&#10;&#09;at org.apache.spark.rdd.RDD.iterator(RDD.scala:338)&#13;&#10;&#09;at org.apache.spark.scheduler.ResultTask.runTask(ResultTask.scala:93)&#13;&#10;&#09;at org.apache.spark.TaskContext.runTaskWithListeners(TaskContext.scala:206)&#13;&#10;&#09;at org.apache.spark.scheduler.Task.run(Task.scala:147)&#13;&#10;&#09;at org.apache.spark.executor.Executor$TaskRunner.$anonfun$run$4(Executor.scala:894)&#13;&#10;&#09;at org.apache.spark.util.SparkErrorUtils.tryWithSafeFinally(SparkErrorUtils.scala:86)&#13;&#10;&#09;at org.apache.spark.util.SparkErrorUtils.tryWithSafeFinally$(SparkErrorUtils.scala:83)&#13;&#10;&#09;at org.apache.spark.util.Utils$.tryWithSafeFinally(Utils.scala:97)&#13;&#10;&#09;at org.apache.spark.executor.Executor$TaskRunner.run(Executor.scala:897)&#13;&#10;&#09;at java.base/java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1144)&#13;&#10;&#09;at java.base/java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:642)&#13;&#10;&#09;at java.base/java.lang.Thread.run(Thread.java:1583)&#13;&#10;Caused by: java.net.SocketTimeoutException: Timed out while waiting for the Python worker to connect back&#13;&#10;&#09;at org.apache.spark.api.python.PythonWorkerFactory.createSimpleWorker(PythonWorkerFactory.scala:285)&#13;&#10;&#09;... 32 more&#13;&#10;&#10;Driver stacktrace:&#13;&#10;&#09;at org.apache.spark.scheduler.DAGScheduler.$anonfun$abortStage$3(DAGScheduler.scala:3318)&#13;&#10;&#09;at scala.Option.getOrElse(Option.scala:201)&#13;&#10;&#09;at org.apache.spark.scheduler.DAGScheduler.$anonfun$abortStage$2(DAGScheduler.scala:3318)&#13;&#10;&#09;at org.apache.spark.scheduler.DAGScheduler.$anonfun$abortStage$2$adapted(DAGScheduler.scala:3310)&#13;&#10;&#09;at scala.collection.immutable.List.foreach(List.scala:323)&#13;&#10;&#09;at org.apache.spark.scheduler.DAGScheduler.abortStage(DAGScheduler.scala:3310)&#13;&#10;&#09;at org.apache.spark.scheduler.DAGScheduler.$anonfun$handleTaskSetFailed$1(DAGScheduler.scala:1363)&#13;&#10;&#09;at org.apache.spark.scheduler.DAGScheduler.$anonfun$handleTaskSetFailed$1$adapted(DAGScheduler.scala:1363)&#13;&#10;&#09;at scala.Option.foreach(Option.scala:437)&#13;&#10;&#09;at org.apache.spark.scheduler.DAGScheduler.handleTaskSetFailed(DAGScheduler.scala:1363)&#13;&#10;&#09;at org.apache.spark.scheduler.DAGSchedulerEventProcessLoop.doOnReceive(DAGScheduler.scala:3589)&#13;&#10;&#09;at org.apache.spark.scheduler.DAGSchedulerEventProcessLoop.onReceive(DAGScheduler.scala:3517)&#13;&#10;&#09;at org.apache.spark.scheduler.DAGSchedulerEventProcessLoop.onReceive(DAGScheduler.scala:3506)&#13;&#10;&#09;at org.apache.spark.util.EventLoop$$anon$1.run(EventLoop.scala:50)&#13;&#10;&#09;at org.apache.spark.scheduler.DAGScheduler.runJob(DAGScheduler.scala:1063)&#13;&#10;&#09;at org.apache.spark.SparkContext.runJob(SparkContext.scala:2496)&#13;&#10;&#09;at org.apache.spark.SparkContext.runJob(SparkContext.scala:2517)&#13;&#10;&#09;at org.apache.spark.SparkContext.runJob(SparkContext.scala:2536)&#13;&#10;&#09;at org.apache.spark.SparkContext.runJob(SparkContext.scala:2561)&#13;&#10;&#09;at org.apache.spark.rdd.RDD.$anonfun$collect$1(RDD.scala:1073)&#13;&#10;&#09;at org.apache.spark.rdd.RDDOperationScope$.withScope(RDDOperationScope.scala:169)&#13;&#10;&#09;at org.apache.spark.rdd.RDDOperationScope$.withScope(RDDOperationScope.scala:134)&#13;&#10;&#09;at org.apache.spark.rdd.RDDOperationScope$.withScope(RDDOperationScope.scala:112)&#13;&#10;&#09;at org.apache.spark.rdd.RDD.withScope(RDD.scala:417)&#13;&#10;&#09;at org.apache.spark.rdd.RDD.collect(RDD.scala:1072)&#13;&#10;&#09;at org.apache.spark.sql.execution.SparkPlan.executeCollect(SparkPlan.scala:480)&#13;&#10;&#09;at org.apache.spark.sql.classic.Dataset.$anonfun$collectToPython$1(Dataset.scala:2144)&#13;&#10;&#09;at org.apache.spark.sql.classic.Dataset.$anonfun$withAction$3(Dataset.scala:2325)&#13;&#10;&#09;at org.apache.spark.sql.execution.QueryExecution$.withInternalError(QueryExecution.scala:872)&#13;&#10;&#09;at org.apache.spark.sql.classic.Dataset.$anonfun$withAction$2(Dataset.scala:2323)&#13;&#10;&#09;at org.apache.spark.sql.execution.QueryExecution.withQueryExecutionId(QueryExecution.scala:429)&#13;&#10;&#09;at org.apache.spark.sql.classic.Dataset.$anonfun$withAction$1(Dataset.scala:2323)&#13;&#10;&#09;at org.apache.spark.sql.execution.SQLExecution$.$anonfun$withNewExecutionId0$8(SQLExecution.scala:228)&#13;&#10;&#09;at org.apache.spark.sql.execution.SQLExecution$.withSessionTagsApplied(SQLExecution.scala:352)&#13;&#10;&#09;at org.apache.spark.sql.execution.SQLExecution$.$anonfun$withNewExecutionId0$7(SQLExecution.scala:189)&#13;&#10;&#09;at org.apache.spark.JobArtifactSet$.withActiveJobArtifactState(JobArtifactSet.scala:94)&#13;&#10;&#09;at org.apache.spark.sql.artifact.ArtifactManager.$anonfun$withResources$1(ArtifactManager.scala:112)&#13;&#10;&#09;at org.apache.spark.sql.artifact.ArtifactManager.withClassLoaderIfNeeded(ArtifactManager.scala:106)&#13;&#10;&#09;at org.apache.spark.sql.artifact.ArtifactManager.withResources(ArtifactManager.scala:111)&#13;&#10;&#09;at org.apache.spark.sql.execution.SQLExecution$.$anonfun$withNewExecutionId0$6(SQLExecution.scala:189)&#13;&#10;&#09;at org.apache.spark.sql.execution.SQLExecution$.withSQLConfPropagated(SQLExecution.scala:375)&#13;&#10;&#09;at org.apache.spark.sql.execution.SQLExecution$.$anonfun$withNewExecutionId0$1(SQLExecution.scala:188)&#13;&#10;&#09;at org.apache.spark.sql.SparkSession.withActive(SparkSession.scala:810)&#13;&#10;&#09;at org.apache.spark.sql.execution.SQLExecution$.withNewExecutionId0(SQLExecution.scala:130)&#13;&#10;&#09;at org.apache.spark.sql.execution.SQLExecution$.withNewExecutionId(SQLExecution.scala:317)&#13;&#10;&#09;at org.apache.spark.sql.classic.Dataset.withAction(Dataset.scala:2322)&#13;&#10;&#09;at org.apache.spark.sql.classic.Dataset.collectToPython(Dataset.scala:2140)&#13;&#10;&#09;at java.base/jdk.internal.reflect.DirectMethodHandleAccessor.invoke(DirectMethodHandleAccessor.java:103)&#13;&#10;&#09;at java.base/java.lang.reflect.Method.invoke(Method.java:580)&#13;&#10;&#09;at py4j.reflection.MethodInvoker.invoke(MethodInvoker.java:244)&#13;&#10;&#09;at py4j.reflection.ReflectionEngine.invoke(ReflectionEngine.java:374)&#13;&#10;&#09;at py4j.Gateway.invoke(Gateway.java:282)&#13;&#10;&#09;at py4j.commands.AbstractCommand.invokeMethod(AbstractCommand.java:132)&#13;&#10;&#09;at py4j.commands.CallCommand.execute(CallCommand.java:79)&#13;&#10;&#09;at py4j.ClientServerConnection.waitForCommands(ClientServerConnection.java:184)&#13;&#10;&#09;at py4j.ClientServerConnection.run(ClientServerConnection.java:108)&#13;&#10;&#09;at java.base/java.lang.Thread.run(Thread.java:1583)&#13;&#10;Caused by: org.apache.spark.SparkException: Python worker failed to connect back.&#13;&#10;&#09;at org.apache.spark.api.python.PythonWorkerFactory.createSimpleWorker(PythonWorkerFactory.scala:303)&#13;&#10;&#09;at org.apache.spark.api.python.PythonWorkerFactory.create(PythonWorkerFactory.scala:154)&#13;&#10;&#09;at org.apache.spark.SparkEnv.createPythonWorker(SparkEnv.scala:182)&#13;&#10;&#09;at org.apache.spark.api.python.BasePythonRunner.compute(PythonRunner.scala:330)&#13;&#10;&#09;at org.apache.spark.api.python.PythonRDD.compute(PythonRDD.scala:73)&#13;&#10;&#09;at org.apache.spark.rdd.RDD.computeOrReadCheckpoint(RDD.scala:374)&#13;&#10;&#09;at org.apache.spark.rdd.RDD.iterator(RDD.scala:338)&#13;&#10;&#09;at org.apache.spark.rdd.MapPartitionsRDD.compute(MapPartitionsRDD.scala:57)&#13;&#10;&#09;at org.apache.spark.rdd.RDD.computeOrReadCheckpoint(RDD.scala:374)&#13;&#10;&#09;at org.apache.spark.rdd.RDD.iterator(RDD.scala:338)&#13;&#10;&#09;at org.apache.spark.rdd.MapPartitionsRDD.compute(MapPartitionsRDD.scala:57)&#13;&#10;&#09;at org.apache.spark.rdd.RDD.computeOrReadCheckpoint(RDD.scala:374)&#13;&#10;&#09;at org.apache.spark.rdd.RDD.iterator(RDD.scala:338)&#13;&#10;&#09;at org.apache.spark.rdd.MapPartitionsRDD.compute(MapPartitionsRDD.scala:57)&#13;&#10;&#09;at org.apache.spark.rdd.RDD.computeOrReadCheckpoint(RDD.scala:374)&#13;&#10;&#09;at org.apache.spark.rdd.RDD.iterator(RDD.scala:338)&#13;&#10;&#09;at org.apache.spark.rdd.MapPartitionsRDD.compute(MapPartitionsRDD.scala:57)&#13;&#10;&#09;at org.apache.spark.rdd.RDD.computeOrReadCheckpoint(RDD.scala:374)&#13;&#10;&#09;at org.apache.spark.rdd.RDD.iterator(RDD.scala:338)&#13;&#10;&#09;at org.apache.spark.rdd.MapPartitionsRDD.compute(MapPartitionsRDD.scala:57)&#13;&#10;&#09;at org.apache.spark.rdd.RDD.computeOrReadCheckpoint(RDD.scala:374)&#13;&#10;&#09;at org.apache.spark.rdd.RDD.iterator(RDD.scala:338)&#13;&#10;&#09;at org.apache.spark.scheduler.ResultTask.runTask(ResultTask.scala:93)&#13;&#10;&#09;at org.apache.spark.TaskContext.runTaskWithListeners(TaskContext.scala:206)&#13;&#10;&#09;at org.apache.spark.scheduler.Task.run(Task.scala:147)&#13;&#10;&#09;at org.apache.spark.executor.Executor$TaskRunner.$anonfun$run$4(Executor.scala:894)&#13;&#10;&#09;at org.apache.spark.util.SparkErrorUtils.tryWithSafeFinally(SparkErrorUtils.scala:86)&#13;&#10;&#09;at org.apache.spark.util.SparkErrorUtils.tryWithSafeFinally$(SparkErrorUtils.scala:83)&#13;&#10;&#09;at org.apache.spark.util.Utils$.tryWithSafeFinally(Utils.scala:97)&#13;&#10;&#09;at org.apache.spark.executor.Executor$TaskRunner.run(Executor.scala:897)&#13;&#10;&#09;at java.base/java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1144)&#13;&#10;&#09;at java.base/java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:642)&#13;&#10;&#09;... 1 more&#13;&#10;Caused by: java.net.SocketTimeoutException: Timed out while waiting for the Python worker to connect back&#13;&#10;&#09;at org.apache.spark.api.python.PythonWorkerFactory.createSimpleWorker(PythonWorkerFactory.scala:285)&#13;&#10;&#09;... 32 more">spark = &lt;pyspark.sql.session.SparkSession object at 0x000002AEFD5C8AD0&gt;
+
+    def test_ecart_debut_contrat_sinistre(spark):
+        dataset = spark.createDataFrame(
+        [("2024-01-01", "2024-01-11", 2, 1, 500.0)],
+        "date_debut string, date_sinistre string, "
+        "nb_paiements long, nb_paiements_echoues long, montant_estime double",
+        )
+    
+&gt;       resultat = prep.ecart_debut_contrat_sinistre(dataset).collect()[0]
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests\test_preparer_dataset_fraude.py:69: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+.venv\Lib\site-packages\pyspark\sql\classic\dataframe.py:503: in collect
+    sock_info = self._jdf.collectToPython()
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv\Lib\site-packages\py4j\java_gateway.py:1362: in __call__
+    return_value = get_return_value(
+.venv\Lib\site-packages\pyspark\errors\exceptions\captured.py:251: in deco
+    return f(*a, **kw)
+           ^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+answer = 'xro158', gateway_client = &lt;py4j.clientserver.JavaClient object at 0x000002AEBD443230&gt;, target_id = 'o157', name = 'collectToPython'
+
+    def get_return_value(answer, gateway_client, target_id=None, name=None):
+        """Converts an answer received from the Java gateway into a Python object.
+    
+        For example, string representation of integers are converted to Python
+        integer, string representation of objects are converted to JavaObject
+        instances, etc.
+    
+        :param answer: the string returned by the Java gateway
+        :param gateway_client: the gateway client used to communicate with the Java
+            Gateway. Only necessary if the answer is a reference (e.g., object,
+            list, map)
+        :param target_id: the name of the object from which the answer comes from
+            (e.g., *object1* in `object1.hello()`). Optional.
+        :param name: the name of the member from which the answer comes from
+            (e.g., *hello* in `object1.hello()`). Optional.
+        """
+        if is_error(answer)[0]:
+            if len(answer) &gt; 1:
+                type = answer[1]
+                value = OUTPUT_CONVERTER[type](answer[2:], gateway_client)
+                if answer[1] == REFERENCE_TYPE:
+&gt;                   raise Py4JJavaError(
+                        "An error occurred while calling {0}{1}{2}.\n".
+                        format(target_id, ".", name), value)
+E                   py4j.protocol.Py4JJavaError: An error occurred while calling o157.collectToPython.
+E                   : org.apache.spark.SparkException: Job aborted due to stage failure: Task 0 in stage 4.0 failed 1 times, most recent failure: Lost task 0.0 in stage 4.0 (TID 3) (DESKTOP-NPVBOL4.mshome.net executor driver): org.apache.spark.SparkException: Python worker failed to connect back.
+E                   	at org.apache.spark.api.python.PythonWorkerFactory.createSimpleWorker(PythonWorkerFactory.scala:303)
+E                   	at org.apache.spark.api.python.PythonWorkerFactory.create(PythonWorkerFactory.scala:154)
+E                   	at org.apache.spark.SparkEnv.createPythonWorker(SparkEnv.scala:182)
+E                   	at org.apache.spark.api.python.BasePythonRunner.compute(PythonRunner.scala:330)
+E                   	at org.apache.spark.api.python.PythonRDD.compute(PythonRDD.scala:73)
+E                   	at org.apache.spark.rdd.RDD.computeOrReadCheckpoint(RDD.scala:374)
+E                   	at org.apache.spark.rdd.RDD.iterator(RDD.scala:338)
+E                   	at org.apache.spark.rdd.MapPartitionsRDD.compute(MapPartitionsRDD.scala:57)
+E                   	at org.apache.spark.rdd.RDD.computeOrReadCheckpoint(RDD.scala:374)
+E                   	at org.apache.spark.rdd.RDD.iterator(RDD.scala:338)
+E                   	at org.apache.spark.rdd.MapPartitionsRDD.compute(MapPartitionsRDD.scala:57)
+E                   	at org.apache.spark.rdd.RDD.computeOrReadCheckpoint(RDD.scala:374)
+E                   	at org.apache.spark.rdd.RDD.iterator(RDD.scala:338)
+E                   	at org.apache.spark.rdd.MapPartitionsRDD.compute(MapPartitionsRDD.scala:57)
+E                   	at org.apache.spark.rdd.RDD.computeOrReadCheckpoint(RDD.scala:374)
+E                   	at org.apache.spark.rdd.RDD.iterator(RDD.scala:338)
+E                   	at org.apache.spark.rdd.MapPartitionsRDD.compute(MapPartitionsRDD.scala:57)
+E                   	at org.apache.spark.rdd.RDD.computeOrReadCheckpoint(RDD.scala:374)
+E                   	at org.apache.spark.rdd.RDD.iterator(RDD.scala:338)
+E                   	at org.apache.spark.rdd.MapPartitionsRDD.compute(MapPartitionsRDD.scala:57)
+E                   	at org.apache.spark.rdd.RDD.computeOrReadCheckpoint(RDD.scala:374)
+E                   	at org.apache.spark.rdd.RDD.iterator(RDD.scala:338)
+E                   	at org.apache.spark.scheduler.ResultTask.runTask(ResultTask.scala:93)
+E                   	at org.apache.spark.TaskContext.runTaskWithListeners(TaskContext.scala:206)
+E                   	at org.apache.spark.scheduler.Task.run(Task.scala:147)
+E                   	at org.apache.spark.executor.Executor$TaskRunner.$anonfun$run$4(Executor.scala:894)
+E                   	at org.apache.spark.util.SparkErrorUtils.tryWithSafeFinally(SparkErrorUtils.scala:86)
+E                   	at org.apache.spark.util.SparkErrorUtils.tryWithSafeFinally$(SparkErrorUtils.scala:83)
+E                   	at org.apache.spark.util.Utils$.tryWithSafeFinally(Utils.scala:97)
+E                   	at org.apache.spark.executor.Executor$TaskRunner.run(Executor.scala:897)
+E                   	at java.base/java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1144)
+E                   	at java.base/java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:642)
+E                   	at java.base/java.lang.Thread.run(Thread.java:1583)
+E                   Caused by: java.net.SocketTimeoutException: Timed out while waiting for the Python worker to connect back
+E                   	at org.apache.spark.api.python.PythonWorkerFactory.createSimpleWorker(PythonWorkerFactory.scala:285)
+E                   	... 32 more
+E                   
+E                   Driver stacktrace:
+E                   	at org.apache.spark.scheduler.DAGScheduler.$anonfun$abortStage$3(DAGScheduler.scala:3318)
+E                   	at scala.Option.getOrElse(Option.scala:201)
+E                   	at org.apache.spark.scheduler.DAGScheduler.$anonfun$abortStage$2(DAGScheduler.scala:3318)
+E                   	at org.apache.spark.scheduler.DAGScheduler.$anonfun$abortStage$2$adapted(DAGScheduler.scala:3310)
+E                   	at scala.collection.immutable.List.foreach(List.scala:323)
+E                   	at org.apache.spark.scheduler.DAGScheduler.abortStage(DAGScheduler.scala:3310)
+E                   	at org.apache.spark.scheduler.DAGScheduler.$anonfun$handleTaskSetFailed$1(DAGScheduler.scala:1363)
+E                   	at org.apache.spark.scheduler.DAGScheduler.$anonfun$handleTaskSetFailed$1$adapted(DAGScheduler.scala:1363)
+E                   	at scala.Option.foreach(Option.scala:437)
+E                   	at org.apache.spark.scheduler.DAGScheduler.handleTaskSetFailed(DAGScheduler.scala:1363)
+E                   	at org.apache.spark.scheduler.DAGSchedulerEventProcessLoop.doOnReceive(DAGScheduler.scala:3589)
+E                   	at org.apache.spark.scheduler.DAGSchedulerEventProcessLoop.onReceive(DAGScheduler.scala:3517)
+E                   	at org.apache.spark.scheduler.DAGSchedulerEventProcessLoop.onReceive(DAGScheduler.scala:3506)
+E                   	at org.apache.spark.util.EventLoop$$anon$1.run(EventLoop.scala:50)
+E                   	at org.apache.spark.scheduler.DAGScheduler.runJob(DAGScheduler.scala:1063)
+E                   	at org.apache.spark.SparkContext.runJob(SparkContext.scala:2496)
+E                   	at org.apache.spark.SparkContext.runJob(SparkContext.scala:2517)
+E                   	at org.apache.spark.SparkContext.runJob(SparkContext.scala:2536)
+E                   	at org.apache.spark.SparkContext.runJob(SparkContext.scala:2561)
+E                   	at org.apache.spark.rdd.RDD.$anonfun$collect$1(RDD.scala:1073)
+E                   	at org.apache.spark.rdd.RDDOperationScope$.withScope(RDDOperationScope.scala:169)
+E                   	at org.apache.spark.rdd.RDDOperationScope$.withScope(RDDOperationScope.scala:134)
+E                   	at org.apache.spark.rdd.RDDOperationScope$.withScope(RDDOperationScope.scala:112)
+E                   	at org.apache.spark.rdd.RDD.withScope(RDD.scala:417)
+E                   	at org.apache.spark.rdd.RDD.collect(RDD.scala:1072)
+E                   	at org.apache.spark.sql.execution.SparkPlan.executeCollect(SparkPlan.scala:480)
+E                   	at org.apache.spark.sql.classic.Dataset.$anonfun$collectToPython$1(Dataset.scala:2144)
+E                   	at org.apache.spark.sql.classic.Dataset.$anonfun$withAction$3(Dataset.scala:2325)
+E                   	at org.apache.spark.sql.execution.QueryExecution$.withInternalError(QueryExecution.scala:872)
+E                   	at org.apache.spark.sql.classic.Dataset.$anonfun$withAction$2(Dataset.scala:2323)
+E                   	at org.apache.spark.sql.execution.QueryExecution.withQueryExecutionId(QueryExecution.scala:429)
+E                   	at org.apache.spark.sql.classic.Dataset.$anonfun$withAction$1(Dataset.scala:2323)
+E                   	at org.apache.spark.sql.execution.SQLExecution$.$anonfun$withNewExecutionId0$8(SQLExecution.scala:228)
+E                   	at org.apache.spark.sql.execution.SQLExecution$.withSessionTagsApplied(SQLExecution.scala:352)
+E                   	at org.apache.spark.sql.execution.SQLExecution$.$anonfun$withNewExecutionId0$7(SQLExecution.scala:189)
+E                   	at org.apache.spark.JobArtifactSet$.withActiveJobArtifactState(JobArtifactSet.scala:94)
+E                   	at org.apache.spark.sql.artifact.ArtifactManager.$anonfun$withResources$1(ArtifactManager.scala:112)
+E                   	at org.apache.spark.sql.artifact.ArtifactManager.withClassLoaderIfNeeded(ArtifactManager.scala:106)
+E                   	at org.apache.spark.sql.artifact.ArtifactManager.withResources(ArtifactManager.scala:111)
+E                   	at org.apache.spark.sql.execution.SQLExecution$.$anonfun$withNewExecutionId0$6(SQLExecution.scala:189)
+E                   	at org.apache.spark.sql.execution.SQLExecution$.withSQLConfPropagated(SQLExecution.scala:375)
+E                   	at org.apache.spark.sql.execution.SQLExecution$.$anonfun$withNewExecutionId0$1(SQLExecution.scala:188)
+E                   	at org.apache.spark.sql.SparkSession.withActive(SparkSession.scala:810)
+E                   	at org.apache.spark.sql.execution.SQLExecution$.withNewExecutionId0(SQLExecution.scala:130)
+E                   	at org.apache.spark.sql.execution.SQLExecution$.withNewExecutionId(SQLExecution.scala:317)
+E                   	at org.apache.spark.sql.classic.Dataset.withAction(Dataset.scala:2322)
+E                   	at org.apache.spark.sql.classic.Dataset.collectToPython(Dataset.scala:2140)
+E                   	at java.base/jdk.internal.reflect.DirectMethodHandleAccessor.invoke(DirectMethodHandleAccessor.java:103)
+E                   	at java.base/java.lang.reflect.Method.invoke(Method.java:580)
+E                   	at py4j.reflection.MethodInvoker.invoke(MethodInvoker.java:244)
+E                   	at py4j.reflection.ReflectionEngine.invoke(ReflectionEngine.java:374)
+E                   	at py4j.Gateway.invoke(Gateway.java:282)
+E                   	at py4j.commands.AbstractCommand.invokeMethod(AbstractCommand.java:132)
+E                   	at py4j.commands.CallCommand.execute(CallCommand.java:79)
+E                   	at py4j.ClientServerConnection.waitForCommands(ClientServerConnection.java:184)
+E                   	at py4j.ClientServerConnection.run(ClientServerConnection.java:108)
+E                   	at java.base/java.lang.Thread.run(Thread.java:1583)
+E                   Caused by: org.apache.spark.SparkException: Python worker failed to connect back.
+E                   	at org.apache.spark.api.python.PythonWorkerFactory.createSimpleWorker(PythonWorkerFactory.scala:303)
+E                   	at org.apache.spark.api.python.PythonWorkerFactory.create(PythonWorkerFactory.scala:154)
+E                   	at org.apache.spark.SparkEnv.createPythonWorker(SparkEnv.scala:182)
+E                   	at org.apache.spark.api.python.BasePythonRunner.compute(PythonRunner.scala:330)
+E                   	at org.apache.spark.api.python.PythonRDD.compute(PythonRDD.scala:73)
+E                   	at org.apache.spark.rdd.RDD.computeOrReadCheckpoint(RDD.scala:374)
+E                   	at org.apache.spark.rdd.RDD.iterator(RDD.scala:338)
+E                   	at org.apache.spark.rdd.MapPartitionsRDD.compute(MapPartitionsRDD.scala:57)
+E                   	at org.apache.spark.rdd.RDD.computeOrReadCheckpoint(RDD.scala:374)
+E                   	at org.apache.spark.rdd.RDD.iterator(RDD.scala:338)
+E                   	at org.apache.spark.rdd.MapPartitionsRDD.compute(MapPartitionsRDD.scala:57)
+E                   	at org.apache.spark.rdd.RDD.computeOrReadCheckpoint(RDD.scala:374)
+E                   	at org.apache.spark.rdd.RDD.iterator(RDD.scala:338)
+E                   	at org.apache.spark.rdd.MapPartitionsRDD.compute(MapPartitionsRDD.scala:57)
+E                   	at org.apache.spark.rdd.RDD.computeOrReadCheckpoint(RDD.scala:374)
+E                   	at org.apache.spark.rdd.RDD.iterator(RDD.scala:338)
+E                   	at org.apache.spark.rdd.MapPartitionsRDD.compute(MapPartitionsRDD.scala:57)
+E                   	at org.apache.spark.rdd.RDD.computeOrReadCheckpoint(RDD.scala:374)
+E                   	at org.apache.spark.rdd.RDD.iterator(RDD.scala:338)
+E                   	at org.apache.spark.rdd.MapPartitionsRDD.compute(MapPartitionsRDD.scala:57)
+E                   	at org.apache.spark.rdd.RDD.computeOrReadCheckpoint(RDD.scala:374)
+E                   	at org.apache.spark.rdd.RDD.iterator(RDD.scala:338)
+E                   	at org.apache.spark.scheduler.ResultTask.runTask(ResultTask.scala:93)
+E                   	at org.apache.spark.TaskContext.runTaskWithListeners(TaskContext.scala:206)
+E                   	at org.apache.spark.scheduler.Task.run(Task.scala:147)
+E                   	at org.apache.spark.executor.Executor$TaskRunner.$anonfun$run$4(Executor.scala:894)
+E                   	at org.apache.spark.util.SparkErrorUtils.tryWithSafeFinally(SparkErrorUtils.scala:86)
+E                   	at org.apache.spark.util.SparkErrorUtils.tryWithSafeFinally$(SparkErrorUtils.scala:83)
+E                   	at org.apache.spark.util.Utils$.tryWithSafeFinally(Utils.scala:97)
+E                   	at org.apache.spark.executor.Executor$TaskRunner.run(Executor.scala:897)
+E                   	at java.base/java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1144)
+E                   	at java.base/java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:642)
+E                   	... 1 more
+E                   Caused by: java.net.SocketTimeoutException: Timed out while waiting for the Python worker to connect back
+E                   	at org.apache.spark.api.python.PythonWorkerFactory.createSimpleWorker(PythonWorkerFactory.scala:285)
+E                   	... 32 more
+
+.venv\Lib\site-packages\py4j\protocol.py:327: Py4JJavaError</failure></testcase><testcase classname="tests.test_preparer_dataset_fraude" name="test_ecart_dates_manquantes" time="10.255"><failure message="py4j.protocol.Py4JJavaError: An error occurred while calling o193.collectToPython.&#10;: org.apache.spark.SparkException: Job aborted due to stage failure: Task 0 in stage 5.0 failed 1 times, most recent failure: Lost task 0.0 in stage 5.0 (TID 4) (DESKTOP-NPVBOL4.mshome.net executor driver): org.apache.spark.SparkException: Python worker failed to connect back.&#13;&#10;&#09;at org.apache.spark.api.python.PythonWorkerFactory.createSimpleWorker(PythonWorkerFactory.scala:303)&#13;&#10;&#09;at org.apache.spark.api.python.PythonWorkerFactory.create(PythonWorkerFactory.scala:154)&#13;&#10;&#09;at org.apache.spark.SparkEnv.createPythonWorker(SparkEnv.scala:182)&#13;&#10;&#09;at org.apache.spark.api.python.BasePythonRunner.compute(PythonRunner.scala:330)&#13;&#10;&#09;at org.apache.spark.api.python.PythonRDD.compute(PythonRDD.scala:73)&#13;&#10;&#09;at org.apache.spark.rdd.RDD.computeOrReadCheckpoint(RDD.scala:374)&#13;&#10;&#09;at org.apache.spark.rdd.RDD.iterator(RDD.scala:338)&#13;&#10;&#09;at org.apache.spark.rdd.MapPartitionsRDD.compute(MapPartitionsRDD.scala:57)&#13;&#10;&#09;at org.apache.spark.rdd.RDD.computeOrReadCheckpoint(RDD.scala:374)&#13;&#10;&#09;at org.apache.spark.rdd.RDD.iterator(RDD.scala:338)&#13;&#10;&#09;at org.apache.spark.rdd.MapPartitionsRDD.compute(MapPartitionsRDD.scala:57)&#13;&#10;&#09;at org.apache.spark.rdd.RDD.computeOrReadCheckpoint(RDD.scala:374)&#13;&#10;&#09;at org.apache.spark.rdd.RDD.iterator(RDD.scala:338)&#13;&#10;&#09;at org.apache.spark.rdd.MapPartitionsRDD.compute(MapPartitionsRDD.scala:57)&#13;&#10;&#09;at org.apache.spark.rdd.RDD.computeOrReadCheckpoint(RDD.scala:374)&#13;&#10;&#09;at org.apache.spark.rdd.RDD.iterator(RDD.scala:338)&#13;&#10;&#09;at org.apache.spark.rdd.MapPartitionsRDD.compute(MapPartitionsRDD.scala:57)&#13;&#10;&#09;at org.apache.spark.rdd.RDD.computeOrReadCheckpoint(RDD.scala:374)&#13;&#10;&#09;at org.apache.spark.rdd.RDD.iterator(RDD.scala:338)&#13;&#10;&#09;at org.apache.spark.rdd.MapPartitionsRDD.compute(MapPartitionsRDD.scala:57)&#13;&#10;&#09;at org.apache.spark.rdd.RDD.computeOrReadCheckpoint(RDD.scala:374)&#13;&#10;&#09;at org.apache.spark.rdd.RDD.iterator(RDD.scala:338)&#13;&#10;&#09;at org.apache.spark.scheduler.ResultTask.runTask(ResultTask.scala:93)&#13;&#10;&#09;at org.apache.spark.TaskContext.runTaskWithListeners(TaskContext.scala:206)&#13;&#10;&#09;at org.apache.spark.scheduler.Task.run(Task.scala:147)&#13;&#10;&#09;at org.apache.spark.executor.Executor$TaskRunner.$anonfun$run$4(Executor.scala:894)&#13;&#10;&#09;at org.apache.spark.util.SparkErrorUtils.tryWithSafeFinally(SparkErrorUtils.scala:86)&#13;&#10;&#09;at org.apache.spark.util.SparkErrorUtils.tryWithSafeFinally$(SparkErrorUtils.scala:83)&#13;&#10;&#09;at org.apache.spark.util.Utils$.tryWithSafeFinally(Utils.scala:97)&#13;&#10;&#09;at org.apache.spark.executor.Executor$TaskRunner.run(Executor.scala:897)&#13;&#10;&#09;at java.base/java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1144)&#13;&#10;&#09;at java.base/java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:642)&#13;&#10;&#09;at java.base/java.lang.Thread.run(Thread.java:1583)&#13;&#10;Caused by: java.net.SocketTimeoutException: Timed out while waiting for the Python worker to connect back&#13;&#10;&#09;at org.apache.spark.api.python.PythonWorkerFactory.createSimpleWorker(PythonWorkerFactory.scala:285)&#13;&#10;&#09;... 32 more&#13;&#10;&#10;Driver stacktrace:&#13;&#10;&#09;at org.apache.spark.scheduler.DAGScheduler.$anonfun$abortStage$3(DAGScheduler.scala:3318)&#13;&#10;&#09;at scala.Option.getOrElse(Option.scala:201)&#13;&#10;&#09;at org.apache.spark.scheduler.DAGScheduler.$anonfun$abortStage$2(DAGScheduler.scala:3318)&#13;&#10;&#09;at org.apache.spark.scheduler.DAGScheduler.$anonfun$abortStage$2$adapted(DAGScheduler.scala:3310)&#13;&#10;&#09;at scala.collection.immutable.List.foreach(List.scala:323)&#13;&#10;&#09;at org.apache.spark.scheduler.DAGScheduler.abortStage(DAGScheduler.scala:3310)&#13;&#10;&#09;at org.apache.spark.scheduler.DAGScheduler.$anonfun$handleTaskSetFailed$1(DAGScheduler.scala:1363)&#13;&#10;&#09;at org.apache.spark.scheduler.DAGScheduler.$anonfun$handleTaskSetFailed$1$adapted(DAGScheduler.scala:1363)&#13;&#10;&#09;at scala.Option.foreach(Option.scala:437)&#13;&#10;&#09;at org.apache.spark.scheduler.DAGScheduler.handleTaskSetFailed(DAGScheduler.scala:1363)&#13;&#10;&#09;at org.apache.spark.scheduler.DAGSchedulerEventProcessLoop.doOnReceive(DAGScheduler.scala:3589)&#13;&#10;&#09;at org.apache.spark.scheduler.DAGSchedulerEventProcessLoop.onReceive(DAGScheduler.scala:3517)&#13;&#10;&#09;at org.apache.spark.scheduler.DAGSchedulerEventProcessLoop.onReceive(DAGScheduler.scala:3506)&#13;&#10;&#09;at org.apache.spark.util.EventLoop$$anon$1.run(EventLoop.scala:50)&#13;&#10;&#09;at org.apache.spark.scheduler.DAGScheduler.runJob(DAGScheduler.scala:1063)&#13;&#10;&#09;at org.apache.spark.SparkContext.runJob(SparkContext.scala:2496)&#13;&#10;&#09;at org.apache.spark.SparkContext.runJob(SparkContext.scala:2517)&#13;&#10;&#09;at org.apache.spark.SparkContext.runJob(SparkContext.scala:2536)&#13;&#10;&#09;at org.apache.spark.SparkContext.runJob(SparkContext.scala:2561)&#13;&#10;&#09;at org.apache.spark.rdd.RDD.$anonfun$collect$1(RDD.scala:1073)&#13;&#10;&#09;at org.apache.spark.rdd.RDDOperationScope$.withScope(RDDOperationScope.scala:169)&#13;&#10;&#09;at org.apache.spark.rdd.RDDOperationScope$.withScope(RDDOperationScope.scala:134)&#13;&#10;&#09;at org.apache.spark.rdd.RDDOperationScope$.withScope(RDDOperationScope.scala:112)&#13;&#10;&#09;at org.apache.spark.rdd.RDD.withScope(RDD.scala:417)&#13;&#10;&#09;at org.apache.spark.rdd.RDD.collect(RDD.scala:1072)&#13;&#10;&#09;at org.apache.spark.sql.execution.SparkPlan.executeCollect(SparkPlan.scala:480)&#13;&#10;&#09;at org.apache.spark.sql.classic.Dataset.$anonfun$collectToPython$1(Dataset.scala:2144)&#13;&#10;&#09;at org.apache.spark.sql.classic.Dataset.$anonfun$withAction$3(Dataset.scala:2325)&#13;&#10;&#09;at org.apache.spark.sql.execution.QueryExecution$.withInternalError(QueryExecution.scala:872)&#13;&#10;&#09;at org.apache.spark.sql.classic.Dataset.$anonfun$withAction$2(Dataset.scala:2323)&#13;&#10;&#09;at org.apache.spark.sql.execution.QueryExecution.withQueryExecutionId(QueryExecution.scala:429)&#13;&#10;&#09;at org.apache.spark.sql.classic.Dataset.$anonfun$withAction$1(Dataset.scala:2323)&#13;&#10;&#09;at org.apache.spark.sql.execution.SQLExecution$.$anonfun$withNewExecutionId0$8(SQLExecution.scala:228)&#13;&#10;&#09;at org.apache.spark.sql.execution.SQLExecution$.withSessionTagsApplied(SQLExecution.scala:352)&#13;&#10;&#09;at org.apache.spark.sql.execution.SQLExecution$.$anonfun$withNewExecutionId0$7(SQLExecution.scala:189)&#13;&#10;&#09;at org.apache.spark.JobArtifactSet$.withActiveJobArtifactState(JobArtifactSet.scala:94)&#13;&#10;&#09;at org.apache.spark.sql.artifact.ArtifactManager.$anonfun$withResources$1(ArtifactManager.scala:112)&#13;&#10;&#09;at org.apache.spark.sql.artifact.ArtifactManager.withClassLoaderIfNeeded(ArtifactManager.scala:106)&#13;&#10;&#09;at org.apache.spark.sql.artifact.ArtifactManager.withResources(ArtifactManager.scala:111)&#13;&#10;&#09;at org.apache.spark.sql.execution.SQLExecution$.$anonfun$withNewExecutionId0$6(SQLExecution.scala:189)&#13;&#10;&#09;at org.apache.spark.sql.execution.SQLExecution$.withSQLConfPropagated(SQLExecution.scala:375)&#13;&#10;&#09;at org.apache.spark.sql.execution.SQLExecution$.$anonfun$withNewExecutionId0$1(SQLExecution.scala:188)&#13;&#10;&#09;at org.apache.spark.sql.SparkSession.withActive(SparkSession.scala:810)&#13;&#10;&#09;at org.apache.spark.sql.execution.SQLExecution$.withNewExecutionId0(SQLExecution.scala:130)&#13;&#10;&#09;at org.apache.spark.sql.execution.SQLExecution$.withNewExecutionId(SQLExecution.scala:317)&#13;&#10;&#09;at org.apache.spark.sql.classic.Dataset.withAction(Dataset.scala:2322)&#13;&#10;&#09;at org.apache.spark.sql.classic.Dataset.collectToPython(Dataset.scala:2140)&#13;&#10;&#09;at java.base/jdk.internal.reflect.DirectMethodHandleAccessor.invoke(DirectMethodHandleAccessor.java:103)&#13;&#10;&#09;at java.base/java.lang.reflect.Method.invoke(Method.java:580)&#13;&#10;&#09;at py4j.reflection.MethodInvoker.invoke(MethodInvoker.java:244)&#13;&#10;&#09;at py4j.reflection.ReflectionEngine.invoke(ReflectionEngine.java:374)&#13;&#10;&#09;at py4j.Gateway.invoke(Gateway.java:282)&#13;&#10;&#09;at py4j.commands.AbstractCommand.invokeMethod(AbstractCommand.java:132)&#13;&#10;&#09;at py4j.commands.CallCommand.execute(CallCommand.java:79)&#13;&#10;&#09;at py4j.ClientServerConnection.waitForCommands(ClientServerConnection.java:184)&#13;&#10;&#09;at py4j.ClientServerConnection.run(ClientServerConnection.java:108)&#13;&#10;&#09;at java.base/java.lang.Thread.run(Thread.java:1583)&#13;&#10;Caused by: org.apache.spark.SparkException: Python worker failed to connect back.&#13;&#10;&#09;at org.apache.spark.api.python.PythonWorkerFactory.createSimpleWorker(PythonWorkerFactory.scala:303)&#13;&#10;&#09;at org.apache.spark.api.python.PythonWorkerFactory.create(PythonWorkerFactory.scala:154)&#13;&#10;&#09;at org.apache.spark.SparkEnv.createPythonWorker(SparkEnv.scala:182)&#13;&#10;&#09;at org.apache.spark.api.python.BasePythonRunner.compute(PythonRunner.scala:330)&#13;&#10;&#09;at org.apache.spark.api.python.PythonRDD.compute(PythonRDD.scala:73)&#13;&#10;&#09;at org.apache.spark.rdd.RDD.computeOrReadCheckpoint(RDD.scala:374)&#13;&#10;&#09;at org.apache.spark.rdd.RDD.iterator(RDD.scala:338)&#13;&#10;&#09;at org.apache.spark.rdd.MapPartitionsRDD.compute(MapPartitionsRDD.scala:57)&#13;&#10;&#09;at org.apache.spark.rdd.RDD.computeOrReadCheckpoint(RDD.scala:374)&#13;&#10;&#09;at org.apache.spark.rdd.RDD.iterator(RDD.scala:338)&#13;&#10;&#09;at org.apache.spark.rdd.MapPartitionsRDD.compute(MapPartitionsRDD.scala:57)&#13;&#10;&#09;at org.apache.spark.rdd.RDD.computeOrReadCheckpoint(RDD.scala:374)&#13;&#10;&#09;at org.apache.spark.rdd.RDD.iterator(RDD.scala:338)&#13;&#10;&#09;at org.apache.spark.rdd.MapPartitionsRDD.compute(MapPartitionsRDD.scala:57)&#13;&#10;&#09;at org.apache.spark.rdd.RDD.computeOrReadCheckpoint(RDD.scala:374)&#13;&#10;&#09;at org.apache.spark.rdd.RDD.iterator(RDD.scala:338)&#13;&#10;&#09;at org.apache.spark.rdd.MapPartitionsRDD.compute(MapPartitionsRDD.scala:57)&#13;&#10;&#09;at org.apache.spark.rdd.RDD.computeOrReadCheckpoint(RDD.scala:374)&#13;&#10;&#09;at org.apache.spark.rdd.RDD.iterator(RDD.scala:338)&#13;&#10;&#09;at org.apache.spark.rdd.MapPartitionsRDD.compute(MapPartitionsRDD.scala:57)&#13;&#10;&#09;at org.apache.spark.rdd.RDD.computeOrReadCheckpoint(RDD.scala:374)&#13;&#10;&#09;at org.apache.spark.rdd.RDD.iterator(RDD.scala:338)&#13;&#10;&#09;at org.apache.spark.scheduler.ResultTask.runTask(ResultTask.scala:93)&#13;&#10;&#09;at org.apache.spark.TaskContext.runTaskWithListeners(TaskContext.scala:206)&#13;&#10;&#09;at org.apache.spark.scheduler.Task.run(Task.scala:147)&#13;&#10;&#09;at org.apache.spark.executor.Executor$TaskRunner.$anonfun$run$4(Executor.scala:894)&#13;&#10;&#09;at org.apache.spark.util.SparkErrorUtils.tryWithSafeFinally(SparkErrorUtils.scala:86)&#13;&#10;&#09;at org.apache.spark.util.SparkErrorUtils.tryWithSafeFinally$(SparkErrorUtils.scala:83)&#13;&#10;&#09;at org.apache.spark.util.Utils$.tryWithSafeFinally(Utils.scala:97)&#13;&#10;&#09;at org.apache.spark.executor.Executor$TaskRunner.run(Executor.scala:897)&#13;&#10;&#09;at java.base/java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1144)&#13;&#10;&#09;at java.base/java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:642)&#13;&#10;&#09;... 1 more&#13;&#10;Caused by: java.net.SocketTimeoutException: Timed out while waiting for the Python worker to connect back&#13;&#10;&#09;at org.apache.spark.api.python.PythonWorkerFactory.createSimpleWorker(PythonWorkerFactory.scala:285)&#13;&#10;&#09;... 32 more">spark = &lt;pyspark.sql.session.SparkSession object at 0x000002AEFD5C8AD0&gt;
+
+    def test_ecart_dates_manquantes(spark):
+        dataset = spark.createDataFrame(
+        [(None, None, None, None, None)],
+            "date_debut string, date_sinistre string, "
+            "nb_paiements long, nb_paiements_echoues long, montant_estime double",
+        )
+    
+&gt;       resultat = prep.ecart_debut_contrat_sinistre(dataset).collect()[0]
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests\test_preparer_dataset_fraude.py:82: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+.venv\Lib\site-packages\pyspark\sql\classic\dataframe.py:503: in collect
+    sock_info = self._jdf.collectToPython()
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv\Lib\site-packages\py4j\java_gateway.py:1362: in __call__
+    return_value = get_return_value(
+.venv\Lib\site-packages\pyspark\errors\exceptions\captured.py:251: in deco
+    return f(*a, **kw)
+           ^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+answer = 'xro194', gateway_client = &lt;py4j.clientserver.JavaClient object at 0x000002AEBD443230&gt;, target_id = 'o193', name = 'collectToPython'
+
+    def get_return_value(answer, gateway_client, target_id=None, name=None):
+        """Converts an answer received from the Java gateway into a Python object.
+    
+        For example, string representation of integers are converted to Python
+        integer, string representation of objects are converted to JavaObject
+        instances, etc.
+    
+        :param answer: the string returned by the Java gateway
+        :param gateway_client: the gateway client used to communicate with the Java
+            Gateway. Only necessary if the answer is a reference (e.g., object,
+            list, map)
+        :param target_id: the name of the object from which the answer comes from
+            (e.g., *object1* in `object1.hello()`). Optional.
+        :param name: the name of the member from which the answer comes from
+            (e.g., *hello* in `object1.hello()`). Optional.
+        """
+        if is_error(answer)[0]:
+            if len(answer) &gt; 1:
+                type = answer[1]
+                value = OUTPUT_CONVERTER[type](answer[2:], gateway_client)
+                if answer[1] == REFERENCE_TYPE:
+&gt;                   raise Py4JJavaError(
+                        "An error occurred while calling {0}{1}{2}.\n".
+                        format(target_id, ".", name), value)
+E                   py4j.protocol.Py4JJavaError: An error occurred while calling o193.collectToPython.
+E                   : org.apache.spark.SparkException: Job aborted due to stage failure: Task 0 in stage 5.0 failed 1 times, most recent failure: Lost task 0.0 in stage 5.0 (TID 4) (DESKTOP-NPVBOL4.mshome.net executor driver): org.apache.spark.SparkException: Python worker failed to connect back.
+E                   	at org.apache.spark.api.python.PythonWorkerFactory.createSimpleWorker(PythonWorkerFactory.scala:303)
+E                   	at org.apache.spark.api.python.PythonWorkerFactory.create(PythonWorkerFactory.scala:154)
+E                   	at org.apache.spark.SparkEnv.createPythonWorker(SparkEnv.scala:182)
+E                   	at org.apache.spark.api.python.BasePythonRunner.compute(PythonRunner.scala:330)
+E                   	at org.apache.spark.api.python.PythonRDD.compute(PythonRDD.scala:73)
+E                   	at org.apache.spark.rdd.RDD.computeOrReadCheckpoint(RDD.scala:374)
+E                   	at org.apache.spark.rdd.RDD.iterator(RDD.scala:338)
+E                   	at org.apache.spark.rdd.MapPartitionsRDD.compute(MapPartitionsRDD.scala:57)
+E                   	at org.apache.spark.rdd.RDD.computeOrReadCheckpoint(RDD.scala:374)
+E                   	at org.apache.spark.rdd.RDD.iterator(RDD.scala:338)
+E                   	at org.apache.spark.rdd.MapPartitionsRDD.compute(MapPartitionsRDD.scala:57)
+E                   	at org.apache.spark.rdd.RDD.computeOrReadCheckpoint(RDD.scala:374)
+E                   	at org.apache.spark.rdd.RDD.iterator(RDD.scala:338)
+E                   	at org.apache.spark.rdd.MapPartitionsRDD.compute(MapPartitionsRDD.scala:57)
+E                   	at org.apache.spark.rdd.RDD.computeOrReadCheckpoint(RDD.scala:374)
+E                   	at org.apache.spark.rdd.RDD.iterator(RDD.scala:338)
+E                   	at org.apache.spark.rdd.MapPartitionsRDD.compute(MapPartitionsRDD.scala:57)
+E                   	at org.apache.spark.rdd.RDD.computeOrReadCheckpoint(RDD.scala:374)
+E                   	at org.apache.spark.rdd.RDD.iterator(RDD.scala:338)
+E                   	at org.apache.spark.rdd.MapPartitionsRDD.compute(MapPartitionsRDD.scala:57)
+E                   	at org.apache.spark.rdd.RDD.computeOrReadCheckpoint(RDD.scala:374)
+E                   	at org.apache.spark.rdd.RDD.iterator(RDD.scala:338)
+E                   	at org.apache.spark.scheduler.ResultTask.runTask(ResultTask.scala:93)
+E                   	at org.apache.spark.TaskContext.runTaskWithListeners(TaskContext.scala:206)
+E                   	at org.apache.spark.scheduler.Task.run(Task.scala:147)
+E                   	at org.apache.spark.executor.Executor$TaskRunner.$anonfun$run$4(Executor.scala:894)
+E                   	at org.apache.spark.util.SparkErrorUtils.tryWithSafeFinally(SparkErrorUtils.scala:86)
+E                   	at org.apache.spark.util.SparkErrorUtils.tryWithSafeFinally$(SparkErrorUtils.scala:83)
+E                   	at org.apache.spark.util.Utils$.tryWithSafeFinally(Utils.scala:97)
+E                   	at org.apache.spark.executor.Executor$TaskRunner.run(Executor.scala:897)
+E                   	at java.base/java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1144)
+E                   	at java.base/java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:642)
+E                   	at java.base/java.lang.Thread.run(Thread.java:1583)
+E                   Caused by: java.net.SocketTimeoutException: Timed out while waiting for the Python worker to connect back
+E                   	at org.apache.spark.api.python.PythonWorkerFactory.createSimpleWorker(PythonWorkerFactory.scala:285)
+E                   	... 32 more
+E                   
+E                   Driver stacktrace:
+E                   	at org.apache.spark.scheduler.DAGScheduler.$anonfun$abortStage$3(DAGScheduler.scala:3318)
+E                   	at scala.Option.getOrElse(Option.scala:201)
+E                   	at org.apache.spark.scheduler.DAGScheduler.$anonfun$abortStage$2(DAGScheduler.scala:3318)
+E                   	at org.apache.spark.scheduler.DAGScheduler.$anonfun$abortStage$2$adapted(DAGScheduler.scala:3310)
+E                   	at scala.collection.immutable.List.foreach(List.scala:323)
+E                   	at org.apache.spark.scheduler.DAGScheduler.abortStage(DAGScheduler.scala:3310)
+E                   	at org.apache.spark.scheduler.DAGScheduler.$anonfun$handleTaskSetFailed$1(DAGScheduler.scala:1363)
+E                   	at org.apache.spark.scheduler.DAGScheduler.$anonfun$handleTaskSetFailed$1$adapted(DAGScheduler.scala:1363)
+E                   	at scala.Option.foreach(Option.scala:437)
+E                   	at org.apache.spark.scheduler.DAGScheduler.handleTaskSetFailed(DAGScheduler.scala:1363)
+E                   	at org.apache.spark.scheduler.DAGSchedulerEventProcessLoop.doOnReceive(DAGScheduler.scala:3589)
+E                   	at org.apache.spark.scheduler.DAGSchedulerEventProcessLoop.onReceive(DAGScheduler.scala:3517)
+E                   	at org.apache.spark.scheduler.DAGSchedulerEventProcessLoop.onReceive(DAGScheduler.scala:3506)
+E                   	at org.apache.spark.util.EventLoop$$anon$1.run(EventLoop.scala:50)
+E                   	at org.apache.spark.scheduler.DAGScheduler.runJob(DAGScheduler.scala:1063)
+E                   	at org.apache.spark.SparkContext.runJob(SparkContext.scala:2496)
+E                   	at org.apache.spark.SparkContext.runJob(SparkContext.scala:2517)
+E                   	at org.apache.spark.SparkContext.runJob(SparkContext.scala:2536)
+E                   	at org.apache.spark.SparkContext.runJob(SparkContext.scala:2561)
+E                   	at org.apache.spark.rdd.RDD.$anonfun$collect$1(RDD.scala:1073)
+E                   	at org.apache.spark.rdd.RDDOperationScope$.withScope(RDDOperationScope.scala:169)
+E                   	at org.apache.spark.rdd.RDDOperationScope$.withScope(RDDOperationScope.scala:134)
+E                   	at org.apache.spark.rdd.RDDOperationScope$.withScope(RDDOperationScope.scala:112)
+E                   	at org.apache.spark.rdd.RDD.withScope(RDD.scala:417)
+E                   	at org.apache.spark.rdd.RDD.collect(RDD.scala:1072)
+E                   	at org.apache.spark.sql.execution.SparkPlan.executeCollect(SparkPlan.scala:480)
+E                   	at org.apache.spark.sql.classic.Dataset.$anonfun$collectToPython$1(Dataset.scala:2144)
+E                   	at org.apache.spark.sql.classic.Dataset.$anonfun$withAction$3(Dataset.scala:2325)
+E                   	at org.apache.spark.sql.execution.QueryExecution$.withInternalError(QueryExecution.scala:872)
+E                   	at org.apache.spark.sql.classic.Dataset.$anonfun$withAction$2(Dataset.scala:2323)
+E                   	at org.apache.spark.sql.execution.QueryExecution.withQueryExecutionId(QueryExecution.scala:429)
+E                   	at org.apache.spark.sql.classic.Dataset.$anonfun$withAction$1(Dataset.scala:2323)
+E                   	at org.apache.spark.sql.execution.SQLExecution$.$anonfun$withNewExecutionId0$8(SQLExecution.scala:228)
+E                   	at org.apache.spark.sql.execution.SQLExecution$.withSessionTagsApplied(SQLExecution.scala:352)
+E                   	at org.apache.spark.sql.execution.SQLExecution$.$anonfun$withNewExecutionId0$7(SQLExecution.scala:189)
+E                   	at org.apache.spark.JobArtifactSet$.withActiveJobArtifactState(JobArtifactSet.scala:94)
+E                   	at org.apache.spark.sql.artifact.ArtifactManager.$anonfun$withResources$1(ArtifactManager.scala:112)
+E                   	at org.apache.spark.sql.artifact.ArtifactManager.withClassLoaderIfNeeded(ArtifactManager.scala:106)
+E                   	at org.apache.spark.sql.artifact.ArtifactManager.withResources(ArtifactManager.scala:111)
+E                   	at org.apache.spark.sql.execution.SQLExecution$.$anonfun$withNewExecutionId0$6(SQLExecution.scala:189)
+E                   	at org.apache.spark.sql.execution.SQLExecution$.withSQLConfPropagated(SQLExecution.scala:375)
+E                   	at org.apache.spark.sql.execution.SQLExecution$.$anonfun$withNewExecutionId0$1(SQLExecution.scala:188)
+E                   	at org.apache.spark.sql.SparkSession.withActive(SparkSession.scala:810)
+E                   	at org.apache.spark.sql.execution.SQLExecution$.withNewExecutionId0(SQLExecution.scala:130)
+E                   	at org.apache.spark.sql.execution.SQLExecution$.withNewExecutionId(SQLExecution.scala:317)
+E                   	at org.apache.spark.sql.classic.Dataset.withAction(Dataset.scala:2322)
+E                   	at org.apache.spark.sql.classic.Dataset.collectToPython(Dataset.scala:2140)
+E                   	at java.base/jdk.internal.reflect.DirectMethodHandleAccessor.invoke(DirectMethodHandleAccessor.java:103)
+E                   	at java.base/java.lang.reflect.Method.invoke(Method.java:580)
+E                   	at py4j.reflection.MethodInvoker.invoke(MethodInvoker.java:244)
+E                   	at py4j.reflection.ReflectionEngine.invoke(ReflectionEngine.java:374)
+E                   	at py4j.Gateway.invoke(Gateway.java:282)
+E                   	at py4j.commands.AbstractCommand.invokeMethod(AbstractCommand.java:132)
+E                   	at py4j.commands.CallCommand.execute(CallCommand.java:79)
+E                   	at py4j.ClientServerConnection.waitForCommands(ClientServerConnection.java:184)
+E                   	at py4j.ClientServerConnection.run(ClientServerConnection.java:108)
+E                   	at java.base/java.lang.Thread.run(Thread.java:1583)
+E                   Caused by: org.apache.spark.SparkException: Python worker failed to connect back.
+E                   	at org.apache.spark.api.python.PythonWorkerFactory.createSimpleWorker(PythonWorkerFactory.scala:303)
+E                   	at org.apache.spark.api.python.PythonWorkerFactory.create(PythonWorkerFactory.scala:154)
+E                   	at org.apache.spark.SparkEnv.createPythonWorker(SparkEnv.scala:182)
+E                   	at org.apache.spark.api.python.BasePythonRunner.compute(PythonRunner.scala:330)
+E                   	at org.apache.spark.api.python.PythonRDD.compute(PythonRDD.scala:73)
+E                   	at org.apache.spark.rdd.RDD.computeOrReadCheckpoint(RDD.scala:374)
+E                   	at org.apache.spark.rdd.RDD.iterator(RDD.scala:338)
+E                   	at org.apache.spark.rdd.MapPartitionsRDD.compute(MapPartitionsRDD.scala:57)
+E                   	at org.apache.spark.rdd.RDD.computeOrReadCheckpoint(RDD.scala:374)
+E                   	at org.apache.spark.rdd.RDD.iterator(RDD.scala:338)
+E                   	at org.apache.spark.rdd.MapPartitionsRDD.compute(MapPartitionsRDD.scala:57)
+E                   	at org.apache.spark.rdd.RDD.computeOrReadCheckpoint(RDD.scala:374)
+E                   	at org.apache.spark.rdd.RDD.iterator(RDD.scala:338)
+E                   	at org.apache.spark.rdd.MapPartitionsRDD.compute(MapPartitionsRDD.scala:57)
+E                   	at org.apache.spark.rdd.RDD.computeOrReadCheckpoint(RDD.scala:374)
+E                   	at org.apache.spark.rdd.RDD.iterator(RDD.scala:338)
+E                   	at org.apache.spark.rdd.MapPartitionsRDD.compute(MapPartitionsRDD.scala:57)
+E                   	at org.apache.spark.rdd.RDD.computeOrReadCheckpoint(RDD.scala:374)
+E                   	at org.apache.spark.rdd.RDD.iterator(RDD.scala:338)
+E                   	at org.apache.spark.rdd.MapPartitionsRDD.compute(MapPartitionsRDD.scala:57)
+E                   	at org.apache.spark.rdd.RDD.computeOrReadCheckpoint(RDD.scala:374)
+E                   	at org.apache.spark.rdd.RDD.iterator(RDD.scala:338)
+E                   	at org.apache.spark.scheduler.ResultTask.runTask(ResultTask.scala:93)
+E                   	at org.apache.spark.TaskContext.runTaskWithListeners(TaskContext.scala:206)
+E                   	at org.apache.spark.scheduler.Task.run(Task.scala:147)
+E                   	at org.apache.spark.executor.Executor$TaskRunner.$anonfun$run$4(Executor.scala:894)
+E                   	at org.apache.spark.util.SparkErrorUtils.tryWithSafeFinally(SparkErrorUtils.scala:86)
+E                   	at org.apache.spark.util.SparkErrorUtils.tryWithSafeFinally$(SparkErrorUtils.scala:83)
+E                   	at org.apache.spark.util.Utils$.tryWithSafeFinally(Utils.scala:97)
+E                   	at org.apache.spark.executor.Executor$TaskRunner.run(Executor.scala:897)
+E                   	at java.base/java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1144)
+E                   	at java.base/java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:642)
+E                   	... 1 more
+E                   Caused by: java.net.SocketTimeoutException: Timed out while waiting for the Python worker to connect back
+E                   	at org.apache.spark.api.python.PythonWorkerFactory.createSimpleWorker(PythonWorkerFactory.scala:285)
+E                   	... 32 more
+
+.venv\Lib\site-packages\py4j\protocol.py:327: Py4JJavaError</failure></testcase><testcase classname="tests.test_preparer_dataset_fraude" name="test_lignes_coherentes" time="10.262"><failure message="py4j.protocol.Py4JJavaError: An error occurred while calling o223.collectToPython.&#10;: org.apache.spark.SparkException: Job aborted due to stage failure: Task 0 in stage 6.0 failed 1 times, most recent failure: Lost task 0.0 in stage 6.0 (TID 5) (DESKTOP-NPVBOL4.mshome.net executor driver): org.apache.spark.SparkException: Python worker failed to connect back.&#13;&#10;&#09;at org.apache.spark.api.python.PythonWorkerFactory.createSimpleWorker(PythonWorkerFactory.scala:303)&#13;&#10;&#09;at org.apache.spark.api.python.PythonWorkerFactory.create(PythonWorkerFactory.scala:154)&#13;&#10;&#09;at org.apache.spark.SparkEnv.createPythonWorker(SparkEnv.scala:182)&#13;&#10;&#09;at org.apache.spark.api.python.BasePythonRunner.compute(PythonRunner.scala:330)&#13;&#10;&#09;at org.apache.spark.api.python.PythonRDD.compute(PythonRDD.scala:73)&#13;&#10;&#09;at org.apache.spark.rdd.RDD.computeOrReadCheckpoint(RDD.scala:374)&#13;&#10;&#09;at org.apache.spark.rdd.RDD.iterator(RDD.scala:338)&#13;&#10;&#09;at org.apache.spark.rdd.MapPartitionsRDD.compute(MapPartitionsRDD.scala:57)&#13;&#10;&#09;at org.apache.spark.rdd.RDD.computeOrReadCheckpoint(RDD.scala:374)&#13;&#10;&#09;at org.apache.spark.rdd.RDD.iterator(RDD.scala:338)&#13;&#10;&#09;at org.apache.spark.rdd.MapPartitionsRDD.compute(MapPartitionsRDD.scala:57)&#13;&#10;&#09;at org.apache.spark.rdd.RDD.computeOrReadCheckpoint(RDD.scala:374)&#13;&#10;&#09;at org.apache.spark.rdd.RDD.iterator(RDD.scala:338)&#13;&#10;&#09;at org.apache.spark.rdd.MapPartitionsRDD.compute(MapPartitionsRDD.scala:57)&#13;&#10;&#09;at org.apache.spark.rdd.RDD.computeOrReadCheckpoint(RDD.scala:374)&#13;&#10;&#09;at org.apache.spark.rdd.RDD.iterator(RDD.scala:338)&#13;&#10;&#09;at org.apache.spark.rdd.MapPartitionsRDD.compute(MapPartitionsRDD.scala:57)&#13;&#10;&#09;at org.apache.spark.rdd.RDD.computeOrReadCheckpoint(RDD.scala:374)&#13;&#10;&#09;at org.apache.spark.rdd.RDD.iterator(RDD.scala:338)&#13;&#10;&#09;at org.apache.spark.rdd.MapPartitionsRDD.compute(MapPartitionsRDD.scala:57)&#13;&#10;&#09;at org.apache.spark.rdd.RDD.computeOrReadCheckpoint(RDD.scala:374)&#13;&#10;&#09;at org.apache.spark.rdd.RDD.iterator(RDD.scala:338)&#13;&#10;&#09;at org.apache.spark.scheduler.ResultTask.runTask(ResultTask.scala:93)&#13;&#10;&#09;at org.apache.spark.TaskContext.runTaskWithListeners(TaskContext.scala:206)&#13;&#10;&#09;at org.apache.spark.scheduler.Task.run(Task.scala:147)&#13;&#10;&#09;at org.apache.spark.executor.Executor$TaskRunner.$anonfun$run$4(Executor.scala:894)&#13;&#10;&#09;at org.apache.spark.util.SparkErrorUtils.tryWithSafeFinally(SparkErrorUtils.scala:86)&#13;&#10;&#09;at org.apache.spark.util.SparkErrorUtils.tryWithSafeFinally$(SparkErrorUtils.scala:83)&#13;&#10;&#09;at org.apache.spark.util.Utils$.tryWithSafeFinally(Utils.scala:97)&#13;&#10;&#09;at org.apache.spark.executor.Executor$TaskRunner.run(Executor.scala:897)&#13;&#10;&#09;at java.base/java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1144)&#13;&#10;&#09;at java.base/java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:642)&#13;&#10;&#09;at java.base/java.lang.Thread.run(Thread.java:1583)&#13;&#10;Caused by: java.net.SocketTimeoutException: Timed out while waiting for the Python worker to connect back&#13;&#10;&#09;at org.apache.spark.api.python.PythonWorkerFactory.createSimpleWorker(PythonWorkerFactory.scala:285)&#13;&#10;&#09;... 32 more&#13;&#10;&#10;Driver stacktrace:&#13;&#10;&#09;at org.apache.spark.scheduler.DAGScheduler.$anonfun$abortStage$3(DAGScheduler.scala:3318)&#13;&#10;&#09;at scala.Option.getOrElse(Option.scala:201)&#13;&#10;&#09;at org.apache.spark.scheduler.DAGScheduler.$anonfun$abortStage$2(DAGScheduler.scala:3318)&#13;&#10;&#09;at org.apache.spark.scheduler.DAGScheduler.$anonfun$abortStage$2$adapted(DAGScheduler.scala:3310)&#13;&#10;&#09;at scala.collection.immutable.List.foreach(List.scala:323)&#13;&#10;&#09;at org.apache.spark.scheduler.DAGScheduler.abortStage(DAGScheduler.scala:3310)&#13;&#10;&#09;at org.apache.spark.scheduler.DAGScheduler.$anonfun$handleTaskSetFailed$1(DAGScheduler.scala:1363)&#13;&#10;&#09;at org.apache.spark.scheduler.DAGScheduler.$anonfun$handleTaskSetFailed$1$adapted(DAGScheduler.scala:1363)&#13;&#10;&#09;at scala.Option.foreach(Option.scala:437)&#13;&#10;&#09;at org.apache.spark.scheduler.DAGScheduler.handleTaskSetFailed(DAGScheduler.scala:1363)&#13;&#10;&#09;at org.apache.spark.scheduler.DAGSchedulerEventProcessLoop.doOnReceive(DAGScheduler.scala:3589)&#13;&#10;&#09;at org.apache.spark.scheduler.DAGSchedulerEventProcessLoop.onReceive(DAGScheduler.scala:3517)&#13;&#10;&#09;at org.apache.spark.scheduler.DAGSchedulerEventProcessLoop.onReceive(DAGScheduler.scala:3506)&#13;&#10;&#09;at org.apache.spark.util.EventLoop$$anon$1.run(EventLoop.scala:50)&#13;&#10;&#09;at org.apache.spark.scheduler.DAGScheduler.runJob(DAGScheduler.scala:1063)&#13;&#10;&#09;at org.apache.spark.SparkContext.runJob(SparkContext.scala:2496)&#13;&#10;&#09;at org.apache.spark.SparkContext.runJob(SparkContext.scala:2517)&#13;&#10;&#09;at org.apache.spark.SparkContext.runJob(SparkContext.scala:2536)&#13;&#10;&#09;at org.apache.spark.SparkContext.runJob(SparkContext.scala:2561)&#13;&#10;&#09;at org.apache.spark.rdd.RDD.$anonfun$collect$1(RDD.scala:1073)&#13;&#10;&#09;at org.apache.spark.rdd.RDDOperationScope$.withScope(RDDOperationScope.scala:169)&#13;&#10;&#09;at org.apache.spark.rdd.RDDOperationScope$.withScope(RDDOperationScope.scala:134)&#13;&#10;&#09;at org.apache.spark.rdd.RDDOperationScope$.withScope(RDDOperationScope.scala:112)&#13;&#10;&#09;at org.apache.spark.rdd.RDD.withScope(RDD.scala:417)&#13;&#10;&#09;at org.apache.spark.rdd.RDD.collect(RDD.scala:1072)&#13;&#10;&#09;at org.apache.spark.sql.execution.SparkPlan.executeCollect(SparkPlan.scala:480)&#13;&#10;&#09;at org.apache.spark.sql.classic.Dataset.$anonfun$collectToPython$1(Dataset.scala:2144)&#13;&#10;&#09;at org.apache.spark.sql.classic.Dataset.$anonfun$withAction$3(Dataset.scala:2325)&#13;&#10;&#09;at org.apache.spark.sql.execution.QueryExecution$.withInternalError(QueryExecution.scala:872)&#13;&#10;&#09;at org.apache.spark.sql.classic.Dataset.$anonfun$withAction$2(Dataset.scala:2323)&#13;&#10;&#09;at org.apache.spark.sql.execution.QueryExecution.withQueryExecutionId(QueryExecution.scala:429)&#13;&#10;&#09;at org.apache.spark.sql.classic.Dataset.$anonfun$withAction$1(Dataset.scala:2323)&#13;&#10;&#09;at org.apache.spark.sql.execution.SQLExecution$.$anonfun$withNewExecutionId0$8(SQLExecution.scala:228)&#13;&#10;&#09;at org.apache.spark.sql.execution.SQLExecution$.withSessionTagsApplied(SQLExecution.scala:352)&#13;&#10;&#09;at org.apache.spark.sql.execution.SQLExecution$.$anonfun$withNewExecutionId0$7(SQLExecution.scala:189)&#13;&#10;&#09;at org.apache.spark.JobArtifactSet$.withActiveJobArtifactState(JobArtifactSet.scala:94)&#13;&#10;&#09;at org.apache.spark.sql.artifact.ArtifactManager.$anonfun$withResources$1(ArtifactManager.scala:112)&#13;&#10;&#09;at org.apache.spark.sql.artifact.ArtifactManager.withClassLoaderIfNeeded(ArtifactManager.scala:106)&#13;&#10;&#09;at org.apache.spark.sql.artifact.ArtifactManager.withResources(ArtifactManager.scala:111)&#13;&#10;&#09;at org.apache.spark.sql.execution.SQLExecution$.$anonfun$withNewExecutionId0$6(SQLExecution.scala:189)&#13;&#10;&#09;at org.apache.spark.sql.execution.SQLExecution$.withSQLConfPropagated(SQLExecution.scala:375)&#13;&#10;&#09;at org.apache.spark.sql.execution.SQLExecution$.$anonfun$withNewExecutionId0$1(SQLExecution.scala:188)&#13;&#10;&#09;at org.apache.spark.sql.SparkSession.withActive(SparkSession.scala:810)&#13;&#10;&#09;at org.apache.spark.sql.execution.SQLExecution$.withNewExecutionId0(SQLExecution.scala:130)&#13;&#10;&#09;at org.apache.spark.sql.execution.SQLExecution$.withNewExecutionId(SQLExecution.scala:317)&#13;&#10;&#09;at org.apache.spark.sql.classic.Dataset.withAction(Dataset.scala:2322)&#13;&#10;&#09;at org.apache.spark.sql.classic.Dataset.collectToPython(Dataset.scala:2140)&#13;&#10;&#09;at java.base/jdk.internal.reflect.DirectMethodHandleAccessor.invoke(DirectMethodHandleAccessor.java:103)&#13;&#10;&#09;at java.base/java.lang.reflect.Method.invoke(Method.java:580)&#13;&#10;&#09;at py4j.reflection.MethodInvoker.invoke(MethodInvoker.java:244)&#13;&#10;&#09;at py4j.reflection.ReflectionEngine.invoke(ReflectionEngine.java:374)&#13;&#10;&#09;at py4j.Gateway.invoke(Gateway.java:282)&#13;&#10;&#09;at py4j.commands.AbstractCommand.invokeMethod(AbstractCommand.java:132)&#13;&#10;&#09;at py4j.commands.CallCommand.execute(CallCommand.java:79)&#13;&#10;&#09;at py4j.ClientServerConnection.waitForCommands(ClientServerConnection.java:184)&#13;&#10;&#09;at py4j.ClientServerConnection.run(ClientServerConnection.java:108)&#13;&#10;&#09;at java.base/java.lang.Thread.run(Thread.java:1583)&#13;&#10;Caused by: org.apache.spark.SparkException: Python worker failed to connect back.&#13;&#10;&#09;at org.apache.spark.api.python.PythonWorkerFactory.createSimpleWorker(PythonWorkerFactory.scala:303)&#13;&#10;&#09;at org.apache.spark.api.python.PythonWorkerFactory.create(PythonWorkerFactory.scala:154)&#13;&#10;&#09;at org.apache.spark.SparkEnv.createPythonWorker(SparkEnv.scala:182)&#13;&#10;&#09;at org.apache.spark.api.python.BasePythonRunner.compute(PythonRunner.scala:330)&#13;&#10;&#09;at org.apache.spark.api.python.PythonRDD.compute(PythonRDD.scala:73)&#13;&#10;&#09;at org.apache.spark.rdd.RDD.computeOrReadCheckpoint(RDD.scala:374)&#13;&#10;&#09;at org.apache.spark.rdd.RDD.iterator(RDD.scala:338)&#13;&#10;&#09;at org.apache.spark.rdd.MapPartitionsRDD.compute(MapPartitionsRDD.scala:57)&#13;&#10;&#09;at org.apache.spark.rdd.RDD.computeOrReadCheckpoint(RDD.scala:374)&#13;&#10;&#09;at org.apache.spark.rdd.RDD.iterator(RDD.scala:338)&#13;&#10;&#09;at org.apache.spark.rdd.MapPartitionsRDD.compute(MapPartitionsRDD.scala:57)&#13;&#10;&#09;at org.apache.spark.rdd.RDD.computeOrReadCheckpoint(RDD.scala:374)&#13;&#10;&#09;at org.apache.spark.rdd.RDD.iterator(RDD.scala:338)&#13;&#10;&#09;at org.apache.spark.rdd.MapPartitionsRDD.compute(MapPartitionsRDD.scala:57)&#13;&#10;&#09;at org.apache.spark.rdd.RDD.computeOrReadCheckpoint(RDD.scala:374)&#13;&#10;&#09;at org.apache.spark.rdd.RDD.iterator(RDD.scala:338)&#13;&#10;&#09;at org.apache.spark.rdd.MapPartitionsRDD.compute(MapPartitionsRDD.scala:57)&#13;&#10;&#09;at org.apache.spark.rdd.RDD.computeOrReadCheckpoint(RDD.scala:374)&#13;&#10;&#09;at org.apache.spark.rdd.RDD.iterator(RDD.scala:338)&#13;&#10;&#09;at org.apache.spark.rdd.MapPartitionsRDD.compute(MapPartitionsRDD.scala:57)&#13;&#10;&#09;at org.apache.spark.rdd.RDD.computeOrReadCheckpoint(RDD.scala:374)&#13;&#10;&#09;at org.apache.spark.rdd.RDD.iterator(RDD.scala:338)&#13;&#10;&#09;at org.apache.spark.scheduler.ResultTask.runTask(ResultTask.scala:93)&#13;&#10;&#09;at org.apache.spark.TaskContext.runTaskWithListeners(TaskContext.scala:206)&#13;&#10;&#09;at org.apache.spark.scheduler.Task.run(Task.scala:147)&#13;&#10;&#09;at org.apache.spark.executor.Executor$TaskRunner.$anonfun$run$4(Executor.scala:894)&#13;&#10;&#09;at org.apache.spark.util.SparkErrorUtils.tryWithSafeFinally(SparkErrorUtils.scala:86)&#13;&#10;&#09;at org.apache.spark.util.SparkErrorUtils.tryWithSafeFinally$(SparkErrorUtils.scala:83)&#13;&#10;&#09;at org.apache.spark.util.Utils$.tryWithSafeFinally(Utils.scala:97)&#13;&#10;&#09;at org.apache.spark.executor.Executor$TaskRunner.run(Executor.scala:897)&#13;&#10;&#09;at java.base/java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1144)&#13;&#10;&#09;at java.base/java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:642)&#13;&#10;&#09;... 1 more&#13;&#10;Caused by: java.net.SocketTimeoutException: Timed out while waiting for the Python worker to connect back&#13;&#10;&#09;at org.apache.spark.api.python.PythonWorkerFactory.createSimpleWorker(PythonWorkerFactory.scala:285)&#13;&#10;&#09;... 32 more">spark = &lt;pyspark.sql.session.SparkSession object at 0x000002AEFD5C8AD0&gt;
+
+    def test_lignes_coherentes(spark):
+        dataset = spark.createDataFrame(
+        [
+            ("s1", 100.0, 10),
+            ("s2", 0.0, 10),
+            ("s3", 200.0, -1),
+        ],
+            "sinistre_id string, montant_estime double, jours_avant_sinistre int",
+        )
+    
+&gt;       resultat = prep.lignes_coherentes(dataset).collect()
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests\test_preparer_dataset_fraude.py:99: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+.venv\Lib\site-packages\pyspark\sql\classic\dataframe.py:503: in collect
+    sock_info = self._jdf.collectToPython()
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv\Lib\site-packages\py4j\java_gateway.py:1362: in __call__
+    return_value = get_return_value(
+.venv\Lib\site-packages\pyspark\errors\exceptions\captured.py:251: in deco
+    return f(*a, **kw)
+           ^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+answer = 'xro224', gateway_client = &lt;py4j.clientserver.JavaClient object at 0x000002AEBD443230&gt;, target_id = 'o223', name = 'collectToPython'
+
+    def get_return_value(answer, gateway_client, target_id=None, name=None):
+        """Converts an answer received from the Java gateway into a Python object.
+    
+        For example, string representation of integers are converted to Python
+        integer, string representation of objects are converted to JavaObject
+        instances, etc.
+    
+        :param answer: the string returned by the Java gateway
+        :param gateway_client: the gateway client used to communicate with the Java
+            Gateway. Only necessary if the answer is a reference (e.g., object,
+            list, map)
+        :param target_id: the name of the object from which the answer comes from
+            (e.g., *object1* in `object1.hello()`). Optional.
+        :param name: the name of the member from which the answer comes from
+            (e.g., *hello* in `object1.hello()`). Optional.
+        """
+        if is_error(answer)[0]:
+            if len(answer) &gt; 1:
+                type = answer[1]
+                value = OUTPUT_CONVERTER[type](answer[2:], gateway_client)
+                if answer[1] == REFERENCE_TYPE:
+&gt;                   raise Py4JJavaError(
+                        "An error occurred while calling {0}{1}{2}.\n".
+                        format(target_id, ".", name), value)
+E                   py4j.protocol.Py4JJavaError: An error occurred while calling o223.collectToPython.
+E                   : org.apache.spark.SparkException: Job aborted due to stage failure: Task 0 in stage 6.0 failed 1 times, most recent failure: Lost task 0.0 in stage 6.0 (TID 5) (DESKTOP-NPVBOL4.mshome.net executor driver): org.apache.spark.SparkException: Python worker failed to connect back.
+E                   	at org.apache.spark.api.python.PythonWorkerFactory.createSimpleWorker(PythonWorkerFactory.scala:303)
+E                   	at org.apache.spark.api.python.PythonWorkerFactory.create(PythonWorkerFactory.scala:154)
+E                   	at org.apache.spark.SparkEnv.createPythonWorker(SparkEnv.scala:182)
+E                   	at org.apache.spark.api.python.BasePythonRunner.compute(PythonRunner.scala:330)
+E                   	at org.apache.spark.api.python.PythonRDD.compute(PythonRDD.scala:73)
+E                   	at org.apache.spark.rdd.RDD.computeOrReadCheckpoint(RDD.scala:374)
+E                   	at org.apache.spark.rdd.RDD.iterator(RDD.scala:338)
+E                   	at org.apache.spark.rdd.MapPartitionsRDD.compute(MapPartitionsRDD.scala:57)
+E                   	at org.apache.spark.rdd.RDD.computeOrReadCheckpoint(RDD.scala:374)
+E                   	at org.apache.spark.rdd.RDD.iterator(RDD.scala:338)
+E                   	at org.apache.spark.rdd.MapPartitionsRDD.compute(MapPartitionsRDD.scala:57)
+E                   	at org.apache.spark.rdd.RDD.computeOrReadCheckpoint(RDD.scala:374)
+E                   	at org.apache.spark.rdd.RDD.iterator(RDD.scala:338)
+E                   	at org.apache.spark.rdd.MapPartitionsRDD.compute(MapPartitionsRDD.scala:57)
+E                   	at org.apache.spark.rdd.RDD.computeOrReadCheckpoint(RDD.scala:374)
+E                   	at org.apache.spark.rdd.RDD.iterator(RDD.scala:338)
+E                   	at org.apache.spark.rdd.MapPartitionsRDD.compute(MapPartitionsRDD.scala:57)
+E                   	at org.apache.spark.rdd.RDD.computeOrReadCheckpoint(RDD.scala:374)
+E                   	at org.apache.spark.rdd.RDD.iterator(RDD.scala:338)
+E                   	at org.apache.spark.rdd.MapPartitionsRDD.compute(MapPartitionsRDD.scala:57)
+E                   	at org.apache.spark.rdd.RDD.computeOrReadCheckpoint(RDD.scala:374)
+E                   	at org.apache.spark.rdd.RDD.iterator(RDD.scala:338)
+E                   	at org.apache.spark.scheduler.ResultTask.runTask(ResultTask.scala:93)
+E                   	at org.apache.spark.TaskContext.runTaskWithListeners(TaskContext.scala:206)
+E                   	at org.apache.spark.scheduler.Task.run(Task.scala:147)
+E                   	at org.apache.spark.executor.Executor$TaskRunner.$anonfun$run$4(Executor.scala:894)
+E                   	at org.apache.spark.util.SparkErrorUtils.tryWithSafeFinally(SparkErrorUtils.scala:86)
+E                   	at org.apache.spark.util.SparkErrorUtils.tryWithSafeFinally$(SparkErrorUtils.scala:83)
+E                   	at org.apache.spark.util.Utils$.tryWithSafeFinally(Utils.scala:97)
+E                   	at org.apache.spark.executor.Executor$TaskRunner.run(Executor.scala:897)
+E                   	at java.base/java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1144)
+E                   	at java.base/java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:642)
+E                   	at java.base/java.lang.Thread.run(Thread.java:1583)
+E                   Caused by: java.net.SocketTimeoutException: Timed out while waiting for the Python worker to connect back
+E                   	at org.apache.spark.api.python.PythonWorkerFactory.createSimpleWorker(PythonWorkerFactory.scala:285)
+E                   	... 32 more
+E                   
+E                   Driver stacktrace:
+E                   	at org.apache.spark.scheduler.DAGScheduler.$anonfun$abortStage$3(DAGScheduler.scala:3318)
+E                   	at scala.Option.getOrElse(Option.scala:201)
+E                   	at org.apache.spark.scheduler.DAGScheduler.$anonfun$abortStage$2(DAGScheduler.scala:3318)
+E                   	at org.apache.spark.scheduler.DAGScheduler.$anonfun$abortStage$2$adapted(DAGScheduler.scala:3310)
+E                   	at scala.collection.immutable.List.foreach(List.scala:323)
+E                   	at org.apache.spark.scheduler.DAGScheduler.abortStage(DAGScheduler.scala:3310)
+E                   	at org.apache.spark.scheduler.DAGScheduler.$anonfun$handleTaskSetFailed$1(DAGScheduler.scala:1363)
+E                   	at org.apache.spark.scheduler.DAGScheduler.$anonfun$handleTaskSetFailed$1$adapted(DAGScheduler.scala:1363)
+E                   	at scala.Option.foreach(Option.scala:437)
+E                   	at org.apache.spark.scheduler.DAGScheduler.handleTaskSetFailed(DAGScheduler.scala:1363)
+E                   	at org.apache.spark.scheduler.DAGSchedulerEventProcessLoop.doOnReceive(DAGScheduler.scala:3589)
+E                   	at org.apache.spark.scheduler.DAGSchedulerEventProcessLoop.onReceive(DAGScheduler.scala:3517)
+E                   	at org.apache.spark.scheduler.DAGSchedulerEventProcessLoop.onReceive(DAGScheduler.scala:3506)
+E                   	at org.apache.spark.util.EventLoop$$anon$1.run(EventLoop.scala:50)
+E                   	at org.apache.spark.scheduler.DAGScheduler.runJob(DAGScheduler.scala:1063)
+E                   	at org.apache.spark.SparkContext.runJob(SparkContext.scala:2496)
+E                   	at org.apache.spark.SparkContext.runJob(SparkContext.scala:2517)
+E                   	at org.apache.spark.SparkContext.runJob(SparkContext.scala:2536)
+E                   	at org.apache.spark.SparkContext.runJob(SparkContext.scala:2561)
+E                   	at org.apache.spark.rdd.RDD.$anonfun$collect$1(RDD.scala:1073)
+E                   	at org.apache.spark.rdd.RDDOperationScope$.withScope(RDDOperationScope.scala:169)
+E                   	at org.apache.spark.rdd.RDDOperationScope$.withScope(RDDOperationScope.scala:134)
+E                   	at org.apache.spark.rdd.RDDOperationScope$.withScope(RDDOperationScope.scala:112)
+E                   	at org.apache.spark.rdd.RDD.withScope(RDD.scala:417)
+E                   	at org.apache.spark.rdd.RDD.collect(RDD.scala:1072)
+E                   	at org.apache.spark.sql.execution.SparkPlan.executeCollect(SparkPlan.scala:480)
+E                   	at org.apache.spark.sql.classic.Dataset.$anonfun$collectToPython$1(Dataset.scala:2144)
+E                   	at org.apache.spark.sql.classic.Dataset.$anonfun$withAction$3(Dataset.scala:2325)
+E                   	at org.apache.spark.sql.execution.QueryExecution$.withInternalError(QueryExecution.scala:872)
+E                   	at org.apache.spark.sql.classic.Dataset.$anonfun$withAction$2(Dataset.scala:2323)
+E                   	at org.apache.spark.sql.execution.QueryExecution.withQueryExecutionId(QueryExecution.scala:429)
+E                   	at org.apache.spark.sql.classic.Dataset.$anonfun$withAction$1(Dataset.scala:2323)
+E                   	at org.apache.spark.sql.execution.SQLExecution$.$anonfun$withNewExecutionId0$8(SQLExecution.scala:228)
+E                   	at org.apache.spark.sql.execution.SQLExecution$.withSessionTagsApplied(SQLExecution.scala:352)
+E                   	at org.apache.spark.sql.execution.SQLExecution$.$anonfun$withNewExecutionId0$7(SQLExecution.scala:189)
+E                   	at org.apache.spark.JobArtifactSet$.withActiveJobArtifactState(JobArtifactSet.scala:94)
+E                   	at org.apache.spark.sql.artifact.ArtifactManager.$anonfun$withResources$1(ArtifactManager.scala:112)
+E                   	at org.apache.spark.sql.artifact.ArtifactManager.withClassLoaderIfNeeded(ArtifactManager.scala:106)
+E                   	at org.apache.spark.sql.artifact.ArtifactManager.withResources(ArtifactManager.scala:111)
+E                   	at org.apache.spark.sql.execution.SQLExecution$.$anonfun$withNewExecutionId0$6(SQLExecution.scala:189)
+E                   	at org.apache.spark.sql.execution.SQLExecution$.withSQLConfPropagated(SQLExecution.scala:375)
+E                   	at org.apache.spark.sql.execution.SQLExecution$.$anonfun$withNewExecutionId0$1(SQLExecution.scala:188)
+E                   	at org.apache.spark.sql.SparkSession.withActive(SparkSession.scala:810)
+E                   	at org.apache.spark.sql.execution.SQLExecution$.withNewExecutionId0(SQLExecution.scala:130)
+E                   	at org.apache.spark.sql.execution.SQLExecution$.withNewExecutionId(SQLExecution.scala:317)
+E                   	at org.apache.spark.sql.classic.Dataset.withAction(Dataset.scala:2322)
+E                   	at org.apache.spark.sql.classic.Dataset.collectToPython(Dataset.scala:2140)
+E                   	at java.base/jdk.internal.reflect.DirectMethodHandleAccessor.invoke(DirectMethodHandleAccessor.java:103)
+E                   	at java.base/java.lang.reflect.Method.invoke(Method.java:580)
+E                   	at py4j.reflection.MethodInvoker.invoke(MethodInvoker.java:244)
+E                   	at py4j.reflection.ReflectionEngine.invoke(ReflectionEngine.java:374)
+E                   	at py4j.Gateway.invoke(Gateway.java:282)
+E                   	at py4j.commands.AbstractCommand.invokeMethod(AbstractCommand.java:132)
+E                   	at py4j.commands.CallCommand.execute(CallCommand.java:79)
+E                   	at py4j.ClientServerConnection.waitForCommands(ClientServerConnection.java:184)
+E                   	at py4j.ClientServerConnection.run(ClientServerConnection.java:108)
+E                   	at java.base/java.lang.Thread.run(Thread.java:1583)
+E                   Caused by: org.apache.spark.SparkException: Python worker failed to connect back.
+E                   	at org.apache.spark.api.python.PythonWorkerFactory.createSimpleWorker(PythonWorkerFactory.scala:303)
+E                   	at org.apache.spark.api.python.PythonWorkerFactory.create(PythonWorkerFactory.scala:154)
+E                   	at org.apache.spark.SparkEnv.createPythonWorker(SparkEnv.scala:182)
+E                   	at org.apache.spark.api.python.BasePythonRunner.compute(PythonRunner.scala:330)
+E                   	at org.apache.spark.api.python.PythonRDD.compute(PythonRDD.scala:73)
+E                   	at org.apache.spark.rdd.RDD.computeOrReadCheckpoint(RDD.scala:374)
+E                   	at org.apache.spark.rdd.RDD.iterator(RDD.scala:338)
+E                   	at org.apache.spark.rdd.MapPartitionsRDD.compute(MapPartitionsRDD.scala:57)
+E                   	at org.apache.spark.rdd.RDD.computeOrReadCheckpoint(RDD.scala:374)
+E                   	at org.apache.spark.rdd.RDD.iterator(RDD.scala:338)
+E                   	at org.apache.spark.rdd.MapPartitionsRDD.compute(MapPartitionsRDD.scala:57)
+E                   	at org.apache.spark.rdd.RDD.computeOrReadCheckpoint(RDD.scala:374)
+E                   	at org.apache.spark.rdd.RDD.iterator(RDD.scala:338)
+E                   	at org.apache.spark.rdd.MapPartitionsRDD.compute(MapPartitionsRDD.scala:57)
+E                   	at org.apache.spark.rdd.RDD.computeOrReadCheckpoint(RDD.scala:374)
+E                   	at org.apache.spark.rdd.RDD.iterator(RDD.scala:338)
+E                   	at org.apache.spark.rdd.MapPartitionsRDD.compute(MapPartitionsRDD.scala:57)
+E                   	at org.apache.spark.rdd.RDD.computeOrReadCheckpoint(RDD.scala:374)
+E                   	at org.apache.spark.rdd.RDD.iterator(RDD.scala:338)
+E                   	at org.apache.spark.rdd.MapPartitionsRDD.compute(MapPartitionsRDD.scala:57)
+E                   	at org.apache.spark.rdd.RDD.computeOrReadCheckpoint(RDD.scala:374)
+E                   	at org.apache.spark.rdd.RDD.iterator(RDD.scala:338)
+E                   	at org.apache.spark.scheduler.ResultTask.runTask(ResultTask.scala:93)
+E                   	at org.apache.spark.TaskContext.runTaskWithListeners(TaskContext.scala:206)
+E                   	at org.apache.spark.scheduler.Task.run(Task.scala:147)
+E                   	at org.apache.spark.executor.Executor$TaskRunner.$anonfun$run$4(Executor.scala:894)
+E                   	at org.apache.spark.util.SparkErrorUtils.tryWithSafeFinally(SparkErrorUtils.scala:86)
+E                   	at org.apache.spark.util.SparkErrorUtils.tryWithSafeFinally$(SparkErrorUtils.scala:83)
+E                   	at org.apache.spark.util.Utils$.tryWithSafeFinally(Utils.scala:97)
+E                   	at org.apache.spark.executor.Executor$TaskRunner.run(Executor.scala:897)
+E                   	at java.base/java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1144)
+E                   	at java.base/java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:642)
+E                   	... 1 more
+E                   Caused by: java.net.SocketTimeoutException: Timed out while waiting for the Python worker to connect back
+E                   	at org.apache.spark.api.python.PythonWorkerFactory.createSimpleWorker(PythonWorkerFactory.scala:285)
+E                   	... 32 more
+
+.venv\Lib\site-packages\py4j\protocol.py:327: Py4JJavaError</failure></testcase><testcase classname="tests.test_preparer_dataset_fraude" name="test_lignes_coherentes_dataset_vide" time="10.720"><failure message="py4j.protocol.Py4JJavaError: An error occurred while calling o253.count.&#10;: org.apache.spark.SparkException: Job aborted due to stage failure: Task 0 in stage 7.0 failed 1 times, most recent failure: Lost task 0.0 in stage 7.0 (TID 6) (DESKTOP-NPVBOL4.mshome.net executor driver): org.apache.spark.SparkException: Python worker failed to connect back.&#13;&#10;&#09;at org.apache.spark.api.python.PythonWorkerFactory.createSimpleWorker(PythonWorkerFactory.scala:303)&#13;&#10;&#09;at org.apache.spark.api.python.PythonWorkerFactory.create(PythonWorkerFactory.scala:154)&#13;&#10;&#09;at org.apache.spark.SparkEnv.createPythonWorker(SparkEnv.scala:182)&#13;&#10;&#09;at org.apache.spark.api.python.BasePythonRunner.compute(PythonRunner.scala:330)&#13;&#10;&#09;at org.apache.spark.api.python.PythonRDD.compute(PythonRDD.scala:73)&#13;&#10;&#09;at org.apache.spark.rdd.RDD.computeOrReadCheckpoint(RDD.scala:374)&#13;&#10;&#09;at org.apache.spark.rdd.RDD.iterator(RDD.scala:338)&#13;&#10;&#09;at org.apache.spark.rdd.MapPartitionsRDD.compute(MapPartitionsRDD.scala:57)&#13;&#10;&#09;at org.apache.spark.rdd.RDD.computeOrReadCheckpoint(RDD.scala:374)&#13;&#10;&#09;at org.apache.spark.rdd.RDD.iterator(RDD.scala:338)&#13;&#10;&#09;at org.apache.spark.rdd.MapPartitionsRDD.compute(MapPartitionsRDD.scala:57)&#13;&#10;&#09;at org.apache.spark.rdd.RDD.computeOrReadCheckpoint(RDD.scala:374)&#13;&#10;&#09;at org.apache.spark.rdd.RDD.iterator(RDD.scala:338)&#13;&#10;&#09;at org.apache.spark.rdd.MapPartitionsRDD.compute(MapPartitionsRDD.scala:57)&#13;&#10;&#09;at org.apache.spark.rdd.RDD.computeOrReadCheckpoint(RDD.scala:374)&#13;&#10;&#09;at org.apache.spark.rdd.RDD.iterator(RDD.scala:338)&#13;&#10;&#09;at org.apache.spark.rdd.MapPartitionsRDD.compute(MapPartitionsRDD.scala:57)&#13;&#10;&#09;at org.apache.spark.rdd.RDD.computeOrReadCheckpoint(RDD.scala:374)&#13;&#10;&#09;at org.apache.spark.rdd.RDD.iterator(RDD.scala:338)&#13;&#10;&#09;at org.apache.spark.rdd.MapPartitionsRDD.compute(MapPartitionsRDD.scala:57)&#13;&#10;&#09;at org.apache.spark.rdd.RDD.computeOrReadCheckpoint(RDD.scala:374)&#13;&#10;&#09;at org.apache.spark.rdd.RDD.iterator(RDD.scala:338)&#13;&#10;&#09;at org.apache.spark.scheduler.ShuffleMapTask.runTask(ShuffleMapTask.scala:107)&#13;&#10;&#09;at org.apache.spark.scheduler.ShuffleMapTask.runTask(ShuffleMapTask.scala:54)&#13;&#10;&#09;at org.apache.spark.TaskContext.runTaskWithListeners(TaskContext.scala:206)&#13;&#10;&#09;at org.apache.spark.scheduler.Task.run(Task.scala:147)&#13;&#10;&#09;at org.apache.spark.executor.Executor$TaskRunner.$anonfun$run$4(Executor.scala:894)&#13;&#10;&#09;at org.apache.spark.util.SparkErrorUtils.tryWithSafeFinally(SparkErrorUtils.scala:86)&#13;&#10;&#09;at org.apache.spark.util.SparkErrorUtils.tryWithSafeFinally$(SparkErrorUtils.scala:83)&#13;&#10;&#09;at org.apache.spark.util.Utils$.tryWithSafeFinally(Utils.scala:97)&#13;&#10;&#09;at org.apache.spark.executor.Executor$TaskRunner.run(Executor.scala:897)&#13;&#10;&#09;at java.base/java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1144)&#13;&#10;&#09;at java.base/java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:642)&#13;&#10;&#09;at java.base/java.lang.Thread.run(Thread.java:1583)&#13;&#10;Caused by: java.net.SocketTimeoutException: Timed out while waiting for the Python worker to connect back&#13;&#10;&#09;at org.apache.spark.api.python.PythonWorkerFactory.createSimpleWorker(PythonWorkerFactory.scala:285)&#13;&#10;&#09;... 33 more&#13;&#10;&#10;Driver stacktrace:&#13;&#10;&#09;at org.apache.spark.scheduler.DAGScheduler.$anonfun$abortStage$3(DAGScheduler.scala:3318)&#13;&#10;&#09;at scala.Option.getOrElse(Option.scala:201)&#13;&#10;&#09;at org.apache.spark.scheduler.DAGScheduler.$anonfun$abortStage$2(DAGScheduler.scala:3318)&#13;&#10;&#09;at org.apache.spark.scheduler.DAGScheduler.$anonfun$abortStage$2$adapted(DAGScheduler.scala:3310)&#13;&#10;&#09;at scala.collection.immutable.List.foreach(List.scala:323)&#13;&#10;&#09;at org.apache.spark.scheduler.DAGScheduler.abortStage(DAGScheduler.scala:3310)&#13;&#10;&#09;at org.apache.spark.scheduler.DAGScheduler.$anonfun$handleTaskSetFailed$1(DAGScheduler.scala:1363)&#13;&#10;&#09;at org.apache.spark.scheduler.DAGScheduler.$anonfun$handleTaskSetFailed$1$adapted(DAGScheduler.scala:1363)&#13;&#10;&#09;at scala.Option.foreach(Option.scala:437)&#13;&#10;&#09;at org.apache.spark.scheduler.DAGScheduler.handleTaskSetFailed(DAGScheduler.scala:1363)&#13;&#10;&#09;at org.apache.spark.scheduler.DAGSchedulerEventProcessLoop.doOnReceive(DAGScheduler.scala:3589)&#13;&#10;&#09;at org.apache.spark.scheduler.DAGSchedulerEventProcessLoop.onReceive(DAGScheduler.scala:3517)&#13;&#10;&#09;at org.apache.spark.scheduler.DAGSchedulerEventProcessLoop.onReceive(DAGScheduler.scala:3506)&#13;&#10;&#09;at org.apache.spark.util.EventLoop$$anon$1.run(EventLoop.scala:50)&#13;&#10;Caused by: org.apache.spark.SparkException: Python worker failed to connect back.&#13;&#10;&#09;at org.apache.spark.api.python.PythonWorkerFactory.createSimpleWorker(PythonWorkerFactory.scala:303)&#13;&#10;&#09;at org.apache.spark.api.python.PythonWorkerFactory.create(PythonWorkerFactory.scala:154)&#13;&#10;&#09;at org.apache.spark.SparkEnv.createPythonWorker(SparkEnv.scala:182)&#13;&#10;&#09;at org.apache.spark.api.python.BasePythonRunner.compute(PythonRunner.scala:330)&#13;&#10;&#09;at org.apache.spark.api.python.PythonRDD.compute(PythonRDD.scala:73)&#13;&#10;&#09;at org.apache.spark.rdd.RDD.computeOrReadCheckpoint(RDD.scala:374)&#13;&#10;&#09;at org.apache.spark.rdd.RDD.iterator(RDD.scala:338)&#13;&#10;&#09;at org.apache.spark.rdd.MapPartitionsRDD.compute(MapPartitionsRDD.scala:57)&#13;&#10;&#09;at org.apache.spark.rdd.RDD.computeOrReadCheckpoint(RDD.scala:374)&#13;&#10;&#09;at org.apache.spark.rdd.RDD.iterator(RDD.scala:338)&#13;&#10;&#09;at org.apache.spark.rdd.MapPartitionsRDD.compute(MapPartitionsRDD.scala:57)&#13;&#10;&#09;at org.apache.spark.rdd.RDD.computeOrReadCheckpoint(RDD.scala:374)&#13;&#10;&#09;at org.apache.spark.rdd.RDD.iterator(RDD.scala:338)&#13;&#10;&#09;at org.apache.spark.rdd.MapPartitionsRDD.compute(MapPartitionsRDD.scala:57)&#13;&#10;&#09;at org.apache.spark.rdd.RDD.computeOrReadCheckpoint(RDD.scala:374)&#13;&#10;&#09;at org.apache.spark.rdd.RDD.iterator(RDD.scala:338)&#13;&#10;&#09;at org.apache.spark.rdd.MapPartitionsRDD.compute(MapPartitionsRDD.scala:57)&#13;&#10;&#09;at org.apache.spark.rdd.RDD.computeOrReadCheckpoint(RDD.scala:374)&#13;&#10;&#09;at org.apache.spark.rdd.RDD.iterator(RDD.scala:338)&#13;&#10;&#09;at org.apache.spark.rdd.MapPartitionsRDD.compute(MapPartitionsRDD.scala:57)&#13;&#10;&#09;at org.apache.spark.rdd.RDD.computeOrReadCheckpoint(RDD.scala:374)&#13;&#10;&#09;at org.apache.spark.rdd.RDD.iterator(RDD.scala:338)&#13;&#10;&#09;at org.apache.spark.scheduler.ShuffleMapTask.runTask(ShuffleMapTask.scala:107)&#13;&#10;&#09;at org.apache.spark.scheduler.ShuffleMapTask.runTask(ShuffleMapTask.scala:54)&#13;&#10;&#09;at org.apache.spark.TaskContext.runTaskWithListeners(TaskContext.scala:206)&#13;&#10;&#09;at org.apache.spark.scheduler.Task.run(Task.scala:147)&#13;&#10;&#09;at org.apache.spark.executor.Executor$TaskRunner.$anonfun$run$4(Executor.scala:894)&#13;&#10;&#09;at org.apache.spark.util.SparkErrorUtils.tryWithSafeFinally(SparkErrorUtils.scala:86)&#13;&#10;&#09;at org.apache.spark.util.SparkErrorUtils.tryWithSafeFinally$(SparkErrorUtils.scala:83)&#13;&#10;&#09;at org.apache.spark.util.Utils$.tryWithSafeFinally(Utils.scala:97)&#13;&#10;&#09;at org.apache.spark.executor.Executor$TaskRunner.run(Executor.scala:897)&#13;&#10;&#09;at java.base/java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1144)&#13;&#10;&#09;at java.base/java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:642)&#13;&#10;&#09;at java.base/java.lang.Thread.run(Thread.java:1583)&#13;&#10;Caused by: java.net.SocketTimeoutException: Timed out while waiting for the Python worker to connect back&#13;&#10;&#09;at org.apache.spark.api.python.PythonWorkerFactory.createSimpleWorker(PythonWorkerFactory.scala:285)&#13;&#10;&#09;... 33 more">spark = &lt;pyspark.sql.session.SparkSession object at 0x000002AEFD5C8AD0&gt;
+
+    def test_lignes_coherentes_dataset_vide(spark):
+        dataset = spark.createDataFrame(
+        [],
+        "sinistre_id string, montant_estime double, jours_avant_sinistre int",
+        )
+    
+&gt;       assert prep.lignes_coherentes(dataset).count() == 0
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests\test_preparer_dataset_fraude.py:110: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+.venv\Lib\site-packages\pyspark\sql\classic\dataframe.py:499: in count
+    return int(self._jdf.count())
+               ^^^^^^^^^^^^^^^^^
+.venv\Lib\site-packages\py4j\java_gateway.py:1362: in __call__
+    return_value = get_return_value(
+.venv\Lib\site-packages\pyspark\errors\exceptions\captured.py:251: in deco
+    return f(*a, **kw)
+           ^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+answer = 'xro254', gateway_client = &lt;py4j.clientserver.JavaClient object at 0x000002AEBD443230&gt;, target_id = 'o253', name = 'count'
+
+    def get_return_value(answer, gateway_client, target_id=None, name=None):
+        """Converts an answer received from the Java gateway into a Python object.
+    
+        For example, string representation of integers are converted to Python
+        integer, string representation of objects are converted to JavaObject
+        instances, etc.
+    
+        :param answer: the string returned by the Java gateway
+        :param gateway_client: the gateway client used to communicate with the Java
+            Gateway. Only necessary if the answer is a reference (e.g., object,
+            list, map)
+        :param target_id: the name of the object from which the answer comes from
+            (e.g., *object1* in `object1.hello()`). Optional.
+        :param name: the name of the member from which the answer comes from
+            (e.g., *hello* in `object1.hello()`). Optional.
+        """
+        if is_error(answer)[0]:
+            if len(answer) &gt; 1:
+                type = answer[1]
+                value = OUTPUT_CONVERTER[type](answer[2:], gateway_client)
+                if answer[1] == REFERENCE_TYPE:
+&gt;                   raise Py4JJavaError(
+                        "An error occurred while calling {0}{1}{2}.\n".
+                        format(target_id, ".", name), value)
+E                   py4j.protocol.Py4JJavaError: An error occurred while calling o253.count.
+E                   : org.apache.spark.SparkException: Job aborted due to stage failure: Task 0 in stage 7.0 failed 1 times, most recent failure: Lost task 0.0 in stage 7.0 (TID 6) (DESKTOP-NPVBOL4.mshome.net executor driver): org.apache.spark.SparkException: Python worker failed to connect back.
+E                   	at org.apache.spark.api.python.PythonWorkerFactory.createSimpleWorker(PythonWorkerFactory.scala:303)
+E                   	at org.apache.spark.api.python.PythonWorkerFactory.create(PythonWorkerFactory.scala:154)
+E                   	at org.apache.spark.SparkEnv.createPythonWorker(SparkEnv.scala:182)
+E                   	at org.apache.spark.api.python.BasePythonRunner.compute(PythonRunner.scala:330)
+E                   	at org.apache.spark.api.python.PythonRDD.compute(PythonRDD.scala:73)
+E                   	at org.apache.spark.rdd.RDD.computeOrReadCheckpoint(RDD.scala:374)
+E                   	at org.apache.spark.rdd.RDD.iterator(RDD.scala:338)
+E                   	at org.apache.spark.rdd.MapPartitionsRDD.compute(MapPartitionsRDD.scala:57)
+E                   	at org.apache.spark.rdd.RDD.computeOrReadCheckpoint(RDD.scala:374)
+E                   	at org.apache.spark.rdd.RDD.iterator(RDD.scala:338)
+E                   	at org.apache.spark.rdd.MapPartitionsRDD.compute(MapPartitionsRDD.scala:57)
+E                   	at org.apache.spark.rdd.RDD.computeOrReadCheckpoint(RDD.scala:374)
+E                   	at org.apache.spark.rdd.RDD.iterator(RDD.scala:338)
+E                   	at org.apache.spark.rdd.MapPartitionsRDD.compute(MapPartitionsRDD.scala:57)
+E                   	at org.apache.spark.rdd.RDD.computeOrReadCheckpoint(RDD.scala:374)
+E                   	at org.apache.spark.rdd.RDD.iterator(RDD.scala:338)
+E                   	at org.apache.spark.rdd.MapPartitionsRDD.compute(MapPartitionsRDD.scala:57)
+E                   	at org.apache.spark.rdd.RDD.computeOrReadCheckpoint(RDD.scala:374)
+E                   	at org.apache.spark.rdd.RDD.iterator(RDD.scala:338)
+E                   	at org.apache.spark.rdd.MapPartitionsRDD.compute(MapPartitionsRDD.scala:57)
+E                   	at org.apache.spark.rdd.RDD.computeOrReadCheckpoint(RDD.scala:374)
+E                   	at org.apache.spark.rdd.RDD.iterator(RDD.scala:338)
+E                   	at org.apache.spark.scheduler.ShuffleMapTask.runTask(ShuffleMapTask.scala:107)
+E                   	at org.apache.spark.scheduler.ShuffleMapTask.runTask(ShuffleMapTask.scala:54)
+E                   	at org.apache.spark.TaskContext.runTaskWithListeners(TaskContext.scala:206)
+E                   	at org.apache.spark.scheduler.Task.run(Task.scala:147)
+E                   	at org.apache.spark.executor.Executor$TaskRunner.$anonfun$run$4(Executor.scala:894)
+E                   	at org.apache.spark.util.SparkErrorUtils.tryWithSafeFinally(SparkErrorUtils.scala:86)
+E                   	at org.apache.spark.util.SparkErrorUtils.tryWithSafeFinally$(SparkErrorUtils.scala:83)
+E                   	at org.apache.spark.util.Utils$.tryWithSafeFinally(Utils.scala:97)
+E                   	at org.apache.spark.executor.Executor$TaskRunner.run(Executor.scala:897)
+E                   	at java.base/java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1144)
+E                   	at java.base/java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:642)
+E                   	at java.base/java.lang.Thread.run(Thread.java:1583)
+E                   Caused by: java.net.SocketTimeoutException: Timed out while waiting for the Python worker to connect back
+E                   	at org.apache.spark.api.python.PythonWorkerFactory.createSimpleWorker(PythonWorkerFactory.scala:285)
+E                   	... 33 more
+E                   
+E                   Driver stacktrace:
+E                   	at org.apache.spark.scheduler.DAGScheduler.$anonfun$abortStage$3(DAGScheduler.scala:3318)
+E                   	at scala.Option.getOrElse(Option.scala:201)
+E                   	at org.apache.spark.scheduler.DAGScheduler.$anonfun$abortStage$2(DAGScheduler.scala:3318)
+E                   	at org.apache.spark.scheduler.DAGScheduler.$anonfun$abortStage$2$adapted(DAGScheduler.scala:3310)
+E                   	at scala.collection.immutable.List.foreach(List.scala:323)
+E                   	at org.apache.spark.scheduler.DAGScheduler.abortStage(DAGScheduler.scala:3310)
+E                   	at org.apache.spark.scheduler.DAGScheduler.$anonfun$handleTaskSetFailed$1(DAGScheduler.scala:1363)
+E                   	at org.apache.spark.scheduler.DAGScheduler.$anonfun$handleTaskSetFailed$1$adapted(DAGScheduler.scala:1363)
+E                   	at scala.Option.foreach(Option.scala:437)
+E                   	at org.apache.spark.scheduler.DAGScheduler.handleTaskSetFailed(DAGScheduler.scala:1363)
+E                   	at org.apache.spark.scheduler.DAGSchedulerEventProcessLoop.doOnReceive(DAGScheduler.scala:3589)
+E                   	at org.apache.spark.scheduler.DAGSchedulerEventProcessLoop.onReceive(DAGScheduler.scala:3517)
+E                   	at org.apache.spark.scheduler.DAGSchedulerEventProcessLoop.onReceive(DAGScheduler.scala:3506)
+E                   	at org.apache.spark.util.EventLoop$$anon$1.run(EventLoop.scala:50)
+E                   Caused by: org.apache.spark.SparkException: Python worker failed to connect back.
+E                   	at org.apache.spark.api.python.PythonWorkerFactory.createSimpleWorker(PythonWorkerFactory.scala:303)
+E                   	at org.apache.spark.api.python.PythonWorkerFactory.create(PythonWorkerFactory.scala:154)
+E                   	at org.apache.spark.SparkEnv.createPythonWorker(SparkEnv.scala:182)
+E                   	at org.apache.spark.api.python.BasePythonRunner.compute(PythonRunner.scala:330)
+E                   	at org.apache.spark.api.python.PythonRDD.compute(PythonRDD.scala:73)
+E                   	at org.apache.spark.rdd.RDD.computeOrReadCheckpoint(RDD.scala:374)
+E                   	at org.apache.spark.rdd.RDD.iterator(RDD.scala:338)
+E                   	at org.apache.spark.rdd.MapPartitionsRDD.compute(MapPartitionsRDD.scala:57)
+E                   	at org.apache.spark.rdd.RDD.computeOrReadCheckpoint(RDD.scala:374)
+E                   	at org.apache.spark.rdd.RDD.iterator(RDD.scala:338)
+E                   	at org.apache.spark.rdd.MapPartitionsRDD.compute(MapPartitionsRDD.scala:57)
+E                   	at org.apache.spark.rdd.RDD.computeOrReadCheckpoint(RDD.scala:374)
+E                   	at org.apache.spark.rdd.RDD.iterator(RDD.scala:338)
+E                   	at org.apache.spark.rdd.MapPartitionsRDD.compute(MapPartitionsRDD.scala:57)
+E                   	at org.apache.spark.rdd.RDD.computeOrReadCheckpoint(RDD.scala:374)
+E                   	at org.apache.spark.rdd.RDD.iterator(RDD.scala:338)
+E                   	at org.apache.spark.rdd.MapPartitionsRDD.compute(MapPartitionsRDD.scala:57)
+E                   	at org.apache.spark.rdd.RDD.computeOrReadCheckpoint(RDD.scala:374)
+E                   	at org.apache.spark.rdd.RDD.iterator(RDD.scala:338)
+E                   	at org.apache.spark.rdd.MapPartitionsRDD.compute(MapPartitionsRDD.scala:57)
+E                   	at org.apache.spark.rdd.RDD.computeOrReadCheckpoint(RDD.scala:374)
+E                   	at org.apache.spark.rdd.RDD.iterator(RDD.scala:338)
+E                   	at org.apache.spark.scheduler.ShuffleMapTask.runTask(ShuffleMapTask.scala:107)
+E                   	at org.apache.spark.scheduler.ShuffleMapTask.runTask(ShuffleMapTask.scala:54)
+E                   	at org.apache.spark.TaskContext.runTaskWithListeners(TaskContext.scala:206)
+E                   	at org.apache.spark.scheduler.Task.run(Task.scala:147)
+E                   	at org.apache.spark.executor.Executor$TaskRunner.$anonfun$run$4(Executor.scala:894)
+E                   	at org.apache.spark.util.SparkErrorUtils.tryWithSafeFinally(SparkErrorUtils.scala:86)
+E                   	at org.apache.spark.util.SparkErrorUtils.tryWithSafeFinally$(SparkErrorUtils.scala:83)
+E                   	at org.apache.spark.util.Utils$.tryWithSafeFinally(Utils.scala:97)
+E                   	at org.apache.spark.executor.Executor$TaskRunner.run(Executor.scala:897)
+E                   	at java.base/java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1144)
+E                   	at java.base/java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:642)
+E                   	at java.base/java.lang.Thread.run(Thread.java:1583)
+E                   Caused by: java.net.SocketTimeoutException: Timed out while waiting for the Python worker to connect back
+E                   	at org.apache.spark.api.python.PythonWorkerFactory.createSimpleWorker(PythonWorkerFactory.scala:285)
+E                   	... 33 more
+
+.venv\Lib\site-packages\py4j\protocol.py:327: Py4JJavaError</failure></testcase></testsuite></testsuites>

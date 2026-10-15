@@ -47,9 +47,17 @@ def lire_token():
 # ------------------------------------------------------------------
 token = lire_token()
 
-lancer(rf"docker cp src\pipeline\preparer_dataset_fraude.py {CONTENEUR}:/app/src/pipeline/preparer_dataset_fraude.py")
-lancer(rf"docker cp tests\test_preparer_dataset_fraude.py {CONTENEUR}:/app/tests/test_preparer_dataset_fraude.py")
-lancer(rf"docker cp .coveragerc {CONTENEUR}:/app/.coveragerc")
+# Liste des fichiers à envoyer dans le conteneur : (fichier sur le PC, destination dans Docker).
+# Comme remplir un carton avant un déménagement : tout ce qui doit partir est dans la liste.
+FICHIERS_A_ENVOYER = [
+    (r"src\pipeline\preparer_dataset_fraude.py", "/app/src/pipeline/preparer_dataset_fraude.py"),
+    (r"src\pipeline\nettoyage_donnees_ia.py", "/app/src/pipeline/nettoyage_donnees_ia.py"),
+    (r"tests\test_preparer_dataset_fraude.py", "/app/tests/test_preparer_dataset_fraude.py"),
+    (r"tests\test_nettoyage_donnees_ia.py", "/app/tests/test_nettoyage_donnees_ia.py"),
+    (".coveragerc", "/app/.coveragerc"),
+]
+for local, distant in FICHIERS_A_ENVOYER:
+    lancer(f"docker cp {local} {CONTENEUR}:{distant}")
 
 # ------------------------------------------------------------------
 # Étape 2 : tests du pipeline, dans le conteneur (là où Spark est installé)
@@ -57,7 +65,9 @@ lancer(rf"docker cp .coveragerc {CONTENEUR}:/app/.coveragerc")
 lancer(
     f'docker exec {CONTENEUR} sh -c "cd /app && PYTHONPATH=/app/src/pipeline '
     "python -m pytest /app/tests/test_preparer_dataset_fraude.py "
-    "--cov=preparer_dataset_fraude --cov-report=term-missing "
+    "/app/tests/test_nettoyage_donnees_ia.py "
+    "--cov=preparer_dataset_fraude --cov=nettoyage_donnees_ia "
+    "--cov-report=term-missing "
     '--cov-report=xml:/app/coverage_fraude.xml -v"'
 )
 
@@ -65,8 +75,8 @@ lancer(
 # Étape 3 : tests de app/outils.py, directement en local (pas besoin de Spark pour ça)
 # ------------------------------------------------------------------
 lancer(
-    f'"{sys.executable}" -m pytest tests/test_outils.py --cov=app '
-    "--cov-report=term-missing --cov-report=xml:coverage.xml -v"
+    f'"{sys.executable}" -m pytest tests/test_outils.py tests/test_outils_perf.py '
+    "--cov=app --cov-report=term-missing --cov-report=xml:coverage.xml -v"
 )
 
 # ------------------------------------------------------------------
