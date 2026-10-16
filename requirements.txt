@@ -1,0 +1,5 @@
+# Dépendances de la version EN LIGNE (Streamlit Community Cloud) : pandas, sans Spark ni Java.
+# La version complète (Docker) utilise Docker/requirements.txt.
+streamlit
+pandas
+pyarrow

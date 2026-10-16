@@ -15,3 +15,6 @@ coverage_fraude.xml
 data/ab_assurance
 data/assure_plus
 Docker/auth.env
+# Secrets et fichiers générés
+Docker/auth.env
+.streamlit/secrets.toml

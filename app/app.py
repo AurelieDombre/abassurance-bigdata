@@ -10,7 +10,7 @@ from pyspark.sql import SparkSession
 from pyspark.sql import functions as F
 
 from outils_perf import noter_mesure
-from outils import vers_csv, texte_pdf, generer_rapport_pdf
+from outils import vers_csv, generer_rapport_pdf
 from auth import exiger_connexion, bouton_deconnexion
 from outils_auth import pages_autorisees
 
@@ -19,7 +19,6 @@ st.set_page_config(page_title="Tableau de bord AbAssurance", layout="wide")
 
 # Où lire les tables Parquet :
 #  - en local (docker compose)  : HDFS, valeur par défaut ;
-#  - en ligne (Hugging Face)    : fichiers du dépôt, via SOURCE_DONNEES=file:///app/data_demo
 DOSSIER_HDFS = os.environ.get("SOURCE_DONNEES", "hdfs://namenode:9000/data/kafka")
 
 # Connexion obligatoire avant tout le reste (Spark, données, pages)
@@ -169,7 +168,7 @@ def calculer():
 # L'affichage
 # ------------------------------------------------------------------
 def tableau_de_bord():
-    # Cette fonction est la "salle" du tableau de bord : elle ne s'exécute
+    # Cette fonction ne s'exécute
     # que si l'utilisateur clique sur cette page dans le menu.
     st.title("Tableau de bord AbAssurance / AssurePlus")
     st.caption("Données lues dans Hadoop (ou dans les fichiers de démo en ligne) et calculées avec Spark.")

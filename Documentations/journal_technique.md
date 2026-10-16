@@ -2321,12 +2321,11 @@ Le gain est de 0,41 s (4,5 %), constant sur les 3 lancements. Le résultat du pi
 
 Réduire le nombre de `count()` dans le programme principal : chacun relance tout le calcul.
 
-
 ## Authentification et rôles (accès admin / user)
 
 ### Objectif
 
-Protéger l'application par une connexion obligatoire, avec deux profils : un administrateur (`admin`) qui voit toutes les pages et un utilisateur (`user`) qui voit seulement le tableau de bord. Cela répond à deux besoins : le dossier d'examen demande des comptes admin et user pour tester l'application, et le critère 2 de l'US 4.3 prévoyait un accès différencié selon le rôle.
+Protéger l'application par une connexion obligatoire, avec deux profils : un administrateur (`admin`) qui voit toutes les pages et un utilisateur (`user`) qui voit le tableau de bord et la détection de fraude.
 
 ### Fonctionnement
 
