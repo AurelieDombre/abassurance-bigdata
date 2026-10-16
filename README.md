@@ -8,9 +8,7 @@ Récupération de données suite fusion ABAssurance et AssurePlus, création de 
 
 | Description | Valeur |
 | --- | --- |
-| Dépôt Git final | ⚠ à compléter |
-| Dépôt 1 (première correction) | ⚠ à compléter |
-| Application en ligne | ⚠ à compléter |
+| Application en ligne | https://abassurance-bigdata.streamlit.app/ |
 | Comptes admin / user | Fournis dans le dossier d'examen (PDF), avec le lien de l'application |
 | Compte user (login / mot de passe)  | Fournis dans le dossier d'examen (PDF), avec le lien de l'application |
 | Version en ligne / version complète (mode démo) | [Documentations/MODE_DEMO.md](./Documentations/MODE_DEMO.md) |
