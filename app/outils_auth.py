@@ -15,7 +15,7 @@ ITERATIONS = 200_000
 # Pages visibles selon le rôle (clés utilisées par app.py)
 PAGES_PAR_ROLE = {
     "admin": ["dashboard", "fraude", "services"],
-    "user": ["dashboard"],
+    "user": ["dashboard", "fraude"],
 }
 
 # Le sel= une chaîne aléatoire ajoutée au mot de passe avant le hachage.

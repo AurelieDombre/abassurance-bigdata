@@ -1,7 +1,6 @@
 # auth.py — écran de connexion Streamlit + contrôle des rôles (admin / user).
 #
-# Les comptes viennent de la variable d'environnement AUTH_USERS (sur Hugging Face :
-# Settings > Variables and secrets > New secret), ou à défaut de .streamlit/secrets.toml.
+# Les comptes viennent de la variable d'environnement AUTH_USERS ( .streamlit/secrets.toml).
 # Voir tools/generer_hash.py pour fabriquer les hashs.
 #
 # Si aucun compte n'est configuré, l'application reste FERMÉE (jamais ouverte par défaut).

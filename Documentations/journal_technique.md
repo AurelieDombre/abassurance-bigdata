@@ -38,6 +38,7 @@ Les sections suivent l'ordre dans lequel les User Stories ont été réalisées.
 | US 7.3 | Écrire les tests unitaires | [US 7.3 : Écrire les tests unitaires](#us-73--écrire-les-tests-unitaires) |
 | US 7.4 | Atteindre la couverture de test de code minimale | [US 7.4 : Atteindre la couverture de test de code minimale](#us-74--atteindre-la-couverture-de-test-de-code-minimale) |
 | US 8.3 | Optimiser les performances | [US 8.3 : Optimiser les performances](#us-83--optimiser-les-performances) |
+| — | Authentification et rôles (accès admin / user) | [Authentification et rôles](#authentification-et-rôles-accès-admin--user) |
  
 Documents complémentaires : [`mapping_donnees.md`](./mapping_donnees.md), [`regles_nettoyage.md`](./regles_nettoyage.md), [`dictionnaire_dataset.md`](./dictionnaire_dataset.md), [`rapport_qualite.md`](./rapport_qualite.md).
 
@@ -2319,3 +2320,68 @@ Le gain est de 0,41 s (4,5 %), constant sur les 3 lancements. Le résultat du pi
 ## Piste non testée
 
 Réduire le nombre de `count()` dans le programme principal : chacun relance tout le calcul.
+
+
+## Authentification et rôles (accès admin / user)
+
+### Objectif
+
+Protéger l'application par une connexion obligatoire, avec deux profils : un administrateur (`admin`) qui voit toutes les pages et un utilisateur (`user`) qui voit seulement le tableau de bord. Cela répond à deux besoins : le dossier d'examen demande des comptes admin et user pour tester l'application, et le critère 2 de l'US 4.3 prévoyait un accès différencié selon le rôle.
+
+### Fonctionnement
+
+* **Connexion obligatoire.** L'application appelle `exiger_connexion()` tout en haut de `app.py`, avant de démarrer Spark ou de lire les données. Tant que l'utilisateur n'est pas identifié, seul le formulaire de connexion s'affiche.
+* **Les comptes ne sont pas dans le code.** Ils sont dans la variable d'environnement `AUTH_USERS` : un texte JSON qui associe chaque identifiant à un mot de passe haché et à un rôle. Avec Docker, elle est lue dans le fichier `Docker/auth.env` (instruction `env_file` du `docker-compose.yaml`). Hors Docker, elle peut aussi venir du fichier `.streamlit/secrets.toml`. Ces fichiers ne sont jamais envoyés sur Git.
+* **Les mots de passe ne sont jamais stockés en clair.** On conserve un *hash* PBKDF2-SHA256 salé (200 000 itérations), au format `pbkdf2_sha256$itérations$sel$hash`, calculé avec la bibliothèque standard de Python (`hashlib`, `hmac`). Un hash fonctionne comme un broyeur : on peut vérifier qu'un mot de passe correspond, mais on ne peut pas reconstituer le mot de passe à partir du résultat. Le sel (une chaîne aléatoire ajoutée avant le calcul) fait que deux comptes avec le même mot de passe n'ont pas le même hash.
+* **Vérification prudente.** Le mot de passe est comparé avec `hmac.compare_digest` (comparaison en temps constant, qui évite de deviner le mot de passe en mesurant le temps de réponse). Quand l'identifiant n'existe pas, un hash factice est quand même vérifié, pour que le temps de réponse ne révèle pas si un compte existe.
+* **L'application est fermée par défaut.** Si `AUTH_USERS` est absente ou invalide (JSON incorrect, hash manquant, rôle inconnu), un message d'erreur s'affiche et l'application s'arrête : elle ne s'ouvre jamais sans comptes configurés.
+* **Limitation des essais.** Après 5 échecs de connexion, le formulaire est bloqué pendant 30 secondes.
+* **Déconnexion.** Un bouton dans la barre latérale efface le rôle de la session.
+
+### Rôles et pages
+
+| Page | `admin` | `user` |
+| --- | --- | --- |
+| Tableau de bord | Oui | Oui |
+| Détection de fraude | Oui | Oui |
+| État des services | Oui | Non |
+
+Le menu n'affiche que les pages autorisées pour le rôle (`PAGES_PAR_ROLE` dans `outils_auth.py`). Les pages « Détection de fraude » et « État des services » appellent en plus `exiger_role("admin")` dès leur première ligne : un utilisateur qui taperait directement l'adresse de la page reçoit un message d'accès refusé.
+
+### Organisation du code
+
+Comme pour `outils.py`, la logique est séparée de l'affichage pour pouvoir être testée :
+
+| Fichier | Rôle |
+| --- | --- |
+| `app/outils_auth.py` | Logique sans Streamlit : hachage, vérification, lecture des comptes, pages par rôle |
+| `app/auth.py` | Interface Streamlit : formulaire de connexion, contrôle du rôle, déconnexion |
+| `tools/generer_hash.py` | Outil en ligne de commande qui fabrique la valeur de `AUTH_USERS` |
+| `Docker/auth.env.example` | Modèle du fichier de comptes, sans vrai hash |
+| `tests/test_outils_auth.py` | Tests unitaires de `outils_auth.py` |
+
+### Créer les comptes
+
+```powershell
+# 1. Depuis la racine du projet : l'outil demande un identifiant, un rôle et un mot de passe
+#    pour chaque compte, puis affiche la valeur de AUTH_USERS
+python tools/generer_hash.py
+
+# 2. Copier le modèle puis y coller la valeur affichée (une seule ligne, JSON entouré d'apostrophes)
+copy Docker\auth.env.example Docker\auth.env
+
+# 3. Recréer le conteneur pour qu'il relise le fichier
+cd Docker
+docker compose up -d --force-recreate app
+```
+
+### Tests
+
+Les tests de `outils_auth.py` vérifient : un hash différent à chaque fois mais toujours vérifiable, un mauvais mot de passe refusé, un hash invalide qui ne fait pas planter (cinq formes de hash invalide testées), la connexion qui renvoie le bon rôle, un identifiant inconnu refusé, la lecture d'un fichier de comptes valide, le refus de fichiers de comptes invalides (JSON incorrect, liste, objet vide, hash manquant, rôle inconnu) et les pages affichées selon le rôle. Le nombre exact de tests est celui affiché par `pytest` ; à reporter dans l'US 7.3.
+
+### Limites connues
+
+* **La limitation des essais dépend de la session du navigateur.** Recharger la page remet le compteur à zéro : ce n'est pas une vraie protection contre les attaques par essais répétés. En production, elle serait bloquer pendant plusieurs heures, où il faudrait faire un système avec l'authentification à deux facteurs.
+* **Pas de HTTPS en local** (`http://localhost:8501`). En ligne, le chiffrement est assuré par l'hébergeur.
+* **Comptes statiques** : pas de création de compte depuis l'application, pas de réinitialisation de mot de passe, pas d'authentification à deux facteurs. En production, on utiliserait un annuaire d'entreprise (SSO).
+* **Comptes de démonstration** : les mots de passe des comptes donnés au correcteur dans le README sont créés pour l'examen uniquement, et ne doivent être utilisés nulle part ailleurs.
