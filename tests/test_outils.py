@@ -1,10 +1,8 @@
-
 # test_outils.py — tests unitaires de app/outils.py
 # https://docs.pytest.org/en/stable/how-to/assert.html
 #
 # Pour les lancer, depuis la racine du projet :
-#   pytest
-#   pytest --cov=app --cov-report=term-missing --cov-report=xml
+#   python lancer_tests.py
 
 import socket
 
@@ -16,6 +14,7 @@ from outils import (
     formater_ligne_log,
     generer_rapport_pdf,
     interpreter_datanodes,
+    probas_en_pourcentage,
     tester_porte,
     texte_pdf,
     trouver_pannes,
@@ -54,6 +53,48 @@ def test_vers_csv_n_ajoute_pas_de_colonne_numero():
     # index=False : pas de colonne 0, 1, 2... ajoutée toute seule par pandas
     texte = vers_csv(faux_clients()).decode("utf-8-sig")
     assert texte.splitlines()[0] == "client_id;code_postal;statut_client"
+
+
+# ==================================================================
+# probas_en_pourcentage : 0.875 -> 88 dans la colonne « proba_fraude (%) »
+# ==================================================================
+def faux_sinistres():
+    """Trois sinistres inventés : une probabilité normale, une à arrondir, une manquante."""
+    return pd.DataFrame({
+        "sinistre_id": ["1", "2", "3"],
+        "proba_fraude": [0.9, 0.875, None],
+    })
+
+
+def test_probas_en_pourcentage_convertit_et_arrondit():
+    # 0.9 -> 90 ; 0.875 -> 87.5 -> arrondi à 88
+    resultat = probas_en_pourcentage(faux_sinistres())
+    assert resultat["proba_fraude (%)"].tolist()[:2] == [90, 88]
+
+
+def test_probas_en_pourcentage_garde_les_cases_vides():
+    # Une probabilité manquante reste vide au lieu de faire planter la conversion
+    resultat = probas_en_pourcentage(faux_sinistres())
+    assert pd.isna(resultat["proba_fraude (%)"].iloc[2])
+
+
+def test_probas_en_pourcentage_renomme_la_colonne():
+    # L'unité apparaît dans le nom de colonne, et l'ancienne colonne n'existe plus
+    colonnes = list(probas_en_pourcentage(faux_sinistres()).columns)
+    assert colonnes == ["sinistre_id", "proba_fraude (%)"]
+
+
+def test_probas_en_pourcentage_ne_touche_pas_l_original():
+    # On travaille sur une copie : le tableau affiché à l'écran garde ses valeurs entre 0 et 1
+    original = faux_sinistres()
+    probas_en_pourcentage(original)
+    assert original["proba_fraude"].tolist()[:2] == [0.9, 0.875]
+
+
+def test_probas_en_pourcentage_dans_le_csv():
+    # Ce que le correcteur verra en ouvrant le fichier dans Excel
+    texte = vers_csv(probas_en_pourcentage(faux_sinistres())).decode("utf-8-sig")
+    assert texte.splitlines()[:3] == ["sinistre_id;proba_fraude (%)", "1;90", "2;88"]
 
 
 # ==================================================================
@@ -286,3 +327,4 @@ def test_ralentissement_amelioration():
     # Si la dernière mesure est plus rapide, tout va bien.
     ralenti, _, _ = detecter_ralentissement([5, 5, 5, 1])
     assert ralenti is False
+ 
