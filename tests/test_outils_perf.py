@@ -82,3 +82,11 @@ def test_la_duree_est_arrondie_a_3_decimales(tmp_path, monkeypatch):
 
     # 1.23456 arrondi à 3 décimales donne 1.235
     assert lignes[1].split(",")[2] == "1.235"
+
+
+def test_dossier_non_inscriptible_ne_plante_pas(tmp_path, monkeypatch):
+    monkeypatch.chdir(tmp_path)
+    # "logs" est un FICHIER : impossible de créer le dossier -> OSError, qu'on doit absorber
+    (tmp_path / "logs").write_text("je bloque")
+
+    assert outils_perf.noter_mesure("lecture", 1.5) is False
