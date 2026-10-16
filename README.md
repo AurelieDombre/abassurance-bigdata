@@ -11,14 +11,24 @@ Récupération de données suite fusion ABAssurance et AssurePlus, création de 
 | Dépôt Git final | ⚠ à compléter |
 | Dépôt 1 (première correction) | ⚠ à compléter |
 | Application en ligne | ⚠ à compléter |
-| Compte admin (login / mot de passe) | ⚠ à compléter |
-| Compte user (login / mot de passe) | ⚠ à compléter |
+| Comptes admin / user | Fournis dans le dossier d'examen (PDF), avec le lien de l'application |
+| Compte user (login / mot de passe)  | Fournis dans le dossier d'examen (PDF), avec le lien de l'application |
+| Version en ligne / version complète (mode démo) | [Documentations/MODE_DEMO.md](./Documentations/MODE_DEMO.md) |
 | Journal technique | [Documentations/journal_technique.md](./Documentations/journal_technique.md) |
 | Rapport de qualité | [Documentations/rapport_qualite.md](./Documentations/rapport_qualite.md) |
 
 ## Architecture
 
 Fichiers CSV (simulant Oracle et SQL Server) → Talaxie (nettoyage, fusion) → Kafka → Spark Streaming → HDFS → Spark (préparation des données, modèle de fraude) → tableau de bord Streamlit
+
+## Deux versions de l'application
+
+| Version | Dossier | Usage |
+| --- | --- | --- |
+| **En ligne** | `en_ligne/` | Correction : consultable sans installation, à partir de données exportées de Hadoop. Le correcteur peut y importer ses propres fichiers CSV ou Parquet. |
+| **Complète** | `app/` | Démonstration en local avec Docker : tout le pipeline Kafka → Hadoop → Spark, le simulateur de fraude, la surveillance des services et les alertes mail. |
+
+Certaines fonctionnalités n'existent que dans la version complète, car elles ont besoin du pipeline. Le détail fonctionnalité par fonctionnalité, la préparation de la démonstration et le format des fichiers à importer sont dans [MODE_DEMO.md](./Documentations/MODE_DEMO.md).
 
 ## Convention de nommage des branches
 
@@ -75,11 +85,28 @@ Copier le fichier de réglages d'exemple, puis y écrire son token SonarQube (le
 copy .env.exemple .env
 ```
 
+## Authentification : créer les comptes
+
+L'application demande une connexion. Elle a deux profils : `admin` (toutes les pages) et `user` (tableau de bord et détection de fraude). Les comptes sont dans le fichier `Docker/auth.env`, qui n'est jamais envoyé sur Git. **Sans ce fichier, l'application reste fermée.**
+
+```powershell
+# Depuis la racine du projet : fabrique la valeur de AUTH_USERS (l'outil demande
+# un identifiant, un rôle et un mot de passe pour chaque compte)
+python tools/generer_hash.py
+
+# Copier le modèle, puis y coller la valeur affichée (une seule ligne)
+copy Docker\auth.env.example Docker\auth.env
+```
+
+Les mots de passe sont enregistrés sous forme de hash (PBKDF2-SHA256 salé), jamais en clair. Détails : [journal technique, section Authentification](./Documentations/journal_technique.md#authentification-et-rôles-accès-admin--user).
+
 ## Lancement du projet
 
 Les étapes se font dans cet ordre. Les commandes `docker` se lancent depuis n'importe quel dossier, sauf `docker compose` qui se lance depuis `Docker`.
 
 ### 1. Démarrer la plateforme (Kafka, Hadoop, Spark, tableau de bord)
+
+Prérequis : le fichier `Docker/auth.env` doit exister (voir « Authentification : créer les comptes »), sinon le conteneur de l'application démarre mais l'écran de connexion affiche « Aucun compte configuré ».
 
 ```powershell
 cd Docker
@@ -140,6 +167,7 @@ docker exec -it pyspark-app python src/prediction/entrainer_modele_fraude.py
 | Mailpit (mails d'alerte) | http://localhost:8025 |
 
 HDFS n'est volontairement pas exposé sur le réseau (sécurité). Pour voir son contenu : `docker exec namenode hdfs dfs -ls /data`.
+Se connecter avec l'un des comptes du tableau « Liens et accès » : `admin` voit les trois pages (tableau de bord, détection de fraude, état des services), `user` voit le tableau de bord et la détection de fraude.
 
 ## Vérifier que Kafka et Hadoop fonctionnent
 
@@ -170,7 +198,7 @@ Les tests de `app/outils.py` se lancent sur le PC. Les tests du pipeline (`prepa
 
 ```powershell
 # Tests de la logique de l'application (directement sur le PC)
-pytest tests/test_outils.py
+pytest tests/test_outils.py tests/test_outils_perf.py tests/test_outils_auth.py
 
 # Chaîne complète en une commande :
 # tests du pipeline dans Docker, tests de outils, couverture, puis envoi à SonarQube

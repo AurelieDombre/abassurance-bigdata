@@ -48,7 +48,6 @@ def lire_token():
 token = lire_token()
 
 # Liste des fichiers à envoyer dans le conteneur : (fichier sur le PC, destination dans Docker).
-# Comme remplir un carton avant un déménagement : tout ce qui doit partir est dans la liste.
 FICHIERS_A_ENVOYER = [
     (r"src\pipeline\preparer_dataset_fraude.py", "/app/src/pipeline/preparer_dataset_fraude.py"),
     (r"src\pipeline\nettoyage_donnees_ia.py", "/app/src/pipeline/nettoyage_donnees_ia.py"),
@@ -76,6 +75,7 @@ lancer(
 # ------------------------------------------------------------------
 lancer(
     f'"{sys.executable}" -m pytest tests/test_outils.py tests/test_outils_perf.py '
+    "tests/test_outils_auth.py "
     "--cov=app --cov-report=term-missing --cov-report=xml:coverage.xml -v"
 )
 
