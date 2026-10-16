@@ -40,9 +40,8 @@ Par conséquent, **les données en ligne sont un instantané** : elles reflèten
 | Connexion avec rôles admin / user | ✅ | ✅ | Même module `auth` et mêmes comptes (`AUTH_USERS`). |
 | Tableau de bord : chiffres clés, contrats par statut, sinistres | ✅ | ✅ | Calculs simples, faits avec pandas sur les exports. |
 | Export CSV (sans colonnes sensibles) | ✅ | ✅ | Identique dans les deux versions. |
-| Import de ses propres fichiers (CSV ou Parquet) | ❌ | ✅ | Pensé pour le correcteur, voir la section 5. Dans la version complète, les données arrivent par le pipeline. |
 | Fraude : qualité du modèle (précision, rappel) | ✅ | ✅ | Métriques déjà calculées par Spark, exportées en Parquet. |
-| Fraude : liste des sinistres à surveiller et export | ✅ | ✅ | Prédictions déjà calculées par Spark, exportées en Parquet. |
+| Fraude : liste des sinistres à surveiller et export | ✅ | ✅ | Prédictions déjà calculées par Spark, exportées en Parquet. Probabilité affichée et exportée en pourcentage dans les deux versions. |
 | Fraude : importance des caractéristiques et règles de l'arbre | ✅ | ❌ | Il faut charger le modèle Spark, ce qui demande Spark et Java. |
 | Fraude : simulateur d'un sinistre | ✅ | ❌ | Le modèle Spark doit calculer en direct, ce qui demande Spark et Java. |
 | Bouton « Recharger depuis Hadoop » | ✅ | ❌ | Il n'y a pas de Hadoop en ligne. |
@@ -70,8 +69,10 @@ Les droits sont définis à un seul endroit, dans `PAGES_PAR_ROLE` (`outils_auth
 Dans la version en ligne, l'onglet **Services** (réservé à l'admin) affiche :
 
 - **Talend** en gris : Talaxie tourne sur le PC, hors Docker. Il ne peut pas être surveillé dans aucune des deux versions.
-- **Kafka, Hadoop et Streaming** en rouge, avec l'alerte « problème sur Kafka, Hadoop, Streaming ».
-- **Spark** en rouge (« non installé sur cette version ») ou en vert si pyspark est présent sur la machine.
+- **Kafka et Hadoop** en rouge : leurs adresses n'existent pas hors de Docker.
+- **Streaming** en rouge, avec le message « non vérifié : Hadoop injoignable » : sans le namenode, il est inutile d'aller vérifier les tables une par une.
+- **Spark** en rouge (« Spark n'est pas installé sur cette version ») : pyspark n'est pas installé sur Streamlit Community Cloud. Si l'application en ligne est lancée sur un PC où pyspark est installé, le voyant Spark peut être vert.
+- Une alerte rouge résume les services en panne.
 
 **C'est le comportement attendu, pas un bug.** Les noms `kafka` et `namenode` n'existent que dans le réseau interne de Docker. Hors de Docker, la machine ne sait pas à quelle adresse les trouver, d'où le message `getaddrinfo failed`. La page détecte cette absence et déclenche l'alerte, ce qui prouve que la surveillance fonctionne.
 
@@ -80,7 +81,7 @@ Deux choix ont été faits pour que la page reste utilisable en ligne :
 - **Vérification sur clic** (bouton « Vérifier les services ») : avec `st.tabs`, Streamlit exécute tous les onglets à chaque interaction. Sans bouton, les vérifications ralentiraient tout le tableau de bord.
 - **Pas de mail ni de journal** : ces deux fonctions restent dans la version complète (`Etat_des_services.py`).
 
-Les adresses des services sont réglables par variables d'environnement (`HOTE_KAFKA`, `PORT_KAFKA`, `HOTE_NAMENODE`). Depuis le PC, Kafka est joignable sur `localhost:9092`, car ce port est publié par Docker. Le namenode, en revanche, ne publie volontairement pas son port 9870 : HDFS n'est pas exposé sur le réseau, par sécurité. La page Services de la version complète le surveille depuis l'intérieur du réseau Docker, ce qui suffit pour la démonstration.
+Les adresses des services sont réglables par variables d'environnement (`HOTE_KAFKA`, `HOTE_NAMENODE`). Depuis le PC, Kafka est joignable sur `localhost:9092`, car ce port est publié par Docker. Le namenode, en revanche, ne publie volontairement pas son port 9870 : HDFS n'est pas exposé sur le réseau, par sécurité. La page Services de la version complète le surveille depuis l'intérieur du réseau Docker, ce qui suffit pour la démonstration.
 
 ---
 
@@ -92,8 +93,8 @@ La démonstration de la vidéo se fait avec la **version complète**, sur le PC.
 
    ```powershell
    cd Docker
-   docker compose up -d
-   docker compose ps    # vérifier que tous les conteneurs sont « Up »
+   docker compose up -d --build   # --build : reconstruit l'application si le code a changé
+   docker compose ps              # vérifier que tous les conteneurs sont « Up »
    cd ..
    ```
 
@@ -125,46 +126,31 @@ La démonstration de la vidéo se fait avec la **version complète**, sur le PC.
 
 ## 5. Mettre à jour les données de la version en ligne
 
-Les fichiers du dossier `en_ligne/donnees` sont des copies des tables Parquet de HDFS. Pour les rafraîchir, la stack Docker doit être lancée. Pour chaque table, exécuter les commandes suivantes depuis le dossier `en_ligne` :
+Les fichiers du dossier `en_ligne/donnees` sont produits par le script `tools/exporter_data_demo.py`. La stack Docker doit être lancée. Depuis la racine du projet :
 
 ```powershell
-# 1) Copier la table de HDFS vers le disque du conteneur namenode
-docker exec namenode hdfs dfs -get /data/clean/<table> /tmp/<table>
-# 2) Copier du conteneur vers le PC
-docker cp namenode:/tmp/<table> ./donnees/<table>
+# 1) Copier le script dans le conteneur de l'application (il a Spark et accès à HDFS)
+docker cp tools/exporter_data_demo.py pyspark-app:/tmp/exporter_data_demo.py
+# 2) Le lancer : il écrit les fichiers dans data/export_demo
+docker exec -u root pyspark-app python /tmp/exporter_data_demo.py
 ```
 
-Tables utilisées : `clients`, `contrats`, `paiements`, `sinistres`, `predictions_fraude`, `metriques_fraude`.
+Ensuite, remplacer le contenu de `en_ligne/donnees` par celui de `data/export_demo`, puis faire un commit et un push sur Git : Streamlit Community Cloud redéploie l'application automatiquement.
 
-Ensuite, faire un commit et un push sur Git : Streamlit Community Cloud redéploie l'application automatiquement.
+Le script :
 
-### Tester avec ses propres données (correcteur)
+- copie les tables `clients`, `contrats`, `paiements`, `sinistres` (depuis `/data/kafka`), `predictions_fraude` et `metriques_fraude` (depuis `/data/clean`) ;
+- **ne garde pas les colonnes sensibles** (email, téléphone, adresse, numéro fiscal, description libre), conformément à l'US 4.3. Une copie brute des tables HDFS les publierait sur le dépôt public ;
+- exporte l'arbre de décision dans `modele_fraude.json`, après avoir vérifié qu'il redonne exactement les probabilités calculées par Spark ;
+- copie les journaux de l'état des services (`etat_services.txt`, `performances.csv`).
 
-Une fois connecté, la barre latérale propose une zone **« Importer vos données »** :
-
-- Fichiers acceptés : `.csv` (séparateur `;` ou `,`, encodage UTF-8 ou celui d'Excel) et `.parquet`.
-- Le **nom du fichier** indique la table remplacée : `clients`, `contrats`, `paiements` ou `sinistres` (majuscules acceptées).
-- Chaque fichier remplace la table du même nom **pour la session en cours uniquement**. Les fichiers d'origine ne sont jamais modifiés. Retirer le fichier de la zone de dépôt rétablit les données de démonstration.
-- Les colonnes obligatoires sont listées dans la zone « Colonnes attendues ». Un fichier auquel il en manque est refusé avec un message qui les nomme. Les colonnes en plus sont acceptées.
-
-| Table | Colonnes obligatoires |
-| --- | --- |
-| clients | client_id, code_postal, date_creation, statut_client |
-| contrats | statut_contrat, type_assurance |
-| paiements | aucune (la table est seulement comptée) |
-| sinistres | sinistre_id, contrat_id, date_sinistre, montant_estime, statut_sinistre |
-
-**Limite :** l'onglet Fraude continue d'afficher les prédictions calculées sur les sinistres de démonstration. Recalculer la fraude sur des sinistres importés demande Spark et le modèle, donc la version complète. Un message le signale quand des sinistres ont été importés.
-
-La lecture et la vérification des fichiers sont dans `outils_import.py`, sans dépendance à Streamlit, et couvertes par `test_outils_import.py` (13 tests).
-
-En local, la variable d'environnement `DOSSIER_DONNEES` permet aussi de pointer l'application vers un autre dossier de fichiers Parquet.
+En local, la variable d'environnement `DOSSIER_DONNEES` permet de pointer l'application vers un autre dossier de fichiers Parquet, à condition qu'ils aient les mêmes noms et les mêmes colonnes.
 
 ---
 
 ## 6. Limites assumées
 
-- **Données figées** : la version en ligne ne montre pas les données qui arrivent après l'export (sauf celles importées à la main, le temps d'une session).
+- **Données figées** : la version en ligne ne montre pas les données qui arrivent après l'export.
 - **Pas de réentraînement ni de simulation en ligne** : le modèle n'est utilisable qu'avec Spark, donc dans la version complète.
 - **Modèle indicatif** : le jeu d'entraînement ne compte que 37 sinistres (données générées). Les probabilités de fraude sont des alertes à vérifier, pas des certitudes.
 - **Supervision partielle** : Talaxie n'est surveillé dans aucune des deux versions, car il tourne hors Docker.

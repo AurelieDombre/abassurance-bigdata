@@ -1,264 +1,170 @@
-# abassurance-bigdata
+# Version en ligne et version complète : ce qui fonctionne où
 
-Récupération de données suite fusion ABAssurance et AssurePlus, création de plateforme data via : Talend + Kafka + Hadoop + Spark + Python/IA
+> Retour : [README](../README.md) · [Journal technique](./journal_technique.md)
 
-> 📄 Les explications détaillées (choix techniques, justifications, problèmes rencontrés et résolutions, avancement des User Stories) sont documentées dans [`journal_technique.md`](./Documentations/journal_technique.md).
+Le projet AbAssurance / AssurePlus existe en **deux versions** de l'application Streamlit :
 
-## Liens et accès
-
-| Description | Valeur |
-| --- | --- |
-| Application en ligne | https://abassurance-bigdata.streamlit.app/ |
-| Comptes admin / user | Fournis dans le dossier d'examen (PDF), avec le lien de l'application |
-| Compte user (login / mot de passe)  | Fournis dans le dossier d'examen (PDF), avec le lien de l'application |
-| Version en ligne / version complète (mode démo) | [Documentations/MODE_DEMO.md](./Documentations/MODE_DEMO.md) |
-| Journal technique | [Documentations/journal_technique.md](./Documentations/journal_technique.md) |
-| Rapport de qualité | [Documentations/rapport_qualite.md](./Documentations/rapport_qualite.md) |
-
-## Architecture
-
-Fichiers CSV (simulant Oracle et SQL Server) → Talaxie (nettoyage, fusion) → Kafka → Spark Streaming → HDFS → Spark (préparation des données, modèle de fraude) → tableau de bord Streamlit
-
-## Deux versions de l'application
-
-| Version | Dossier | Usage |
+| | Version complète (locale) | Version en ligne (déployée) |
 | --- | --- | --- |
-| **En ligne** | `en_ligne/` | Correction : consultable sans installation, à partir de données exportées de Hadoop. Le correcteur peut y importer ses propres fichiers CSV ou Parquet. |
-| **Complète** | `app/` | Démonstration en local avec Docker : tout le pipeline Kafka → Hadoop → Spark, le simulateur de fraude, la surveillance des services et les alertes mail. |
+| Dossier | `app/` | `en_ligne/` |
+| Où elle tourne | Sur le PC, dans Docker | Streamlit Community Cloud |
+| Source des données | Hadoop (HDFS), alimenté en continu par Kafka | Fichiers Parquet exportés de HDFS (dossier `en_ligne/donnees`) |
+| Traitements | Spark (PySpark) | pandas |
+| Usage | Démonstration en direct (vidéo de soutenance) | Consultation et correction par le jury |
 
-Certaines fonctionnalités n'existent que dans la version complète, car elles ont besoin du pipeline. Le détail fonctionnalité par fonctionnalité, la préparation de la démonstration et le format des fichiers à importer sont dans [MODE_DEMO.md](./Documentations/MODE_DEMO.md).
+En résumé, la version en ligne est une **vitrine** : elle montre les résultats du pipeline. La version complète est **l'atelier** : elle contient le pipeline qui produit ces résultats.
 
-## Convention de nommage des branches
+---
 
-Le projet utilise une convention de nommage inspirée de Git Flow afin de faciliter l'organisation du développement et d'identifier rapidement l'objectif de chaque branche.
+## 1. Pourquoi deux versions ?
 
-| Type               | Convention                   | Exemple                         |
-| ------------------ | ---------------------------- | ------------------------------- |
-| Branche principale | `main`                       | `main`                          |
-| Développement      | `develop`                    | `develop`                       |
-| Fonctionnalité     | `feature/<id>-<description>` | `feature/US1.1-mapping-donnees` |
-| Correction         | `bugfix/<id>-<description>`  | `bugfix/US8.1-erreur-pipeline`  |
-| Correction urgente | `hotfix/<description>`       | `hotfix/erreur-kafka`           |
-| Version            | `release/<version>`          | `release/1.0.0`                 |
+Le pipeline complet repose sur plusieurs services lourds qui tournent dans des conteneurs Docker :
 
-Règles :
+- **Kafka** reçoit les données publiées par Talaxie.
+- **Hadoop** (un namenode et deux datanodes) stocke ces données.
+- **Spark** les traite et entraîne le modèle de fraude.
+- **Mailpit** reçoit les mails d'alerte.
 
-* Les noms de branches sont écrits en minuscules.
-* Les mots sont séparés par des tirets.
-* Les espaces et caractères spéciaux sont interdits.
-* Les branches feature et bugfix sont associées à une User Story lorsque cela est possible.
-* Les nouvelles branches sont créées à partir de develop.
-* Les fonctionnalités terminées sont fusionnées dans develop.
-* main contient uniquement du code validé et stable.
+Un hébergement gratuit comme Streamlit Community Cloud ne peut pas faire tourner cet ensemble, pour trois raisons : la mémoire est limitée, Java n'est pas disponible et il n'est pas possible d'y lancer plusieurs conteneurs. Héberger toute la stack en ligne demanderait un serveur payant et dédié.
 
-## Prérequis
+Le choix retenu correspond à l'option de repli acceptée par le formateur. La version en ligne lit des **exports** des tables produites par le pipeline. Le jury peut ainsi se connecter et consulter les résultats sans rien installer.
 
-* Docker Desktop
-* Java 21 LTS (Eclipse Adoptium / Temurin), `JAVA_HOME` correctement défini, Java 64 bits
-* Python 3.14 (développement local) : le conteneur applicatif utilise Python 3.12
-* Talaxie (voir plus bas) pour les jobs d'intégration
-* SonarQube Server en local (voir plus bas) pour l'analyse qualité
+Par conséquent, **les données en ligne sont un instantané** : elles reflètent l'état de Hadoop au moment de l'export, et ne se mettent pas à jour toutes seules.
 
-## Installation de l'environnement Python
+---
 
-L'environnement local sert aux tests de `app/outils.py`, à la génération du jeu de données et à l'analyse SonarQube. Le reste tourne dans Docker.
+## 2. Tableau des fonctionnalités
 
-```powershell
-# 1. Créer l'environnement virtuel, puis l'ACTIVER avant toute installation
-#    (sinon les paquets s'installent sur le Python du système, pas dans le projet)
-python -m venv .venv
-.\.venv\Scripts\Activate.ps1
+| Fonctionnalité | Complète | En ligne | Pourquoi |
+| --- | :---: | :---: | --- |
+| Connexion avec rôles admin / user | ✅ | ✅ | Même module `auth` et mêmes comptes (`AUTH_USERS`). |
+| Tableau de bord : chiffres clés, contrats par statut, sinistres | ✅ | ✅ | Calculs simples, faits avec pandas sur les exports. |
+| Export CSV (sans colonnes sensibles) | ✅ | ✅ | Identique dans les deux versions. |
+| Import de ses propres fichiers (CSV ou Parquet) | ❌ | ✅ | Pensé pour le correcteur, voir la section 5. Dans la version complète, les données arrivent par le pipeline. |
+| Fraude : qualité du modèle (précision, rappel) | ✅ | ✅ | Métriques déjà calculées par Spark, exportées en Parquet. |
+| Fraude : liste des sinistres à surveiller et export | ✅ | ✅ | Prédictions déjà calculées par Spark, exportées en Parquet. |
+| Fraude : importance des caractéristiques et règles de l'arbre | ✅ | ❌ | Il faut charger le modèle Spark, ce qui demande Spark et Java. |
+| Fraude : simulateur d'un sinistre | ✅ | ❌ | Le modèle Spark doit calculer en direct, ce qui demande Spark et Java. |
+| Bouton « Recharger depuis Hadoop » | ✅ | ❌ | Il n'y a pas de Hadoop en ligne. |
+| État des services : voyants Kafka / Hadoop / Streaming / Spark | ✅ | ⚠️ | La page existe (onglet admin), mais les services sont absents, donc les voyants sont rouges. Voir la section 3. |
+| Alerte mail en cas de panne | ✅ | ❌ | Le serveur Mailpit n'existe que dans Docker. |
+| Journal des vérifications (`logs/etat_services.log`) | ✅ | ❌ | Sur l'hébergement, les fichiers écrits sont effacés à chaque redémarrage. |
+| Performances du pipeline (US 6.3) | ✅ | ❌ | Les chronos portent sur le vrai pipeline, absent en ligne. |
+| Arrivée continue des données (streaming Kafka vers HDFS) | ✅ | ❌ | Les données en ligne sont figées à la date d'export. |
 
-# 2. Mettre à jour pip et installer les dépendances du projet
-python -m pip install --upgrade pip
-pip install -r Docker/requirements.txt
+✅ = disponible · ❌ = absent de cette version · ⚠️ = présent, mais sans objet à surveiller
 
-# 3. Outils utilisés seulement en local : générateur de données et analyse SonarQube
-pip install Faker pysonar
-```
+### Pages selon le rôle
 
-Copier le fichier de réglages d'exemple, puis y écrire son token SonarQube (le fichier `.env` n'est jamais envoyé sur Git) :
-
-```powershell
-copy .env.exemple .env
-```
-
-## Authentification : créer les comptes
-
-L'application demande une connexion. Elle a deux profils : `admin` (toutes les pages) et `user` (tableau de bord et détection de fraude). Les comptes sont dans le fichier `Docker/auth.env`, qui n'est jamais envoyé sur Git. **Sans ce fichier, l'application reste fermée.**
-
-```powershell
-# Depuis la racine du projet : fabrique la valeur de AUTH_USERS (l'outil demande
-# un identifiant, un rôle et un mot de passe pour chaque compte)
-python tools/generer_hash.py
-
-# Copier le modèle, puis y coller la valeur affichée (une seule ligne)
-copy Docker\auth.env.example Docker\auth.env
-```
-
-Les mots de passe sont enregistrés sous forme de hash (PBKDF2-SHA256 salé), jamais en clair. Détails : [journal technique, section Authentification](./Documentations/journal_technique.md#authentification-et-rôles-accès-admin--user).
-
-## Lancement du projet
-
-Les étapes se font dans cet ordre. Les commandes `docker` se lancent depuis n'importe quel dossier, sauf `docker compose` qui se lance depuis `Docker`.
-
-### 1. Démarrer la plateforme (Kafka, Hadoop, Spark, tableau de bord)
-
-Prérequis : le fichier `Docker/auth.env` doit exister (voir « Authentification : créer les comptes »), sinon le conteneur de l'application démarre mais l'écran de connexion affiche « Aucun compte configuré ».
-
-```powershell
-cd Docker
-docker compose up -d --build
-
-# Vérifier que tous les conteneurs sont démarrés
-docker compose ps
-cd ..
-```
-
-### 2. Préparer l'environnement
-
-Ce script crée les topics Kafka et les dossiers HDFS (`/data/kafka/...`) : à faire une seule fois après le premier démarrage.
-
-```powershell
-.\Docker\init-environment.ps1
-```
-
-### 3. Générer les jeux de données de départ
-
-Crée les fichiers CSV dans `data/ab_assurance` (AbAssurance, type Oracle) et `data/assure_plus` (AssurePlus, type SQL Server).
-
-```powershell
-python generate_dataset.py
-```
-
-### 4. Lancer les jobs Talaxie
-
-Les jobs lisent les CSV, les nettoient, les fusionnent, puis envoient les 4 tables (clients, contrats, paiements, sinistres) dans Kafka. L'ordre des jobs et leur rôle sont décrits dans le [journal technique](./Documentations/journal_technique.md). Les jobs exportés sont dans le dossier `Export Jobs Talaxie`.
-
-### 5. Lancer le streaming Kafka vers HDFS
-
-Chaque script lit un topic Kafka en continu et écrit dans HDFS (`/data/kafka/<table>`). Ils tournent sans s'arrêter : un terminal par table.
-
-```powershell
-docker exec -it pyspark-app python streaming_topics/streaming_clients.py
-docker exec -it pyspark-app python streaming_topics/streaming_contrats.py
-docker exec -it pyspark-app python streaming_topics/streaming_paiements.py
-docker exec -it pyspark-app python streaming_topics/streaming_sinistres.py
-```
-
-### 6. Préparer le jeu de données et entraîner le modèle de fraude
-
-```powershell
-# Prépare une ligne par sinistre et sépare entraînement / à prédire (écrit dans /data/clean)
-docker exec -it pyspark-app python src/pipeline/preparer_dataset_fraude.py
-
-# Entraîne le modèle (validation croisée), enregistre le modèle et les prédictions
-docker exec -it pyspark-app python src/prediction/entrainer_modele_fraude.py
-```
-
-### 7. Ouvrir les services
-
-| Service | Adresse |
+| Rôle | Onglets visibles |
 | --- | --- |
-| Tableau de bord Streamlit | http://localhost:8501 |
-| Kafka UI (topics et messages) | http://localhost:8080 |
-| Mailpit (mails d'alerte) | http://localhost:8025 |
+| admin | Tableau de bord, Fraude, Services |
+| user | Tableau de bord, Fraude |
 
-HDFS n'est volontairement pas exposé sur le réseau (sécurité). Pour voir son contenu : `docker exec namenode hdfs dfs -ls /data`.
-Se connecter avec l'un des comptes du tableau « Liens et accès » : `admin` voit les trois pages (tableau de bord, détection de fraude, état des services), `user` voit le tableau de bord et la détection de fraude.
+Les droits sont définis à un seul endroit, dans `PAGES_PAR_ROLE` (`outils_auth.py`). L'application construit ses onglets à partir de `pages_autorisees(role)`.
 
-## Vérifier que Kafka et Hadoop fonctionnent
+---
 
-```bash
-# Vérification des conteneurs
-docker compose ps
+## 3. L'onglet « Services » en ligne : des voyants rouges attendus
 
-# Vérifier que Hadoop est fonctionnel
-docker exec namenode hdfs dfs -ls /data
-```
+Dans la version en ligne, l'onglet **Services** (réservé à l'admin) affiche :
 
-Créer un dossier de test dans HDFS :
+- **Talend** en gris : Talaxie tourne sur le PC, hors Docker. Il ne peut pas être surveillé dans aucune des deux versions.
+- **Kafka, Hadoop et Streaming** en rouge, avec l'alerte « problème sur Kafka, Hadoop, Streaming ».
+- **Spark** en rouge (« non installé sur cette version ») ou en vert si pyspark est présent sur la machine.
 
-```bash
-docker exec -it namenode hdfs dfs -mkdir -p /abassurance/test
-```
+**C'est le comportement attendu, pas un bug.** Les noms `kafka` et `namenode` n'existent que dans le réseau interne de Docker. Hors de Docker, la machine ne sait pas à quelle adresse les trouver, d'où le message `getaddrinfo failed`. La page détecte cette absence et déclenche l'alerte, ce qui prouve que la surveillance fonctionne.
 
-Créer et lister un topic Kafka de test :
+Deux choix ont été faits pour que la page reste utilisable en ligne :
 
-```bash
-docker exec -it kafka /opt/kafka/bin/kafka-topics.sh --create --topic test-abassurance --bootstrap-server localhost:9092
-docker exec -it kafka /opt/kafka/bin/kafka-topics.sh --list --bootstrap-server localhost:9092
-```
+- **Vérification sur clic** (bouton « Vérifier les services ») : avec `st.tabs`, Streamlit exécute tous les onglets à chaque interaction. Sans bouton, les vérifications ralentiraient tout le tableau de bord.
+- **Pas de mail ni de journal** : ces deux fonctions restent dans la version complète (`Etat_des_services.py`).
 
-## Tests unitaires et qualité du code
+Les adresses des services sont réglables par variables d'environnement (`HOTE_KAFKA`, `PORT_KAFKA`, `HOTE_NAMENODE`). Depuis le PC, Kafka est joignable sur `localhost:9092`, car ce port est publié par Docker. Le namenode, en revanche, ne publie volontairement pas son port 9870 : HDFS n'est pas exposé sur le réseau, par sécurité. La page Services de la version complète le surveille depuis l'intérieur du réseau Docker, ce qui suffit pour la démonstration.
 
-Les tests de `app/outils.py` se lancent sur le PC. Les tests du pipeline (`preparer_dataset_fraude.py`) ont besoin de Spark : ils se lancent dans le conteneur `pyspark-app`.
+---
+
+## 4. Préparer la démonstration (version complète, en local)
+
+La démonstration de la vidéo se fait avec la **version complète**, sur le PC.
+
+1. **Lancer la stack Docker** (la commande `docker compose` se lance depuis le dossier `Docker`) :
+
+   ```powershell
+   cd Docker
+   docker compose up -d
+   docker compose ps    # vérifier que tous les conteneurs sont « Up »
+   cd ..
+   ```
+
+   Conteneurs attendus : `namenode`, `datanode`, `datanode2`, `kafka`, `pyspark-app` (l'application, port 8501) et `mailpit` (port 8025). `kafka-init-permissions` s'arrête tout seul après son travail : c'est normal.
+   L'ancien conteneur `abassurance-streamlit` utilise lui aussi le port 8501. Il ne doit pas être démarré en même temps que `pyspark-app`.
+2. **S'assurer que Hadoop contient les données** : les 4 tables dans `/data/kafka/`, les tables nettoyées dans `/data/clean/`.
+3. **S'assurer que le modèle de fraude existe** dans `/data/models/modele_fraude`. Sinon, lancer dans l'ordre :
+
+   ```powershell
+   docker exec -it pyspark-app python src/pipeline/preparer_dataset_fraude.py
+   docker exec -it pyspark-app python src/prediction/entrainer_modele_fraude.py
+   ```
+
+4. **Ouvrir l'application** : http://localhost:8501, puis se connecter en admin.
+5. **Avant d'enregistrer :**
+   - ouvrir la page **Détection de fraude** une première fois, car le démarrage de Spark et le chargement du modèle prennent du temps. Ensuite, ils restent en mémoire et le simulateur répond vite ;
+   - ouvrir **État des services** et vérifier que tous les voyants (sauf Talend) sont verts ;
+   - préparer un ou deux exemples de sinistres à saisir dans le simulateur.
+6. **Pour montrer l'alerte** pendant la démo, arrêter un service :
+
+   ```powershell
+   docker stop kafka      # le voyant Kafka passe au rouge, un mail arrive dans Mailpit
+   docker start kafka     # retour au vert
+   ```
+
+   Le mail d'alerte se consulte dans Mailpit : http://localhost:8025.
+
+---
+
+## 5. Mettre à jour les données de la version en ligne
+
+Les fichiers du dossier `en_ligne/donnees` sont des copies des tables Parquet de HDFS. Pour les rafraîchir, la stack Docker doit être lancée. Pour chaque table, exécuter les commandes suivantes depuis le dossier `en_ligne` :
 
 ```powershell
-# Tests de la logique de l'application (directement sur le PC)
-pytest tests/test_outils.py tests/test_outils_perf.py tests/test_outils_auth.py
-
-# Chaîne complète en une commande :
-# tests du pipeline dans Docker, tests de outils, couverture, puis envoi à SonarQube
-python lancer_tests.py
+# 1) Copier la table de HDFS vers le disque du conteneur namenode
+docker exec namenode hdfs dfs -get /data/clean/<table> /tmp/<table>
+# 2) Copier du conteneur vers le PC
+docker cp namenode:/tmp/<table> ./donnees/<table>
 ```
 
-Pour `lancer_tests.py`, il faut : les conteneurs démarrés, l'environnement virtuel activé, `pysonar` installé, SonarQube Server démarré et un token SonarQube dans le fichier `.env` (ligne `SONAR_TOKEN=...`).
+Tables utilisées : `clients`, `contrats`, `paiements`, `sinistres`, `predictions_fraude`, `metriques_fraude`.
 
-Résultats et explications : [rapport de qualité](./Documentations/rapport_qualite.md) et [journal technique](./Documentations/journal_technique.md).
+Ensuite, faire un commit et un push sur Git : Streamlit Community Cloud redéploie l'application automatiquement.
 
-## Installation de SonarQube
+### Tester avec ses propres données (correcteur)
 
-**SonarQube for IDE** (extension VS Code) : affiche les problèmes de qualité directement dans l'éditeur.
-**SonarQube Server** : analyse le projet et affiche le tableau de bord complet dans un navigateur.
+Une fois connecté, la barre latérale propose une zone **« Importer vos données »** :
 
-Installation du serveur en local :
+- Fichiers acceptés : `.csv` (séparateur `;` ou `,`, encodage UTF-8 ou celui d'Excel) et `.parquet`.
+- Le **nom du fichier** indique la table remplacée : `clients`, `contrats`, `paiements` ou `sinistres` (majuscules acceptées).
+- Chaque fichier remplace la table du même nom **pour la session en cours uniquement**. Les fichiers d'origine ne sont jamais modifiés. Retirer le fichier de la zone de dépôt rétablit les données de démonstration.
+- Les colonnes obligatoires sont listées dans la zone « Colonnes attendues ». Un fichier auquel il en manque est refusé avec un message qui les nomme. Les colonnes en plus sont acceptées.
 
-1. Télécharger le package en fonction de l'OS.
-2. Aller dans le dossier `C:\sonarqube\bin\windows-x86-64`.
-3. Lancer `StartSonar.bat`.
-4. Ouvrir `localhost:9000` : SonarQube Server s'ouvre.
+| Table | Colonnes obligatoires |
+| --- | --- |
+| clients | client_id, code_postal, date_creation, statut_client |
+| contrats | statut_contrat, type_assurance |
+| paiements | aucune (la table est seulement comptée) |
+| sinistres | sinistre_id, contrat_id, date_sinistre, montant_estime, statut_sinistre |
 
-Créer le projet et l'analyser en suivant les étapes indiquées sur la page de SonarQube Server pour obtenir le rapport. Pour les analyses suivantes, créer un token (*My Account → Security*) et le mettre dans le fichier `.env`. La clé du projet et les dossiers analysés sont dans `sonar-project.properties`.
+**Limite :** l'onglet Fraude continue d'afficher les prédictions calculées sur les sinistres de démonstration. Recalculer la fraude sur des sinistres importés demande Spark et le modèle, donc la version complète. Un message le signale quand des sinistres ont été importés.
 
-## Installation de Talaxie (fork de Talend Open Studio)
+La lecture et la vérification des fichiers sont dans `outils_import.py`, sans dépendance à Streamlit, et couvertes par `test_outils_import.py` (13 tests).
 
-Talend Open Studio ayant été discontinué par Qlik le 31/01/2024, le projet utilise **Talaxie**, un fork communautaire open source (licence Apache 2.0).
+En local, la variable d'environnement `DOSSIER_DONNEES` permet aussi de pointer l'application vers un autre dossier de fichiers Parquet.
 
-Prérequis : Java 17 ou 21.
+---
 
-Installation :
+## 6. Limites assumées
 
-1. Télécharger la version Windows : Talaxie DI (Data Integration).
-2. Extraire le package dans un dossier dont le chemin ne contient pas de caractère spécial.
-3. Ouvrir l'exécutable `TOS-DIc`.
-4. Créer un workspace, puis un projet.
-5. Dans job : créer un job nommé "test".
-6. Dans l'onglet palette, glisser un composant `tJava` dans la fenêtre du job test.
-7. Double-cliquer sur l'encart `tJava` et tester avec, par exemple : `System.out.println("Talaxie OK - environnement fonctionnel");`
-8. Exécuter le job : l'absence d'erreur confirme le succès de l'installation.
-
-## Test de l'installation PySpark (optionnel)
-
-Fichiers dans le dossier `script_test_installation`.
-
-```bash
-python -m venv .venv
-.venv\Scripts\activate
-pip install -r Docker/requirements.txt
-python essaie-pyspark.py
-
-```
-
-PySpark 4.2.0 est installé avec les dépendances du projet (`Docker/requirements.txt`).
-
-## Tableau des versions installées
-
-| Outil | Version | Mode d'installation |
-| --- | --- | --- |
-| Talaxie (fork Talend Open Studio DI) | V8.9.0-SNAPSHOT | Natif Windows, JDK 21 (JDK système 25 non compatible) |
-| Apache Kafka | 4.3.1 | Docker, image `apache/kafka:latest`, mode KRaft (sans Zookeeper) |
-| Apache Hadoop | 3.2.1 | Docker, images `bde2020/hadoop-namenode:2.0.0-hadoop3.2.1-java8` et `bde2020/hadoop-datanode:2.0.0-hadoop3.2.1-java8` |
-| Apache Spark (PySpark) | 4.2.0 | Docker, image de base `python:3.12-slim` + OpenJDK 21 |
-| Python (environnement de dev local) | 3.14.5 | venv natif Windows |
-| Python (conteneur applicatif) | 3.12 | Docker, choisi pour sa compatibilité éprouvée avec PySpark en environnement Linux conteneurisé |
+- **Données figées** : la version en ligne ne montre pas les données qui arrivent après l'export (sauf celles importées à la main, le temps d'une session).
+- **Pas de réentraînement ni de simulation en ligne** : le modèle n'est utilisable qu'avec Spark, donc dans la version complète.
+- **Modèle indicatif** : le jeu d'entraînement ne compte que 37 sinistres (données générées). Les probabilités de fraude sont des alertes à vérifier, pas des certitudes.
+- **Supervision partielle** : Talaxie n'est surveillé dans aucune des deux versions, car il tourne hors Docker.
