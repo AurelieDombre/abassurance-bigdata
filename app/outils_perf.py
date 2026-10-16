@@ -8,15 +8,24 @@ FICHIER_PERF = "logs/performances.csv"
 
 
 def noter_mesure(etape, duree):
-    """Ajoute une ligne dans le carnet : la date, l'étape, et sa durée en secondes."""
-    os.makedirs("logs", exist_ok=True)
+    """Ajoute une ligne dans le carnet : la date, l'étape, et sa durée en secondes.
 
-    # Si le carnet n'existe pas encore, on écrit d'abord la ligne des titres
-    nouveau = not os.path.exists(FICHIER_PERF)
+    Le carnet est un bonus : si on ne peut pas y écrire (dossier en lecture seule,
+    droits insuffisants dans Docker ou en ligne), on l'ignore au lieu de faire
+    planter le tableau de bord. Retourne True si la mesure a été écrite.
+    """
+    try:
+        os.makedirs("logs", exist_ok=True)
 
-    # "a" = on AJOUTE à la fin, on n'efface jamais les anciennes mesures
-    with open(FICHIER_PERF, "a", encoding="utf-8") as fichier:
-        if nouveau:
-            fichier.write("date,etape,duree_s\n")
-        date = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-        fichier.write(date + "," + etape + "," + str(round(duree, 3)) + "\n")
+        # Si le carnet n'existe pas encore, on écrit d'abord la ligne des titres
+        nouveau = not os.path.exists(FICHIER_PERF)
+
+        # "a" = on AJOUTE à la fin, on n'efface jamais les anciennes mesures
+        with open(FICHIER_PERF, "a", encoding="utf-8") as fichier:
+            if nouveau:
+                fichier.write("date,etape,duree_s\n")
+            date = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+            fichier.write(date + "," + etape + "," + str(round(duree, 3)) + "\n")
+        return True
+    except OSError:
+        return False

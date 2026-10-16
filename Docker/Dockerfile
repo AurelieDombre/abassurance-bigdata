@@ -23,6 +23,8 @@ RUN pip install --no-cache-dir --default-timeout=120 --retries 10 -r requirement
 
 COPY app/ ./app/
 COPY src/ ./src/
+COPY tests/ ./tests/
+COPY data_demo/ ./data_demo/
 
 RUN groupadd --system app && useradd --system --gid app --create-home --home-dir /home/app --shell /bin/bash app && \
     chown -R app:app /app /opt/spark-jars
