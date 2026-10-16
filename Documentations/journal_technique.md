@@ -1,6 +1,6 @@
 # Journal technique — abassurance-bigdata
 
-Ce document détaille les choix techniques, leurs justifications, les problèmes rencontrés et leur résolution, ainsi que l'avancement des User Stories du projet. Pour les instructions d'installation et d'exécution, voir le [`README.md`](./README.md).
+Ce document détaille les choix techniques, leurs justifications, les problèmes rencontrés et leur résolution, ainsi que l'avancement des User Stories du projet. Pour les instructions d'installation et d'exécution, voir le [`README.md`](../README.md).
 
 ## Sommaire
  
@@ -39,8 +39,9 @@ Les sections suivent l'ordre dans lequel les User Stories ont été réalisées.
 | US 7.4 | Atteindre la couverture de test de code minimale | [US 7.4 : Atteindre la couverture de test de code minimale](#us-74--atteindre-la-couverture-de-test-de-code-minimale) |
 | US 8.3 | Optimiser les performances | [US 8.3 : Optimiser les performances](#us-83--optimiser-les-performances) |
 | — | Authentification et rôles (accès admin / user) | [Authentification et rôles](#authentification-et-rôles-accès-admin--user) |
+| — | Déploiement : version en ligne et version complète | [Déploiement en ligne et mode démo](#déploiement-en-ligne-et-mode-démo) |
  
-Documents complémentaires : [`mapping_donnees.md`](./mapping_donnees.md), [`regles_nettoyage.md`](./regles_nettoyage.md), [`dictionnaire_dataset.md`](./dictionnaire_dataset.md), [`rapport_qualite.md`](./rapport_qualite.md).
+Documents complémentaires : [`mapping_donnees.md`](./mapping_donnees.md), [`regles_nettoyage.md`](./regles_nettoyage.md), [`dictionnaire_dataset.md`](./dictionnaire_dataset.md), [`rapport_qualite.md`](./rapport_qualite.md), [`MODE_DEMO.md`](./MODE_DEMO.md).
 
 ## Choix du framework Python
 
@@ -2384,3 +2385,20 @@ Les tests de `outils_auth.py` vérifient : un hash différent à chaque fois mai
 * **Pas de HTTPS en local** (`http://localhost:8501`). En ligne, le chiffrement est assuré par l'hébergeur.
 * **Comptes statiques** : pas de création de compte depuis l'application, pas de réinitialisation de mot de passe, pas d'authentification à deux facteurs. En production, on utiliserait un annuaire d'entreprise (SSO).
 * **Comptes de démonstration** : les mots de passe des comptes donnés au correcteur dans le README sont créés pour l'examen uniquement, et ne doivent être utilisés nulle part ailleurs.
+
+## Déploiement en ligne et mode démo
+
+### Objectif
+
+Rendre l'application consultable par le correcteur sans qu'il ait à installer Docker, Kafka, Hadoop et Spark.
+
+### Choix retenu
+
+Toute la plateforme (Kafka, Hadoop avec un namenode et deux datanodes, Spark, Mailpit) ne peut pas tourner sur un hébergement gratuit : la mémoire est limitée, Java n'est pas disponible et il n'est pas possible d'y lancer plusieurs conteneurs. Le projet a donc deux versions de l'application :
+
+* **La version en ligne** (`en_ligne/`, Streamlit Community Cloud) lit des exports Parquet des tables de Hadoop avec pandas. C'est une vitrine des résultats du pipeline. Le correcteur peut y importer ses propres fichiers CSV ou Parquet, qui remplacent les données de démonstration le temps de sa session.
+* **La version complète** (`app/`, Docker) contient tout le pipeline. C'est elle qui sert à la démonstration de la soutenance.
+
+Certaines fonctionnalités n'existent que dans la version complète, car elles ont besoin du pipeline : simulateur de fraude, règles de l'arbre de décision, alertes mail, journal des vérifications, mesures de performance. La page « État des services » est présente en ligne pour l'administrateur, mais ses voyants y sont rouges, car les services ne sont pas joignables hors du réseau Docker : c'est le comportement attendu.
+
+Le tableau complet des différences, la préparation de la démonstration, la mise à jour des données en ligne et le format des fichiers à importer sont décrits dans [`MODE_DEMO.md`](./MODE_DEMO.md).

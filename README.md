@@ -11,14 +11,24 @@ Récupération de données suite fusion ABAssurance et AssurePlus, création de 
 | Dépôt Git final | ⚠ à compléter |
 | Dépôt 1 (première correction) | ⚠ à compléter |
 | Application en ligne | ⚠ à compléter |
-| Compte admin (login / mot de passe) | Aurelie / administrateur |
-| Compte user (login / mot de passe)  | Lilou / lilou |
+| Comptes admin / user | Fournis dans le dossier d'examen (PDF), avec le lien de l'application |
+| Compte user (login / mot de passe)  | Fournis dans le dossier d'examen (PDF), avec le lien de l'application |
+| Version en ligne / version complète (mode démo) | [Documentations/MODE_DEMO.md](./Documentations/MODE_DEMO.md) |
 | Journal technique | [Documentations/journal_technique.md](./Documentations/journal_technique.md) |
 | Rapport de qualité | [Documentations/rapport_qualite.md](./Documentations/rapport_qualite.md) |
 
 ## Architecture
 
 Fichiers CSV (simulant Oracle et SQL Server) → Talaxie (nettoyage, fusion) → Kafka → Spark Streaming → HDFS → Spark (préparation des données, modèle de fraude) → tableau de bord Streamlit
+
+## Deux versions de l'application
+
+| Version | Dossier | Usage |
+| --- | --- | --- |
+| **En ligne** | `en_ligne/` | Correction : consultable sans installation, à partir de données exportées de Hadoop. Le correcteur peut y importer ses propres fichiers CSV ou Parquet. |
+| **Complète** | `app/` | Démonstration en local avec Docker : tout le pipeline Kafka → Hadoop → Spark, le simulateur de fraude, la surveillance des services et les alertes mail. |
+
+Certaines fonctionnalités n'existent que dans la version complète, car elles ont besoin du pipeline. Le détail fonctionnalité par fonctionnalité, la préparation de la démonstration et le format des fichiers à importer sont dans [MODE_DEMO.md](./Documentations/MODE_DEMO.md).
 
 ## Convention de nommage des branches
 
@@ -77,7 +87,7 @@ copy .env.exemple .env
 
 ## Authentification : créer les comptes
 
-L'application demande une connexion. Elle a deux profils : `admin` (toutes les pages) et `user` (tableau de bord seulement). Les comptes sont dans le fichier `Docker/auth.env`, qui n'est jamais envoyé sur Git. **Sans ce fichier, l'application reste fermée.**
+L'application demande une connexion. Elle a deux profils : `admin` (toutes les pages) et `user` (tableau de bord et détection de fraude). Les comptes sont dans le fichier `Docker/auth.env`, qui n'est jamais envoyé sur Git. **Sans ce fichier, l'application reste fermée.**
 
 ```powershell
 # Depuis la racine du projet : fabrique la valeur de AUTH_USERS (l'outil demande
