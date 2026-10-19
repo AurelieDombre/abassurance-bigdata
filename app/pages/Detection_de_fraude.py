@@ -4,7 +4,7 @@ import pandas as pd
 import streamlit as st
 from auth import exiger_role
 
-# Page réservée aux administrateurs (même si quelqu'un tape l'URL directement)
+# Role requis pour accéder à cette page : « admin » ou « user » (un agent d'assurance)
 exiger_role("admin", "user")
 from pyspark.sql import SparkSession
 from pyspark.ml import PipelineModel

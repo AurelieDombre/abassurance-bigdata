@@ -260,7 +260,7 @@ def tableau_de_bord():
 # ------------------------------------------------------------------
 # Le panneau d'affichage (le menu de la sidebar)
 # ------------------------------------------------------------------
-# Les pages visibles dépendent du rôle : admin = tout, user = tableau de bord seulement.
+# Les pages disponibles, avec leur titre et leur icône. Le nom de la page = le nom du fichier Python (sans .py)
 toutes_les_pages = {
     "dashboard": st.Page(tableau_de_bord, title="Tableau de bord", icon="📊", default=True),
     "fraude": st.Page("pages/Detection_de_fraude.py", title="Détection de fraude", icon="🕵️"),
