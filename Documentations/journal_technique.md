@@ -324,7 +324,7 @@ Les données du dataset ont été générées par un script avec Faker afin de s
 
 2. **Écrire le résultat standardisé (`tFileOutputDelimited`)** : un `tFileOutputDelimited` écrit le résultat standardisé dans `output/ab_assurance_extract_talaxie/ab_assurance_extract_client.csv`. Relier `tFileInputDelimited_1` vers ce composant (clic droit → Ligne → Main → clic sur `tFileOutputDelimited`). Définir le chemin de sortie en zone de staging. Cocher « Inclure l'en-tête » pour que le fichier garde les noms de colonnes `ab_*` — utile pour la lisibilité et pour que l'US suivante (nettoyage) puisse relire ce fichier facilement. Vérifier que l'encodage est bien UTF-8.
 
-3. **Exécuter et valider** : exécution du job, puis ouverture du fichier généré pour confirmer le nombre de ligness pour chaque table extraite, avec les accents corrects.
+3. **Exécuter et valider** : exécution du job, puis ouverture du fichier généré pour confirmer le nombre de lignes pour chaque table extraite, avec les accents corrects.
 
 Capture d'écran des jobs :
 
@@ -1205,7 +1205,7 @@ Hypothèse écartée : une clé JSON mal nommée. Dans ce cas, seule la colonne 
 ### Impact
 
 * Toute la table `contrats` est inutilisable dans HDFS (statut, type, primes, dates), pas seulement le statut.
-* Le nombre de ligness stockées correspond au nombre de ligness extraites (446), ce qui masque le problème dans la vérification de l'US 4.2. Seule la taille du fichier Parquet (2,7 Ko pour 446 lignes) était un indice.
+* Le nombre de lignes stockées correspond au nombre de lignes extraites (446), ce qui masque le problème dans la vérification de l'US 4.2. Seule la taille du fichier Parquet (2,7 Ko pour 446 lignes) était un indice.
 * Les indicateurs du dashboard par statut de contrat (actifs, suspendus, résiliés) sont impossibles à calculer.
 * Les topics `clients`, `paiements` et `sinistres` ne sont pas concernés : leurs champs numériques sont tous renseignés dans la fusion (0 valeur vide sur 1576 paiements et 98 sinistres).
 
@@ -1237,7 +1237,8 @@ Le bug a été localisé en remontant la chaîne, étape par étape, pour élimi
 
 **1. Talaxie : publier un JSON valide**
 
-Faire en sorte qu'une prime vide soit écrite `null` dans le JSON (ou `0`), au lieu de rien. Composant modifié : job kafka_contrats.
+Faire en sorte que les primes ne soient pas vide dans le JSON. J'ai multiplier par 12 les primes mensuelles et complétet le fichier puis fait de même avec prime annuelle (divisé / 12). j'ai relancer le fichier dans le 
+composant : job kafka_contrats.
 
 **2. Talaxie : harmoniser les statuts en français**
 
@@ -1620,7 +1621,7 @@ Un arbre de décision fonctionne comme un questionnaire : « le montant dépasse
 
 Ce choix a été fait pour trois raisons :
 
-* **il est explicable** : on peut afficher les règles apprises et les expliquer à un conducteur de travaux ou à un jury, ce qui est impossible avec un réseau de neurones ;
+* **il est explicable** : on peut afficher les règles apprises et les expliquer à un gestionnaire de sinistres ou à un jury, ce qui est impossible avec un réseau de neurones ;
 * **il est adapté aux petits jeux de données** : avec 37 lignes, un modèle plus complexe apprendrait « par cœur » les exemples au lieu de généraliser ;
 * **il est natif de Spark ML** : il s'intègre à la stack Big Data du projet sans dépendance supplémentaire.
 
@@ -1679,7 +1680,7 @@ Concrètement :
 
 Les suspects étant très rares (7 sur 37), un tirage au hasard pourrait mettre tous les suspects dans le même pli, et certains plis de test n'en contiendraient aucun. Les suspects et les non-suspects sont donc numérotés **séparément**, puis répartis à égalité entre les 5 plis (numéro de la ligne modulo 5). Chaque pli contient ainsi 1 ou 2 suspects. Le tirage utilise une graine fixe (`rand(42)`), ce qui rend l'évaluation reproductible, et `cache()` fige la numérotation pour qu'elle ne change pas entre deux utilisations.
 
-Ces deux indicateurs sont enregistrés dans `metriques_fraude`, avec le nombre de ligness et le nombre de suspects.
+Ces deux indicateurs sont enregistrés dans `metriques_fraude`, avec le nombre de lignes et le nombre de suspects.
 
 #### Entraînement final et prédictions
 
