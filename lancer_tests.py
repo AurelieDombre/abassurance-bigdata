@@ -75,8 +75,8 @@ lancer(
 # ------------------------------------------------------------------
 lancer(
     f'"{sys.executable}" -m pytest tests/test_outils.py tests/test_outils_perf.py '
-    "tests/test_outils_auth.py "
-    "--cov=app --cov-report=term-missing --cov-report=xml:coverage.xml -v"
+    "tests/test_outils_auth.py tests/test_en_ligne.py "
+    "--cov=app --cov=en_ligne --cov-report=term-missing --cov-report=xml:coverage.xml -v"
 )
 
 # ------------------------------------------------------------------

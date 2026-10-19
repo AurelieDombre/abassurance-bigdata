@@ -64,6 +64,6 @@ def test_charger_utilisateurs_invalide(texte):
 
 
 def test_pages_par_role():
-    assert pages_autorisees("user") == ["dashboard"]
+    assert pages_autorisees("user") == ["dashboard", "fraude"]
     assert pages_autorisees("admin") == ["dashboard", "fraude", "services"]
     assert pages_autorisees("inconnu") == []

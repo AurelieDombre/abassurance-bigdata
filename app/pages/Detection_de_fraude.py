@@ -4,11 +4,12 @@ import pandas as pd
 import streamlit as st
 from auth import exiger_role
 
-# Page réservée aux administrateurs (même si quelqu'un tape l'URL directement)
+# Role requis pour accéder à cette page : « admin » ou « user » (un agent d'assurance)
 exiger_role("admin", "user")
 from pyspark.sql import SparkSession
 from pyspark.ml import PipelineModel
 from pyspark.ml.functions import vector_to_array
+from outils import probas_en_pourcentage
 
 # --- Chemins vers les données et le modèle dans Hadoop
 HDFS = "hdfs://namenode:9000"
@@ -127,7 +128,8 @@ else:
     st.download_button(
         label="Télécharger la liste (CSV)",
         # utf-8-sig + séparateur « ; » = s'ouvre correctement dans Excel en français
-        data=a_surveiller.to_csv(index=False, sep=";").encode("utf-8-sig"),
+        # probas_en_pourcentage : 0.875 devient 88, dans une colonne « proba_fraude (%) »
+        data=probas_en_pourcentage(a_surveiller).to_csv(index=False, sep=";").encode("utf-8-sig"),
         file_name="sinistres_a_surveiller.csv",
         mime="text/csv",
     )
@@ -162,4 +164,3 @@ if st.button("Évaluer ce sinistre"):
     # "probability" contient [proba pas fraude, proba fraude] : on prend la case 1
     resultat = modele.transform(ligne).withColumn("p", vector_to_array("probability")[1]).first()
     st.metric("Probabilité de fraude", f"{resultat['p']:.0%}")
-    

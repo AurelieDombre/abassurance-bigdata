@@ -3,9 +3,9 @@
 Ce document détaille les choix techniques, leurs justifications, les problèmes rencontrés et leur résolution, ainsi que l'avancement des User Stories du projet. Pour les instructions d'installation et d'exécution, voir le [`README.md`](../README.md).
 
 ## Sommaire
- 
+
 Les sections suivent l'ordre dans lequel les User Stories ont été réalisées.
- 
+
 | US | Sujet | Section |
 | --- | --- | --- |
 | US 0.1 | Création du dépôt Git et convention de nommage des branches | [README](../README.md#convention-de-nommage-des-branches) |
@@ -20,6 +20,7 @@ Les sections suivent l'ordre dans lequel les User Stories ont été réalisées.
 | US 1.4 | Contrôle du nombre d'enregistrements | [US 1.4 Contrôle du nombre d'enregistrements](#us-14-contrôle-du-nombre-denregistrements) |
 | US 2.1 | Nettoyage des données | [US 2.1 Nettoyage des données](#us-21-nettoyage-des-données) |
 | US 2.2 | Transformation au format commun : fusionner les données | [US 2.2 Transformation au format commun : fusionner les données](#us-22-transformation-au-format-commun--fusionner-les-données) |
+| US 3.1 | Créer les topics Kafka | [US 3.1 — Créer les topics Kafka](#us-31--créer-les-topics-kafka) |
 | US 3.2 | Publication des données transformées vers Kafka | [US 3.2 — Publication des données transformées vers Kafka](#us-32--publication-des-données-transformées-vers-kafka) |
 | US 3.3 | Synchronisation pendant la phase de transition | [US 3.3 — Synchronisation pendant la phase de transition](#us-33--synchronisation-pendant-la-phase-de-transition) |
 | US 4.1 | Installer l'espace de stockage centralisé | [US 4.1 Installer l'espace de stockage centralisé](#us-41-installer-lespace-de-stockage-centralisé) |
@@ -38,6 +39,7 @@ Les sections suivent l'ordre dans lequel les User Stories ont été réalisées.
 | US 7.3 | Écrire les tests unitaires | [US 7.3 : Écrire les tests unitaires](#us-73--écrire-les-tests-unitaires) |
 | US 7.4 | Atteindre la couverture de test de code minimale | [US 7.4 : Atteindre la couverture de test de code minimale](#us-74--atteindre-la-couverture-de-test-de-code-minimale) |
 | US 8.3 | Optimiser les performances | [US 8.3 : Optimiser les performances](#us-83--optimiser-les-performances) |
+| US 8.4 | Documenter le projet | [US 8.4 : Documenter le projet](#us-84--documenter-le-projet) |
 | — | Authentification et rôles (accès admin / user) | [Authentification et rôles](#authentification-et-rôles-accès-admin--user) |
 | — | Déploiement : version en ligne et version complète | [Déploiement en ligne et mode démo](#déploiement-en-ligne-et-mode-démo) |
  
@@ -322,7 +324,7 @@ Les données du dataset ont été générées par un script avec Faker afin de s
 
 2. **Écrire le résultat standardisé (`tFileOutputDelimited`)** : un `tFileOutputDelimited` écrit le résultat standardisé dans `output/ab_assurance_extract_talaxie/ab_assurance_extract_client.csv`. Relier `tFileInputDelimited_1` vers ce composant (clic droit → Ligne → Main → clic sur `tFileOutputDelimited`). Définir le chemin de sortie en zone de staging. Cocher « Inclure l'en-tête » pour que le fichier garde les noms de colonnes `ab_*` — utile pour la lisibilité et pour que l'US suivante (nettoyage) puisse relire ce fichier facilement. Vérifier que l'encodage est bien UTF-8.
 
-3. **Exécuter et valider** : exécution du job, puis ouverture du fichier généré pour confirmer le nombre de ligness pour chaque table extraite, avec les accents corrects.
+3. **Exécuter et valider** : exécution du job, puis ouverture du fichier généré pour confirmer le nombre de lignes pour chaque table extraite, avec les accents corrects.
 
 Capture d'écran des jobs :
 
@@ -657,6 +659,46 @@ Décision client_id : String ("AB-"/"AP-") vs Integer.
 Diagnostic : Le schéma officiel typait client_id en Integer, incompatible avec un préfixe texte.
 Correction : Modification du type de client_id dans le schéma commun (Métadonnées) de Integer vers String, propagée aux jobs.
 
+## US 3.1 — Créer les topics Kafka
+
+### Objectif
+
+Préparer dans Kafka un « canal » par table, dans lequel Talaxie publiera les données transformées (US 3.2) et que Spark lira en continu (US 4.2).
+
+Un topic Kafka fonctionne comme une chaîne de télévision dédiée : Talaxie diffuse sur la chaîne « clients », et Spark regarde cette chaîne en permanence pour enregistrer tout ce qui y passe.
+
+### Réalisation
+
+Les topics sont créés par le script `Docker/init-environment.ps1`, à lancer une fois après le premier démarrage de la plateforme :
+
+```powershell
+.\Docker\init-environment.ps1
+```
+
+| Topic | Contenu |
+| --- | --- |
+| `abassurance.clients.v1` | Clients fusionnés AbAssurance / AssurePlus |
+| `abassurance.contrats.v1` | Contrats |
+| `abassurance.paiements.v1` | Paiements |
+| `abassurance.sinistres.v1` | Sinistres |
+
+Choix effectués :
+
+* **Nommage** `abassurance.<table>.v1` : le préfixe identifie le projet, le suffixe `v1` permettra de créer une nouvelle version d'un topic si le format des messages change, sans casser les programmes qui lisent l'ancienne.
+* **Une partition et un facteur de réplication de 1** : le volume de données est faible et il n'y a qu'un seul broker Kafka. En production, on augmenterait les deux pour répartir la charge et ne rien perdre en cas de panne d'un serveur.
+* **Création automatique désactivée** (`KAFKA_AUTO_CREATE_TOPICS_ENABLE: "false"` dans le `docker-compose.yaml`) : une faute de frappe dans un nom de topic provoque une erreur visible, au lieu de créer en silence un topic vide que personne ne lit.
+* **Script relançable** : l'option `--if-not-exists` évite une erreur si les topics existent déjà. Le script attend aussi que Kafka soit prêt (20 essais espacés de 5 secondes) au lieu d'un délai fixe.
+
+Le même script crée l'arborescence HDFS utilisée par le streaming (`/data/kafka/<table>`, `/data/checkpoints/<table>`, `/data/clean`).
+
+### Vérification
+
+```powershell
+docker exec kafka /opt/kafka/bin/kafka-topics.sh --list --bootstrap-server localhost:9092
+```
+
+Les topics et leurs messages sont aussi visibles dans Kafka UI (http://localhost:8080).
+
 ## US 3.2 — Publication des données transformées vers Kafka
 
 1. Télécharger le composant Kafka dans Talaxie. Il permet de réutiliser cette config Kafka dans tous les jobs sans la reconfigurer à chaque fois. Appelé ce composant via un tLibraryLoad.
@@ -721,7 +763,7 @@ Critères d'acceptation :
 * ports HDFS non exposés au host (accès limité au réseau Docker interne).
 * Une authentification forte (Kerberos + Apache Ranger) serait la solution de production, non implémentée ici par simplification.
 
-## US4.2 — Stocker les données reçues de Kafka dans (Hadoop)
+## US 4.2 — Stocker les données reçues de Kafka dans Hadoop
 
 Mise en place de 4 jobs Spark Structured Streaming (un par topic Kafka :
 contrats, paiements, sinistres, clients) consommant en continu les messages
@@ -785,7 +827,7 @@ Exemple du fichier sinistres :
 
 ![resultat_sinistre_stockage.png](images/resultat_sinistre_stockage.png)
 
-## US4.3 Proteger les données sensibles stockées
+## US 4.3 — Protéger les données sensibles stockées
 
 Ceci est une partie lourde et qui demande du temps. Je vais lister ce qu'il faudrait faire.
 
@@ -1163,7 +1205,7 @@ Hypothèse écartée : une clé JSON mal nommée. Dans ce cas, seule la colonne 
 ### Impact
 
 * Toute la table `contrats` est inutilisable dans HDFS (statut, type, primes, dates), pas seulement le statut.
-* Le nombre de ligness stockées correspond au nombre de ligness extraites (446), ce qui masque le problème dans la vérification de l'US 4.2. Seule la taille du fichier Parquet (2,7 Ko pour 446 lignes) était un indice.
+* Le nombre de lignes stockées correspond au nombre de lignes extraites (446), ce qui masque le problème dans la vérification de l'US 4.2. Seule la taille du fichier Parquet (2,7 Ko pour 446 lignes) était un indice.
 * Les indicateurs du dashboard par statut de contrat (actifs, suspendus, résiliés) sont impossibles à calculer.
 * Les topics `clients`, `paiements` et `sinistres` ne sont pas concernés : leurs champs numériques sont tous renseignés dans la fusion (0 valeur vide sur 1576 paiements et 98 sinistres).
 
@@ -1195,7 +1237,8 @@ Le bug a été localisé en remontant la chaîne, étape par étape, pour élimi
 
 **1. Talaxie : publier un JSON valide**
 
-Faire en sorte qu'une prime vide soit écrite `null` dans le JSON (ou `0`), au lieu de rien. Composant modifié : job kafka_contrats.
+Faire en sorte que les primes ne soient pas vide dans le JSON. J'ai multiplier par 12 les primes mensuelles et complétet le fichier puis fait de même avec prime annuelle (divisé / 12). j'ai relancer le fichier dans le 
+composant : job kafka_contrats.
 
 **2. Talaxie : harmoniser les statuts en français**
 
@@ -1578,7 +1621,7 @@ Un arbre de décision fonctionne comme un questionnaire : « le montant dépasse
 
 Ce choix a été fait pour trois raisons :
 
-* **il est explicable** : on peut afficher les règles apprises et les expliquer à un conducteur de travaux ou à un jury, ce qui est impossible avec un réseau de neurones ;
+* **il est explicable** : on peut afficher les règles apprises et les expliquer à un gestionnaire de sinistres ou à un jury, ce qui est impossible avec un réseau de neurones ;
 * **il est adapté aux petits jeux de données** : avec 37 lignes, un modèle plus complexe apprendrait « par cœur » les exemples au lieu de généraliser ;
 * **il est natif de Spark ML** : il s'intègre à la stack Big Data du projet sans dépendance supplémentaire.
 
@@ -1637,7 +1680,7 @@ Concrètement :
 
 Les suspects étant très rares (7 sur 37), un tirage au hasard pourrait mettre tous les suspects dans le même pli, et certains plis de test n'en contiendraient aucun. Les suspects et les non-suspects sont donc numérotés **séparément**, puis répartis à égalité entre les 5 plis (numéro de la ligne modulo 5). Chaque pli contient ainsi 1 ou 2 suspects. Le tirage utilise une graine fixe (`rand(42)`), ce qui rend l'évaluation reproductible, et `cache()` fige la numérotation pour qu'elle ne change pas entre deux utilisations.
 
-Ces deux indicateurs sont enregistrés dans `metriques_fraude`, avec le nombre de ligness et le nombre de suspects.
+Ces deux indicateurs sont enregistrés dans `metriques_fraude`, avec le nombre de lignes et le nombre de suspects.
 
 #### Entraînement final et prédictions
 
@@ -1659,7 +1702,7 @@ Les données sont générées aléatoirement : il n'existe pas de lien réel ent
 La page lit les résultats dans HDFS et se compose de quatre parties :
 
 1. **Qualité du modèle** : nombre de sinistres d'entraînement, nombre de suspects, précision et rappel, accompagnés d'un avertissement rappelant que les chiffres sont indicatifs.
-2. **Sinistres à surveiller** : un curseur règle le seuil de probabilité ; le tableau affiche les sinistres au-dessus du seuil, triés du plus suspect au moins suspect, avec un export CSV (séparateur `;`, ouvrable directement dans Excel).
+2. **Sinistres à surveiller** : un curseur règle le seuil de probabilité ; le tableau affiche les sinistres au-dessus du seuil, triés du plus suspect au moins suspect, avec la probabilité affichée en pourcentage. Un export CSV (séparateur `;`, ouvrable directement dans Excel) contient la colonne `proba_fraude (%)` : la probabilité y est écrite en pourcentage entier (0,84 devient 84), grâce à la fonction `probas_en_pourcentage` de `outils.py`, partagée avec la version en ligne.
 3. **Ce que le modèle a appris** : un graphique de l'importance de chaque caractéristique et les règles de l'arbre en texte.
 4. **Simulateur** : l'utilisateur saisit les cinq caractéristiques d'un sinistre fictif et obtient sa probabilité de fraude, calculée par le modèle sauvegardé.
 
@@ -1913,17 +1956,17 @@ Le fichier n'est jamais effacé : on ajoute toujours à la suite. Les 40 derniè
 
 ## US 6.3 : Mesurer les performances du pipeline
 
-## Objectif
+### Objectif
 
 Mesurer le temps de réponse de chaque étape du pipeline, afin de vérifier la fluidité du service et de repérer un éventuel ralentissement.
 
-## Ce qui est mesuré
+### Ce qui est mesuré
 
 La page Streamlit « État des services » (`Etat_des_services.py`) vérifie 4 étapes : Kafka, Hadoop, Streaming et Spark. À chaque vérification, chaque étape est chronométrée avec `time.time()` : durée = heure d'arrivée − heure de départ.
 
 Les temps mesurés sont des **temps de réponse des services** : combien de secondes met chaque étape à répondre à la vérification. La durée des traitements eux-mêmes (par exemple `preparer_dataset_fraude.py`) est mesurée dans la US 8.3.
 
-## Où sont les résultats
+### Où sont les résultats
 
 Chaque mesure est ajoutée à la fin du fichier `logs/performances.csv` par la fonction `noter_mesure` (fichier `outils_perf.py`). Une ligne contient la date, l'étape et la durée en secondes (`duree_s`). Le fichier n'est jamais effacé : il garde tout l'historique.
 
@@ -1936,7 +1979,7 @@ La page affiche ensuite, dans la section « Performances du pipeline » :
 ![etat_service_temps.png](images/etat_service_temps.png)
 (Capture prise lors du premier démarrage du pipeline, spark mets un peu de temps à démarrer la première fois)
 
-## Comment un ralentissement est détecté
+### Comment un ralentissement est détecté
 
 La fonction `detecter_ralentissement` (dans `app/outils.py`) applique une règle simple :
 
@@ -1951,34 +1994,21 @@ Exemple : Spark : 2,1 s (d'habitude 0,6 s)
 
 Cette fonction est couverte par 7 tests unitaires : pas assez de mesures, temps stable, ralentissement, petit écart ignoré, seuil exact, facteur personnalisé, amélioration.
 
-## Limites et améliorations possibles
+### Limites et améliorations possibles
 
 * Les temps mesurés sont ceux des vérifications de services, pas ceux des gros traitements Spark.
 * La première vérification de Spark peut être plus longue que les suivantes, car la session Spark doit démarrer.
 * Le seuil (2 fois la moyenne) est un choix de départ, à ajuster avec l'expérience.
 * Les mesures ne sont prises que lorsque la page est ouverte ou actualisée, pas en continu.
 
-### 7. Correspondance avec les critères de l'US
+### Correspondance avec l'objectif de l'US
 
-| Critère | Réalisation |
+| Attendu | Réalisation |
 | --- | --- |
-| Un tableau de bord de suivi est mis en place et accessible | Page « État des services » avec un voyant par étape |
-| Une alerte automatique est envoyée en cas de problème | Bannière rouge + mail d'alerte (Mailpit) |
-| L'historique des traitements (logs) passés est consultable | Fichier `logs/etat_services.log` affiché dans la page |
-
-### 8. Limites connues
-
-* **Talaxie n'est pas surveillé** : il tourne hors Docker.
-* **La vérification n'a lieu que lorsque la page est ouverte.** Si personne ne la consulte, aucune alerte ne part. En production, la surveillance serait un programme séparé qui tourne en permanence.
-* **Le voyant « Streaming » vérifie que des fichiers existent**, pas que le streaming tourne à cet instant.
-* **Le serveur de mail est simulé** (Mailpit) : aucun mail réel n'est envoyé.
-
-### 9. Évolutions possibles en production
-
-* Surveillance continue, alertes via **Alertmanager** (mail, Slack, SMS).
-* Vrai serveur de mail d'entreprise.
-* Surveillance de Talaxie (état des jobs planifiés).
-* Logs centralisés (par exemple Elasticsearch).
+| Mesurer le temps de réponse de chaque étape du pipeline | Chaque vérification (Kafka, Hadoop, Streaming, Spark) est chronométrée et enregistrée dans `logs/performances.csv` |
+| Vérifier la fluidité du service | Tableau de synthèse par étape (nombre de mesures, minimum, moyenne, maximum) et graphique de l'évolution des temps |
+| Repérer un éventuel ralentissement | Fonction `detecter_ralentissement` : message orange si la dernière mesure dépasse 2 fois la moyenne habituelle |
+| Résultats vérifiables | `noter_mesure` (6 tests) et `detecter_ralentissement` (7 tests) sont couverts par des tests unitaires (US 7.3) |
 
 ## US 7.1 Configuration de SonarQube
 
@@ -2032,7 +2062,39 @@ Après correction
 
 Les tests unitaires sont relancés après les corrections (voir les US 7.3 et 7.4) pour vérifier qu'aucune fonction n'a été cassée.
 
-## US 7.3 : Ecrire les tests unitaire
+### Analyse finale (19/10/2026)
+
+La dernière analyse SonarQube signale **2 alertes de sécurité**, de même nature, dans `en_ligne/app.py` (lignes 154 et 172) :
+
+> *Using HTTP protocol is insecure. Use HTTPS instead.*
+
+Elles portent sur les deux requêtes envoyées au namenode par la page « Services » :
+
+```python
+# Ligne 154 : état des datanodes
+adresse = ("http://" + HOTE_NAMENODE + ":9870/jmx"
+           "?qry=Hadoop:service=NameNode,name=FSNamesystemState")
+
+# Ligne 172 : contenu des tables écrites par le streaming
+adresse = ("http://" + HOTE_NAMENODE + ":9870/webhdfs/v1/data/kafka/"
+           + table + "?op=LISTSTATUS")
+```
+
+**Pourquoi SonarQube les signale.** HTTP fait circuler les échanges en clair : quelqu'un placé sur le réseau pourrait les lire, comme une carte postale.
+
+**Pourquoi elles ne sont pas corrigées en passant à HTTPS.** Le namenode ne répond qu'en HTTP sur le port 9870. Écrire simplement `https://` ferait échouer la vérification à chaque fois. Passer Hadoop en HTTPS demanderait de créer des certificats, de les installer sur le namenode et les deux datanodes, et de modifier la configuration HDFS (`dfs.http.policy=HTTPS_ONLY`).
+
+**Pourquoi le risque est faible ici :**
+
+* les requêtes restent à l'intérieur du réseau Docker : le port 9870 n'est pas publié vers l'extérieur (voir `docker-compose.yaml`) ;
+* elles ne transportent aucune donnée client, seulement l'état technique de HDFS (nombre de datanodes, liste de fichiers) ;
+* dans la version en ligne, elles n'atteignent rien, puisque Hadoop n'existe pas sur Streamlit Community Cloud.
+
+**Décision.** Les deux alertes ont été examinées et marquées *Safe* dans SonarQube, avec cette justification. Elles ne sont pas masquées dans le code : elles restent visibles et justifiées.
+
+**En production**, HDFS serait configuré en HTTPS, avec une authentification Kerberos, pour que les échanges entre les services soient chiffrés et que seuls les services autorisés puissent interroger le namenode.
+
+## US 7.3 : Écrire les tests unitaires
 
 ### 1. Objectif
 
@@ -2055,7 +2117,7 @@ pluggy==1.6.0
 pygments==2.21.0
 ```
 
-## 3. Outils utilisés
+### 3. Outils utilisés
 
 | Outil | Rôle |
 | --- | --- |
@@ -2064,7 +2126,7 @@ pygments==2.21.0
 
 Installation : `pip install pytest pytest-cov pandas fpdf2` (ajoutés aussi à `requirements.txt`).
 
-## 4. Organisation du code pour pouvoir tester
+### 4. Organisation du code pour pouvoir tester
 
 Les pages Streamlit affichent le résultat dès qu'on les importe, et les scripts Spark ont besoin de Hadoop : ils ne se testent pas facilement tels quels.
 
@@ -2076,8 +2138,10 @@ Deux choix d'organisation permettent de les tester quand même :
 ```shell
 abassurance-bigdata/
 ├── app/
-│   ├── app.py, outils.py, outils_perf.py, ...
+│   ├── app.py, outils.py, outils_perf.py, outils_auth.py, auth.py
 │   └── pages/
+├── en_ligne/
+│   └── app.py                           ← version en ligne (pandas, sans Spark)
 ├── src/
 │   └── pipeline/
 │       ├── preparer_dataset_fraude.py   ← logique découpée en fonctions
@@ -2085,6 +2149,8 @@ abassurance-bigdata/
 ├── tests/
 │   ├── test_outils.py                   ← tests unitaires de l'application
 │   ├── test_outils_perf.py              ← tests du carnet de chronos
+│   ├── test_outils_auth.py              ← tests de l'authentification
+│   ├── test_en_ligne.py                 ← tests de bout en bout de la version en ligne
 │   ├── test_preparer_dataset_fraude.py  ← tests unitaires du pipeline
 │   └── test_nettoyage_donnees_ia.py     ← tests du nettoyage
 ├── pytest.ini                           ← indique à pytest où trouver outils.py
@@ -2096,13 +2162,14 @@ abassurance-bigdata/
 
 Les tests du pipeline s'exécutent **dans le conteneur** `pyspark-app` (là où Spark est installé). Le rapport de couverture (`coverage_fraude.xml`) est ensuite copié sur le poste, puis l'adresse `/app` qu'il contient est remplacée par le dossier réel du projet pour que SonarQube retrouve les fichiers.
 
-## 5. Ce qui est testé
+### 5. Ce qui est testé
 
-### 5.1 Application : 40 tests sur 10 fonctions de `app/outils.py` et `app/outils_perf.py`
+#### 5.1 Application : 46 tests sur 11 fonctions de `app/outils.py` et `app/outils_perf.py`
 
 | Fonction | Rôle | Nb de tests | Cas vérifiés |
 | --- | --- | --- | --- |
 | `vers_csv` | Tableau → CSV lisible dans Excel | 3 | Marqueur UTF-8, séparateur `;`, pas de colonne numéro |
+| `probas_en_pourcentage` | Probabilité de fraude (0,875) → pourcentage entier (88) pour l'export CSV | 5 | Conversion et arrondi, case vide conservée, colonne renommée `proba_fraude (%)`, tableau d'origine intact, contenu du CSV |
 | `texte_pdf` | Remplace les caractères inconnus du PDF | 3 | Accents conservés, emoji remplacé, texte vide |
 | `generer_rapport_pdf` | Fabrique le rapport PDF | 2 | Fichier commençant par `%PDF`, cas sans statut |
 | `tester_porte` | Vérifie qu'un service répond | 3 | Service ouvert, port fermé, machine inconnue |
@@ -2111,11 +2178,11 @@ Les tests du pipeline s'exécutent **dans le conteneur** `pyspark-app` (là où 
 | `formater_ligne_log` | Ligne du carnet de bord | 2 | Ligne `OK`, ligne `ALERTE` |
 | `construire_mail` | Contenu du mail d'alerte | 4 | Sujet, texte, adresses par défaut et personnalisées |
 | `detecter_ralentissement` | Détection d'un ralentissement | 7 | Pas assez de mesures, temps stable, ralentissement, petit écart ignoré, seuil exact, facteur personnalisé, amélioration |
-| `noter_mesure` | Ajoute une mesure de temps dans le carnet de chronos | 5 | Fichier et titres créés, étape et durée écrites, titres écrits une seule fois, anciennes mesures conservées, durée arrondie à 3 décimales |
+| `noter_mesure` | Ajoute une mesure de temps dans le carnet de chronos | 6 | Fichier et titres créés, étape et durée écrites, titres écrits une seule fois, anciennes mesures conservées, durée arrondie à 3 décimales, dossier non inscriptible sans plantage |
 
 Ces tests utilisent un dossier temporaire créé par pytest : le vrai fichier `logs/performances.csv` n'est jamais touché.
 
-### 5.2 Pipeline fraude : 10 tests sur 7 fonctions de `preparer_dataset_fraude.py`
+#### 5.2 Pipeline fraude : 11 tests sur 8 fonctions de `preparer_dataset_fraude.py`
 
 | Fonction | Rôle | Nb de tests | Cas vérifiés |
 | --- | --- | --- | --- |
@@ -2134,7 +2201,7 @@ Ces tests utilisent un vrai Spark local avec de petites tables créées dans le 
 
 **Ce qui n'est pas couvert par les tests unitaires** : `demarrer_spark` (ligne 18) et `lire_nettoyer_tables` (lignes 32 à 52), qui se branchent sur HDFS. Elles se vérifient en conditions réelles, en lançant le pipeline. Couverture actuelle du fichier : 68 %.
 
-#### 5.3 Nettoyage : 13 tests sur 7 fonctions de `nettoyage_donnees_ia.py
+#### 5.3 Nettoyage : 13 tests sur 7 fonctions de `nettoyage_donnees_ia.py`
 
 | Fonction | Rôle | Nb de tests | Cas vérifiés |
 | --- | --- | --- | --- |
@@ -2150,14 +2217,37 @@ Ces tests tournent dans le conteneur, comme ceux du pipeline. Couverture du fich
 
 Les fonctions `preparer_*` ne sont appelées par aucun script du pipeline actuel (le script de préparation applique `nettoyer` et `harmoniser_statuts` lui-même). Elles sont testées pour garantir leur logique en cas de réutilisation.
 
-## 6. Comment lancer les tests
+#### 5.4 Authentification : 17 tests sur `app/outils_auth.py`
 
-Deux commandes, selon l'endroit où les tests s'exécutent. Les tests de `outils.py` et `outils_perf.py` tournent directement sur le poste, ceux du pipeline et du nettoyage ont besoin de Spark et tournent dans le conteneur `pyspark-app`.
+| Fonction | Rôle | Nb de tests | Cas vérifiés |
+| --- | --- | --- | --- |
+| `hacher_mot_de_passe` / `verifier_mot_de_passe` | Hachage PBKDF2 et vérification | 7 | Hash différent à chaque fois mais vérifiable, mauvais mot de passe refusé, 5 formes de hash invalide qui ne font pas planter |
+| `authentifier` | Connexion : renvoie le rôle | 2 | Bon rôle renvoyé, mauvais mot de passe ou identifiant inconnu refusés |
+| `charger_utilisateurs` | Lecture des comptes (`AUTH_USERS`) | 7 | Fichier valide lu, 6 fichiers invalides refusés (JSON incorrect, liste, objet vide, valeur vide, hash manquant, rôle inconnu) |
+| `pages_autorisees` | Pages visibles selon le rôle | 1 | admin : 3 pages, user : tableau de bord et fraude, rôle inconnu : aucune |
+
+#### 5.5 Version en ligne : 20 tests de bout en bout sur `en_ligne/app.py`
+
+Ces tests utilisent `AppTest` de Streamlit, qui joue le rôle d'un navigateur « robot » : il lance l'application, remplit le formulaire de connexion, clique sur les boutons, puis on vérifie ce qui s'affiche. Ils tournent sur de petites données créées pour le test, dans un dossier temporaire : les vrais fichiers de `en_ligne/donnees` et les vrais comptes (`.streamlit/secrets.toml`) ne sont jamais utilisés.
+
+| Domaine | Nb de tests | Cas vérifiés |
+| --- | --- | --- |
+| Connexion | 6 | Formulaire affiché, application fermée sans compte configuré, 3 connexions refusées, déconnexion |
+| Onglets selon le rôle | 2 | user : tableau de bord et fraude ; admin : en plus les services |
+| Tableau de bord | 5 | Chiffres clés, contrats par statut (dont statut vide), montant total des sinistres, un bouton d'export par table, message clair si les fichiers manquent |
+| Fraude | 3 | Qualité du modèle, curseur de seuil, message clair si les prédictions manquent |
+| Services (admin) | 4 | Attente du clic, alerte quand les services sont injoignables, streaming non vérifié si Hadoop est absent, résultat conservé après un autre clic |
+
+Ces tests couvrent aussi `app/auth.py` (formulaire de connexion), à 83 %.
+
+### 6. Comment lancer les tests
+
+Deux commandes, selon l'endroit où les tests s'exécutent. Les tests de l'application (outils, authentification, version en ligne) tournent directement sur le poste, ceux du pipeline et du nettoyage ont besoin de Spark et tournent dans le conteneur `pyspark-app`.
 
 ```shell
-# Tests de la logique de l'application, sur le poste (depuis la racine du projet)
-pytest tests/test_outils.py tests/test_outils_perf.py
- 
+# Tests de l'application, sur le poste (depuis la racine du projet)
+pytest tests/test_outils.py tests/test_outils_perf.py tests/test_outils_auth.py tests/test_en_ligne.py
+
 # Chaîne complète : tests du pipeline dans le conteneur, tests de l'application,
 # couverture, puis analyse SonarQube (voir l'US 7.4)
 python lancer_tests.py
@@ -2166,11 +2256,9 @@ python lancer_tests.py
 Pour obtenir aussi la couverture et un rapport de résultats consultable :
 
 ```shell
-(.venv) PS C:\xampp\htdocs\Projets\abassurance-bigdata> python lancer_tests.py 
+(.venv) PS C:\xampp\htdocs\Projets\abassurance-bigdata> python lancer_tests.py
 
-================================ tests coverage ================================
-_______________ coverage: platform linux, python 3.12.14-final-0 _______________
-
+---- Tests du pipeline, dans le conteneur ----
 Name                                      Stmts   Miss  Cover   Missing
 -----------------------------------------------------------------------
 src/pipeline/nettoyage_donnees_ia.py         45      0   100%
@@ -2178,41 +2266,43 @@ src/pipeline/preparer_dataset_fraude.py      56     18    68%   18, 32-52
 -----------------------------------------------------------------------
 TOTAL                                       101     18    82%
 Coverage XML written to file /app/coverage_fraude.xml
-======================== 24 passed, 1 warning in 17.80s ========================
+24 passed
 
-======================================== test session starts ===========================================
+---- Tests de l'application, sur le poste ----
 Name                 Stmts   Miss  Cover   Missing
 --------------------------------------------------
-app\app.py             106    106     0%   3-261
-app\outils.py           74      0   100%
-app\outils_perf.py      11      0   100%
+app\app.py             115    115     0%   3-274
+app\auth.py             58     10    83%   31-33, 47-48, 65-66, 73-75
+app\outils.py           78      0   100%
+app\outils_auth.py      45      0   100%
+app\outils_perf.py      15      0   100%
+en_ligne\app.py        147     26    82%   146, 156-158, 163, 168-181, 192-199, 249
 --------------------------------------------------
-TOTAL                  191    106    45%
+TOTAL                  458    151    67%
 Coverage XML written to file coverage.xml
-==================================================================================================================== 40 passed in 3.76s ==============================================
-
+83 passed
 ```
 
-## 6. Consulter les résultats
+### 7. Consulter les résultats
 
 * **Dans le terminal** : pytest affiche un point par test réussi et la liste détaillée de ceux qui échouent (avec la ligne fautive et la valeur obtenue).
 * **Dans un fichier** : `logs/rapport_tests.xml` (format JUnit, lisible par la plupart des outils de suivi).
 * **Dans SonarQube** : la couverture produite par les tests (`coverage.xml`) est lue lors de l'analyse (voir US 7.4).
 
-## 7. Correspondance avec les critères de l'US
+### 8. Correspondance avec les critères de l'US
 
 | Critère | Réalisation |
 | --- | --- |
-| Les composants principaux disposent de tests unitaires | 64 tests : 35 sur `outils.py`, 5 sur `outils_perf.py`, 11 sur `preparer_dataset_fraude.py` et 13 sur `nettoyage_donnees_ia.py`. Voir les limites ci-dessous |
-| Les tests s'exécutent sans erreur | `pytest tests/test_outils.py tests/test_outils_perf.py` sur le poste (40 tests réussis) et `python lancer_tests.py` pour les 24 tests Spark dans le conteneur (tous réussis) |
+| Les composants principaux disposent de tests unitaires | 107 tests : 40 sur `outils.py`, 6 sur `outils_perf.py`, 17 sur `outils_auth.py`, 20 sur la version en ligne, 11 sur `preparer_dataset_fraude.py` et 13 sur `nettoyage_donnees_ia.py`. Voir les limites ci-dessous |
+| Les tests s'exécutent sans erreur | `python lancer_tests.py` : 83 tests réussis sur le poste et 24 tests Spark réussis dans le conteneur |
 | Les résultats des tests sont consultables | Terminal, fichier `logs/rapport_tests.xml`, SonarQube |
-| Les tests peuvent être relancés automatiquement | Commande unique `pytest` et script `lancer_tests.ps1` ; intégration continue décrite pour la production |
+| Les tests peuvent être relancés automatiquement | Script `lancer_tests.py` ; intégration continue décrite pour la production |
 
-## 8. Limites connues
+### 9. Limites connues
 
-**Seule une partie du code est testée unitairement.** La logique de `outils.py` et `outils_perf.py`, le nettoyage et les fonctions de `preparer_dataset_fraude.py` sont couverts. Les pages Streamlit (affichage), les scripts de streaming et l'entraînement du modèle ne le sont pas. Ils sont vérifiés autrement : par les comptages de l'US 1.4, par les échantillons du tableau de bord (US 5.1) et par les métriques du modèle (US 5.3).
+**Seule une partie du code est testée unitairement.** La logique de `outils.py`, `outils_perf.py` et `outils_auth.py`, la version en ligne, le nettoyage et les fonctions de `preparer_dataset_fraude.py` sont couverts. Les pages Streamlit de la version complète (qui démarrent Spark), les scripts de streaming et l'entraînement du modèle ne le sont pas. Ils sont vérifiés autrement : par les comptages de l'US 1.4, par les échantillons du tableau de bord (US 5.1) et par les métriques du modèle (US 5.3).
 
-## 9. Évolutions possibles
+### 10. Évolutions possibles
 
 * Tests des fonctions de `entrainer_modele_fraude.py` qui ne dépendent pas de HDFS (préparation des colonnes, construction du pipeline).
 * Tests d'intégration lancés dans Docker avec le pipeline complet.
@@ -2220,37 +2310,50 @@ Coverage XML written to file coverage.xml
 
 ## US 7.4 : Atteindre la couverture de test de code minimale
 
-## Objectif
+### Objectif
 
-Atteindre une couverture minimale de 60 % sur les fichiers qui contiennent de la logique et des calculs : `app/outils.py`, `app/outils_perf.py`, `src/pipeline/nettoyage_donnees_ia.py` et `src/pipeline/preparer_dataset_fraude.py`.
+Atteindre une couverture minimale de 60 % sur les fichiers qui contiennent de la logique et des calculs : `app/outils.py`, `app/outils_perf.py`, `app/outils_auth.py`, `en_ligne/app.py`, `src/pipeline/nettoyage_donnees_ia.py` et `src/pipeline/preparer_dataset_fraude.py`.
 
-Les tests unitaires ne sont pas écrits sur tout le code : les pages Streamlit, les scripts de streaming et le générateur de données dépendent de l'affichage, de Kafka ou de HDFS.
+Les tests unitaires ne sont pas écrits sur tout le code : les pages Streamlit de la version complète, les scripts de streaming et le générateur de données dépendent de Spark, de Kafka ou de HDFS.
 
-## Résultats
+### Résultats
 
 | Fichier | Nombre de tests | Couverture | Seuil de 60 % |
 | --- | --- | --- | --- |
-| `app/outils.py` | 35 | 100 % | Atteint |
-| `app/outils_perf.py` | 5 | 100 % | Atteint |
+| `app/outils.py` | 40 | 100 % | Atteint |
+| `app/outils_perf.py` | 6 | 100 % | Atteint |
+| `app/outils_auth.py` | 17 | 100 % | Atteint |
+| `en_ligne/app.py` | 20 | 82 % | Atteint |
+| `app/auth.py` | (couvert par les tests de la version en ligne) | 83 % | Atteint |
 | `src/pipeline/nettoyage_donnees_ia.py` | 13 | 100 % | Atteint |
 | `src/pipeline/preparer_dataset_fraude.py` | 11 | 68 % | Atteint |
 
-Couverture affichée par SonarQube pour l'ensemble du projet :
+Dans `en_ligne/app.py`, les lignes non couvertes sont les cas où **les services répondent** (Kafka joignable, réponse du namenode, tables du streaming trouvées, Spark qui calcule) : les tests tournent sans Kafka, Hadoop ni Spark, ils ne jouent donc que les cas de panne. Les cas où tout fonctionne se vérifient dans la version complète, où les voyants passent au vert.
 
-| Mesure | Couverture |
-| --- | --- |
-| Nouveau code (*New Code*) | 69,8 % |
-| Ensemble du projet (*Overall Code*) | 25,5 % |
+Couverture affichée par SonarQube :
 
-Le chiffre global est plus bas que ceux des fichiers testés, car la majorité des autres fichiers (scripts de streaming, génération du dataset, pages Streamlit, entraînement du modèle) n'ont pas de tests unitaires. Le rapport produit sur le poste contient aussi `app/app.py` (l'interface Streamlit, 106 lignes) à 0 %, ce qui ramène la couverture du dossier `app` à 45 %.
+| Mesure | Avant exclusion | Après exclusion |
+| --- | --- | --- |
+| Nouveau code (*New Code*) | 47,1 % | **55,1 %** |
+| Ensemble du projet (*Overall Code*) | 27,4 % | **61 %** |
+
+**Fichiers exclus du calcul de couverture.** Certains fichiers ne peuvent pas être testés unitairement : ils démarrent Spark, lisent Hadoop ou Kafka, ou ne font qu'afficher des pages Streamlit. Ils sont exclus du **calcul de couverture** dans `sonar-project.properties`, mais restent **analysés par SonarQube pour la qualité** (bugs, sécurité, maintenabilité) :
+
+```properties
+sonar.coverage.exclusions=app/app.py,app/pages/**,streaming_topics/**,src/prediction/**,generate_dataset.py,tools/**
+```
+
+Leur logique de calcul a été déplacée dans des fichiers testés (`outils.py`, `preparer_dataset_fraude.py`, `nettoyage_donnees_ia.py`). Sans cette exclusion, le pourcentage mélangerait le code testable avec du code qui ne peut l'être qu'en conditions réelles, et ne dirait plus rien de la qualité des tests. Les deux mesures (avant et après) sont données pour que la différence reste visible.
+
+Le chiffre du nouveau code (55,1 %) porte uniquement sur les lignes modifiées récemment. Il est plus bas que celui de l'ensemble du projet, car une partie de ces lignes ne peut être exécutée qu'avec les services lancés, comme les cas « service joignable » de la page Services. Le détail fichier par fichier est consultable dans SonarQube.
 
 ![pourcentage_couverture_test_code.png](images/pourcentage_couverture_test_code.png)
 
-## Comment la couverture est mesurée
+### Comment la couverture est mesurée
 
 La couverture est le pourcentage de lignes de code exécutées par au moins un test. L'outil utilisé est `pytest-cov`, et le résultat est envoyé à SonarQube.
 
-* Les tests de `outils.py` et `outils_perf.py` tournent directement sur le poste.
+* Les tests de `outils.py`, `outils_perf.py`, `outils_auth.py` et de la version en ligne tournent directement sur le poste.
 * Les tests de `preparer_dataset_fraude.py` et `nettoyage_donnees_ia.py` tournent dans le conteneur Docker `pyspark-app`, là où Spark est installé. Ils sont lancés dans **une seule commande** pytest, pour que le rapport de couverture (`coverage_fraude.xml`) contienne les deux fichiers : chaque lancement de pytest réécrit son rapport en entier.
 * Chaque exécution produit un rapport XML (`coverage.xml` et `coverage_fraude.xml`). Pour le rapport du conteneur, l'adresse `/app` qu'il contient est remplacée par le dossier réel du projet, afin que SonarQube retrouve les fichiers.
 * Le fichier `.coveragerc` exclut le bloc `if __name__ == "__main__":`. Ce bloc ne fait qu'appeler les fonctions dans l'ordre : la logique est dans les fonctions, qui sont testées.
@@ -2263,7 +2366,7 @@ python lancer_tests.py
 
 Le script envoie les fichiers dans le conteneur, lance les deux séries de tests, récupère les rapports et lance l'analyse SonarQube. Il s'arrête dès qu'un test échoue. Le token SonarQube est lu dans un fichier `.env`, qui n'est pas versionné.
 
-## Parties non couvertes
+### Parties non couvertes
 
 Pour `preparer_dataset_fraude.py`, 32 % du code n'est pas couvert :
 
@@ -2272,7 +2375,7 @@ Pour `preparer_dataset_fraude.py`, 32 % du code n'est pas couvert :
 
 Ces deux fonctions dépendent de Hadoop. Elles ne se testent pas en test unitaire simple, mais se vérifient en conditions réelles, en lançant le pipeline.
 
-## Améliorations possibles
+### Améliorations possibles
 
 * Tester `lire_nettoyer_tables` avec un faux Spark qui renvoie de petites tables, sans passer par HDFS.
 * Tester les fonctions de `entrainer_modele_fraude.py` qui ne dépendent pas de HDFS.
@@ -2280,18 +2383,18 @@ Ces deux fonctions dépendent de Hadoop. Elles ne se testent pas en test unitair
 
 ## US 8.3 : Optimiser les performances
 
-## Objectif
+### Objectif
 
 Réduire le temps de traitement du script de préparation du dataset fraude (`preparer_dataset_fraude.py`), en mesurant la durée avant et après chaque optimisation.
 
-## Méthode de mesure
+### Méthode de mesure
 
 * Un chronomètre (`time.perf_counter()`) mesure la durée du pipeline, de la lecture des tables HDFS à l'écriture des résultats. Le démarrage de Spark n'est pas compté.
 * Chaque version est lancée **3 fois** dans le conteneur `pyspark-app`, dans la foulée. Une seule mesure peut être faussée par un hasard (un autre programme qui tourne, l'état du disque).
 * On compare les **médianes** (la valeur du milieu), qui ignorent un lancement exceptionnellement lent ou rapide.
 * Le jeu de données est petit : 98 sinistres, dont 37 pour l'entraînement.
 
-## Résultats
+### Résultats
 
 | Version | Mesures (s) | Médiane (s) | Écart avec la référence |
 | --- | --- | --- | --- |
@@ -2299,11 +2402,11 @@ Réduire le temps de traitement du script de préparation du dataset fraude (`pr
 | Essai 1 : `cache()` | 15,96 / 16,10 / 15,88 / 15,72 | 15,92 | +6,88 s (+76 %) |
 | Essai 2 : 4 partitions de calcul | 8,64 / 8,63 / 8,17 | 8,63 | −0,41 s (−4,5 %) |
 
-## Essai 1 : le cache (abandonné)
+### Essai 1 : le cache (abandonné)
 
 L'idée était de garder le dataset en mémoire pour ne pas refaire le calcul à chaque `count()`, `show()` et écriture. Le résultat est l'inverse de l'attendu : le pipeline est plus lent. Sur 98 lignes, l'opération de mise en mémoire coûte plus cher que le recalcul. Cet essai a été abandonné.
 
-## Essai 2 : réduire les partitions de calcul (retenu)
+### Essai 2 : réduire les partitions de calcul (retenu)
 
 Par défaut, Spark découpe les jointures et les regroupements en 200 morceaux (`spark.sql.shuffle.partitions`). Pour 98 lignes, c'est démesuré. Le réglage a été ramené à 4 dans `demarrer_spark` :
 
@@ -2313,14 +2416,45 @@ Par défaut, Spark découpe les jointures et les regroupements en 200 morceaux (
 
 Le gain est de 0,41 s (4,5 %), constant sur les 3 lancements. Le résultat du pipeline est identique (37 lignes d'entraînement, 61 à prédire, 7 suspects pour 30 non suspects) et les 10 tests unitaires passent toujours.
 
-## Limites
+### Limites
 
 * Le gain est faible et mesuré sur seulement 3 lancements.
 * Les volumes réels d'AbAssurance sont sans commune mesure avec ce jeu de données. Le comportement de ces deux optimisations y serait probablement différent : le cache deviendrait sans doute utile, et 4 partitions seraient trop peu. Elles seraient à retester sur de gros volumes.
 
-## Piste non testée
+### Piste non testée
 
 Réduire le nombre de `count()` dans le programme principal : chacun relance tout le calcul.
+
+## US 8.4 : Documenter le projet
+
+### Objectif
+
+Permettre à une autre personne (un correcteur, un futur développeur) de comprendre, installer, lancer et vérifier le projet sans aide.
+
+### Documents produits
+
+| Document | Contenu |
+| --- | --- |
+| `README.md` (racine du dépôt) | Liens et accès, architecture, convention de nommage des branches, installation, lancement pas à pas, tests |
+| `journal_technique.md` | Choix techniques, problèmes rencontrés et solutions, réalisation de chaque User Story |
+| `MODE_DEMO.md` | Différences entre la version en ligne et la version complète, préparation de la démonstration, mise à jour des données en ligne |
+| `rapport_qualite.md` | Résultats SonarQube, tests unitaires et couverture |
+| `mapping_donnees.md` | Correspondance des champs AbAssurance / AssurePlus vers le modèle commun |
+| `regles_nettoyage.md` | Règles de nettoyage appliquées aux données |
+| `dictionnaire_dataset.md` | Description des colonnes du jeu de données de la détection de fraude |
+| `MCDs/` | Modèles conceptuels des deux sources et du modèle final |
+
+Le code est lui-même commenté en français, avec des explications en langage simple.
+
+### Revue de cohérence (16/10/2026)
+
+Avant le dépôt, le projet a été relu en entier pour vérifier que le code et la documentation disent la même chose. Les écarts trouvés ont été corrigés, notamment :
+
+* les nombres de tests et les pourcentages de couverture, qui différaient d'un document à l'autre (US 7.3, US 7.4 et rapport de qualité) ;
+* des liens cassés (titres du sommaire, nom de fichier `MODE_DEMO.md` dont la casse différait des liens) ;
+* des parties de l'US 6.3 recopiées par erreur depuis l'US 6.2 ;
+* la description des droits d'accès aux pages, et des tests qui attendaient encore l'ancienne règle (le profil user voit aussi la détection de fraude) ;
+* la procédure de mise à jour des données en ligne, qui passe désormais par `tools/exporter_data_demo.py` pour ne jamais publier les colonnes sensibles.
 
 ## Authentification et rôles (accès admin / user)
 
@@ -2346,7 +2480,7 @@ Protéger l'application par une connexion obligatoire, avec deux profils : un ad
 | Détection de fraude | Oui | Oui |
 | État des services | Oui | Non |
 
-Le menu n'affiche que les pages autorisées pour le rôle (`PAGES_PAR_ROLE` dans `outils_auth.py`). Les pages « Détection de fraude » et « État des services » appellent en plus `exiger_role("admin")` dès leur première ligne : un utilisateur qui taperait directement l'adresse de la page reçoit un message d'accès refusé.
+Le menu n'affiche que les pages autorisées pour le rôle (`PAGES_PAR_ROLE` dans `outils_auth.py`). Chaque page vérifie aussi le rôle dès sa première ligne, avec `exiger_role(...)` : « État des services » appelle `exiger_role("admin")`, « Détection de fraude » appelle `exiger_role("admin", "user")`. Un utilisateur qui taperait directement l'adresse d'une page non autorisée reçoit un message d'accès refusé.
 
 ### Organisation du code
 
@@ -2396,9 +2530,10 @@ Rendre l'application consultable par le correcteur sans qu'il ait à installer D
 
 Toute la plateforme (Kafka, Hadoop avec un namenode et deux datanodes, Spark, Mailpit) ne peut pas tourner sur un hébergement gratuit : la mémoire est limitée, Java n'est pas disponible et il n'est pas possible d'y lancer plusieurs conteneurs. Le projet a donc deux versions de l'application :
 
-* **La version en ligne** (`en_ligne/`, Streamlit Community Cloud) lit des exports Parquet des tables de Hadoop avec pandas. C'est une vitrine des résultats du pipeline. Le correcteur peut y importer ses propres fichiers CSV ou Parquet, qui remplacent les données de démonstration le temps de sa session.
+* **La version en ligne** (`en_ligne/`, Streamlit Community Cloud) lit des exports Parquet des tables de Hadoop avec pandas. C'est une vitrine des résultats du pipeline.
 * **La version complète** (`app/`, Docker) contient tout le pipeline. C'est elle qui sert à la démonstration de la soutenance.
 
 Certaines fonctionnalités n'existent que dans la version complète, car elles ont besoin du pipeline : simulateur de fraude, règles de l'arbre de décision, alertes mail, journal des vérifications, mesures de performance. La page « État des services » est présente en ligne pour l'administrateur, mais ses voyants y sont rouges, car les services ne sont pas joignables hors du réseau Docker : c'est le comportement attendu.
 
-Le tableau complet des différences, la préparation de la démonstration, la mise à jour des données en ligne et le format des fichiers à importer sont décrits dans [`MODE_DEMO.md`](./MODE_DEMO.md).
+Le tableau complet des différences, la préparation de la démonstration et la mise à jour des données en ligne sont décrits dans [`MODE_DEMO.md`](./MODE_DEMO.md).
+

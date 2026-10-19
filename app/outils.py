@@ -3,13 +3,7 @@
 # Ici, on range les fonctions qui ne font QUE du calcul : elles reçoivent
 # quelque chose, elles renvoient un résultat, et c'est tout. Elles n'affichent
 # rien (pas de Streamlit) et n'ont pas besoin de Spark ni de Hadoop.
-#
-# Image : c'est l'atelier où l'on fabrique les pièces. Les pages Streamlit
-# sont la vitrine du magasin : elles utilisent les pièces, mais on ne
-# peut pas tester une pièce à l'intérieur d'une vitrine. En les sortant
-# ici, les tests unitaires peuvent les prendre une par une.
-#
-# Fichier à placer dans le dossier app/, à côté de app.py et outils_perf.py.
+
 
 import socket
 from datetime import datetime
@@ -26,6 +20,24 @@ def vers_csv(tableau_pandas):
     encoding="utf-8-sig" = ajoute un petit marqueur invisible au début du
     fichier pour qu'Excel affiche bien les accents (é, è, à...) sans bug."""
     return tableau_pandas.to_csv(index=False, sep=";").encode("utf-8-sig")
+
+
+def probas_en_pourcentage(tableau_pandas, colonne="proba_fraude"):
+    """Prépare la liste des sinistres pour l'export CSV : la probabilité de fraude,
+    rangée par le modèle entre 0 et 1 (0.875), devient un pourcentage entier (88).
+
+    Pourquoi un nombre entier ? Dans un Excel français, « 87.5 » (avec un point)
+    risque d'être lu comme du texte. « 88 » se lit partout pareil.
+    Image : on traduit la note sur 1 en note sur 100, plus parlante pour un humain.
+
+    Le tableau d'origine n'est pas modifié : on travaille sur une copie
+    (comme on annote une photocopie, pas l'original)."""
+    copie = tableau_pandas.copy()
+    # * 100 puis arrondi à l'unité. "Int64" (avec un I majuscule) = entier qui
+    # accepte les cases vides : une probabilité manquante reste vide au lieu de planter.
+    copie[colonne] = (copie[colonne] * 100).round().astype("Int64")
+    # On renomme la colonne pour que l'unité soit écrite dans le fichier
+    return copie.rename(columns={colonne: "proba_fraude (%)"})
 
 
 def texte_pdf(texte):

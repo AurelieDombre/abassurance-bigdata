@@ -10,7 +10,6 @@ Récupération de données suite fusion ABAssurance et AssurePlus, création de 
 | --- | --- |
 | Application en ligne | https://abassurance-bigdata.streamlit.app/ |
 | Comptes admin / user | Fournis dans le dossier d'examen (PDF), avec le lien de l'application |
-| Compte user (login / mot de passe)  | Fournis dans le dossier d'examen (PDF), avec le lien de l'application |
 | Version en ligne / version complète (mode démo) | [Documentations/MODE_DEMO.md](./Documentations/MODE_DEMO.md) |
 | Journal technique | [Documentations/journal_technique.md](./Documentations/journal_technique.md) |
 | Rapport de qualité | [Documentations/rapport_qualite.md](./Documentations/rapport_qualite.md) |
@@ -23,10 +22,10 @@ Fichiers CSV (simulant Oracle et SQL Server) → Talaxie (nettoyage, fusion) →
 
 | Version | Dossier | Usage |
 | --- | --- | --- |
-| **En ligne** | `en_ligne/` | Correction : consultable sans installation, à partir de données exportées de Hadoop. Le correcteur peut y importer ses propres fichiers CSV ou Parquet. |
+| **En ligne** | `en_ligne/` | Correction : consultable sans installation, à partir de données exportées de Hadoop. |
 | **Complète** | `app/` | Démonstration en local avec Docker : tout le pipeline Kafka → Hadoop → Spark, le simulateur de fraude, la surveillance des services et les alertes mail. |
 
-Certaines fonctionnalités n'existent que dans la version complète, car elles ont besoin du pipeline. Le détail fonctionnalité par fonctionnalité, la préparation de la démonstration et le format des fichiers à importer sont dans [MODE_DEMO.md](./Documentations/MODE_DEMO.md).
+Certaines fonctionnalités n'existent que dans la version complète, car elles ont besoin du pipeline. Le détail fonctionnalité par fonctionnalité, la préparation de la démonstration et la mise à jour des données en ligne sont dans [MODE_DEMO.md](./Documentations/MODE_DEMO.md).
 
 ## Convention de nommage des branches
 
@@ -61,7 +60,7 @@ Règles :
 
 ## Installation de l'environnement Python
 
-L'environnement local sert aux tests de `app/outils.py`, à la génération du jeu de données et à l'analyse SonarQube. Le reste tourne dans Docker.
+L'environnement local sert aux tests de l'application (outils, authentification, version en ligne), à la génération du jeu de données et à l'analyse SonarQube. Le reste tourne dans Docker.
 
 ```powershell
 # 1. Créer l'environnement virtuel, puis l'ACTIVER avant toute installation
@@ -165,7 +164,7 @@ docker exec -it pyspark-app python src/prediction/entrainer_modele_fraude.py
 | Mailpit (mails d'alerte) | http://localhost:8025 |
 
 HDFS n'est volontairement pas exposé sur le réseau (sécurité). Pour voir son contenu : `docker exec namenode hdfs dfs -ls /data`.
-Se connecter avec l'un des comptes du tableau « Liens et accès » : `admin` voit les trois pages (tableau de bord, détection de fraude, état des services), `user` voit le tableau de bord et la détection de fraude.
+Se connecter avec l'un des comptes créés à l'étape « Authentification : créer les comptes » : `admin` voit les trois pages (tableau de bord, détection de fraude, état des services), `user` voit le tableau de bord et la détection de fraude.
 
 ## Vérifier que Kafka et Hadoop fonctionnent
 
@@ -190,16 +189,27 @@ docker exec -it kafka /opt/kafka/bin/kafka-topics.sh --create --topic test-abass
 docker exec -it kafka /opt/kafka/bin/kafka-topics.sh --list --bootstrap-server localhost:9092
 ```
 
+## Version en ligne (Streamlit Community Cloud)
+
+La version en ligne est dans le dossier `en_ligne/`. Elle lit des fichiers exportés de Hadoop (`en_ligne/donnees`) avec pandas, sans Spark ni Docker.
+
+* **Dépendances** : `en_ligne/requirements.txt` (Streamlit Community Cloud l'installe tout seul).
+* **Comptes** : la valeur `AUTH_USERS` (même format que `Docker/auth.env`) est collée dans les *Secrets* de l'application sur Streamlit Community Cloud. Pour la tester en local, elle va dans `.streamlit/secrets.toml`, qui n'est jamais envoyé sur Git.
+* **Lancement en local** : `streamlit run en_ligne/app.py`
+* **Mise à jour des données** : script `tools/exporter_data_demo.py`, qui retire les colonnes sensibles avant l'export.
+
+Ce qui diffère entre les deux versions, et pourquoi : [MODE_DEMO.md](./Documentations/MODE_DEMO.md).
+
 ## Tests unitaires et qualité du code
 
-Les tests de `app/outils.py` se lancent sur le PC. Les tests du pipeline (`preparer_dataset_fraude.py`) ont besoin de Spark : ils se lancent dans le conteneur `pyspark-app`.
+107 tests unitaires. Les tests de l'application (outils, authentification, version en ligne : 83 tests) se lancent sur le PC. Les tests du pipeline (`preparer_dataset_fraude.py`, `nettoyage_donnees_ia.py` : 24 tests) ont besoin de Spark : ils se lancent dans le conteneur `pyspark-app`.
 
 ```powershell
-# Tests de la logique de l'application (directement sur le PC)
-pytest tests/test_outils.py tests/test_outils_perf.py tests/test_outils_auth.py
+# Tests de l'application (directement sur le PC)
+pytest tests/test_outils.py tests/test_outils_perf.py tests/test_outils_auth.py tests/test_en_ligne.py
 
 # Chaîne complète en une commande :
-# tests du pipeline dans Docker, tests de outils, couverture, puis envoi à SonarQube
+# tests du pipeline dans Docker, tests de l'application, couverture, puis envoi à SonarQube
 python lancer_tests.py
 ```
 
@@ -246,8 +256,7 @@ Fichiers dans le dossier `script_test_installation`.
 python -m venv .venv
 .venv\Scripts\activate
 pip install -r Docker/requirements.txt
-python essaie-pyspark.py
-
+python script_test_installation/essaie-pyspark.py
 ```
 
 PySpark 4.2.0 est installé avec les dépendances du projet (`Docker/requirements.txt`).

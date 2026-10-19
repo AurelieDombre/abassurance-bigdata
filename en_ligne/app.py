@@ -17,7 +17,7 @@ import streamlit as st
 # On réutilise la connexion du projet (dossier app/) : mêmes comptes, même AUTH_USERS qu'en Docker.
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent / "app"))
 from auth import bouton_deconnexion, exiger_connexion
-from outils import tester_porte, interpreter_datanodes, trouver_pannes
+from outils import tester_porte, interpreter_datanodes, trouver_pannes, probas_en_pourcentage
 from outils_auth import pages_autorisees  
 
 st.set_page_config(page_title="Tableau de bord AbAssurance", layout="wide")
@@ -104,14 +104,30 @@ def page_fraude():
     ]
     for colonne, (titre, valeur) in zip(st.columns(4), cartes):
         colonne.metric(titre, valeur)
-    st.warning("Le jeu d'entraînement est très petit : ces chiffres sont indicatifs.")
+        st.warning("Données générées aléatoirement : le modèle ne peut pas apprendre de vrai motif "
+               "et fait moins bien que le hasard. Cette page démontre la chaîne technique, "
+               "pas une capacité de détection.")
 
     st.subheader("Sinistres à surveiller")
     seuil = st.slider("Probabilité de fraude d'au moins", 0.0, 1.0, 0.5, 0.05)
     a_surveiller = predictions[predictions["proba_fraude"] >= seuil].sort_values("proba_fraude", ascending=False)
     st.metric("Sinistres signalés", str(len(a_surveiller)) + " sur " + str(len(predictions)))
-    st.dataframe(a_surveiller, hide_index=True)
-    st.download_button("Télécharger la liste (CSV)", csv_pour_excel(a_surveiller), "sinistres_a_surveiller.csv", "text/csv")
+    # À l'écran : la probabilité (0.875) s'affiche directement en pourcentage (87.5 %),
+    # sans changer les données elles-mêmes (seulement la façon de les montrer).
+    st.dataframe(
+        a_surveiller,
+        hide_index=True,
+        column_config={
+            "proba_fraude": st.column_config.NumberColumn("Probabilité de fraude", format="percent")
+        },
+    )
+    # Dans le fichier CSV : la probabilité devient un pourcentage entier (88)
+    st.download_button(
+        "Télécharger la liste (CSV)",
+        csv_pour_excel(probas_en_pourcentage(a_surveiller)),
+        "sinistres_a_surveiller.csv",
+        "text/csv",
+    )
 
 # ------------------------------------------------------------------
 # Page « Services » (admin) : version allégée de Etat_des_services.py
@@ -145,7 +161,7 @@ def _verifier_hadoop():
     except Exception as erreur:
         # Pas de reponse
         return False, "namenode injoignable : " + str(erreur)
-    # Même règle que la version Docker : si au moins un datanode est vivant et aucun n'est silencieux, c'est OK.
+    # On interprète le nombre de datanodes vivants et silencieux pour savoir si Hadoop est OK.
     return interpreter_datanodes(vivants, silencieux)
 
 
@@ -161,7 +177,7 @@ def _verifier_streaming():
             if len(fichiers) == 0:
                 vides.append(table)
         except Exception:
-            vides.append(table)   # illisible = problème
+            vides.append(table)
     if len(vides) == 0:
         return True, "les 4 tables contiennent des fichiers"
     return False, "table vide ou introuvable : " + ", ".join(vides)
@@ -189,9 +205,7 @@ def page_services():
     st.title("État des services du pipeline")
     st.caption("Kafka → Hadoop → Spark")
 
-    # IMPORTANT : avec st.tabs, Streamlit exécute TOUS les onglets à chaque clic,
-    # même ceux qu'on ne regarde pas. Sans bouton, chaque clic sur le tableau de bord
-    # relancerait les vérifications (plusieurs secondes d'attente).
+    # Streamlit execute le code de la page à chaque interaction (clic, scroll, changement d'onglet...).
     # On attend donc que l'admin appuie sur le bouton.
     if st.button("Vérifier les services"):
         etapes = [
@@ -205,7 +219,7 @@ def page_services():
                 for nom, fonction in etapes:
                 # Si le namenode (le bibliothécaire) est absent, inutile
                 # d'aller ouvrir les tiroirs un par un : on sait déjà que c'est fermé.
-                    if nom == "Streaming" and not resultats[1][1]:   # resultats[1] = Hadoop
+                    if nom == "Streaming" and not resultats[1][1]:
                         resultats.append((nom, False, "non vérifié : Hadoop injoignable", 0.0))
                         continue
                     debut = time.time()
@@ -249,21 +263,21 @@ def page_services():
 # ------------------------------------------------------------------
 bouton_deconnexion()
 
-# Clé de page -> (titre de l'onglet, fonction qui l'affiche)
+# Le « plan du bâtiment » : pour chaque page, le titre de son onglet et la fonction qui l'affiche
 PAGES = {
     "dashboard": ("Tableau de bord", page_tableau_de_bord),
     "fraude": ("Fraude", page_fraude),
     "services": ("Services", page_services),
 }
 
-# On ne montre que les pages autorisées pour le rôle de l'utilisateur connecté.
-cles = [cle for cle in pages_autorisees(st.session_state["role"]) if cle in PAGES]
+# Les pages que ce rôle a le droit de voir (par exemple user -> ["dashboard", "fraude"])
+pages_du_role = pages_autorisees(st.session_state["role"])
 
-if not cles:
-    st.error("Aucune page n'est autorisée pour ce rôle.")
-    st.stop()
+# On crée un onglet par page autorisée...
+onglets = st.tabs([PAGES[cle][0] for cle in pages_du_role])
 
-onglets = st.tabs([PAGES[cle][0] for cle in cles])
-for onglet, cle in zip(onglets, cles):
+# ...puis on remplit chaque onglet avec sa page (zip = on avance dans les 2 listes en même temps)
+for onglet, cle in zip(onglets, pages_du_role):
+    titre, afficher_page = PAGES[cle]
     with onglet:
-        PAGES[cle][1]()   # on appelle la fonction de la page
+        afficher_page()
