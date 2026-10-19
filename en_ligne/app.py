@@ -104,7 +104,9 @@ def page_fraude():
     ]
     for colonne, (titre, valeur) in zip(st.columns(4), cartes):
         colonne.metric(titre, valeur)
-    st.warning("Le jeu d'entraînement est très petit : ces chiffres sont indicatifs.")
+        st.warning("Données générées aléatoirement : le modèle ne peut pas apprendre de vrai motif "
+               "et fait moins bien que le hasard. Cette page démontre la chaîne technique, "
+               "pas une capacité de détection.")
 
     st.subheader("Sinistres à surveiller")
     seuil = st.slider("Probabilité de fraude d'au moins", 0.0, 1.0, 0.5, 0.05)
@@ -159,7 +161,7 @@ def _verifier_hadoop():
     except Exception as erreur:
         # Pas de reponse
         return False, "namenode injoignable : " + str(erreur)
-    # Même règle que la version Docker : si au moins un datanode est vivant et aucun n'est silencieux, c'est OK.
+    # On interprète le nombre de datanodes vivants et silencieux pour savoir si Hadoop est OK.
     return interpreter_datanodes(vivants, silencieux)
 
 
@@ -203,9 +205,7 @@ def page_services():
     st.title("État des services du pipeline")
     st.caption("Kafka → Hadoop → Spark")
 
-    # IMPORTANT : avec st.tabs, Streamlit exécute TOUS les onglets à chaque clic,
-    # même ceux qu'on ne regarde pas. Sans bouton, chaque clic sur le tableau de bord
-    # relancerait les vérifications (plusieurs secondes d'attente).
+    # Streamlit execute le code de la page à chaque interaction (clic, scroll, changement d'onglet...).
     # On attend donc que l'admin appuie sur le bouton.
     if st.button("Vérifier les services"):
         etapes = [

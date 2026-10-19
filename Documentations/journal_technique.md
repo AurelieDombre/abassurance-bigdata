@@ -3,9 +3,9 @@
 Ce document détaille les choix techniques, leurs justifications, les problèmes rencontrés et leur résolution, ainsi que l'avancement des User Stories du projet. Pour les instructions d'installation et d'exécution, voir le [`README.md`](../README.md).
 
 ## Sommaire
- 
+
 Les sections suivent l'ordre dans lequel les User Stories ont été réalisées.
- 
+
 | US | Sujet | Section |
 | --- | --- | --- |
 | US 0.1 | Création du dépôt Git et convention de nommage des branches | [README](../README.md#convention-de-nommage-des-branches) |
@@ -2061,6 +2061,38 @@ Après correction
 
 Les tests unitaires sont relancés après les corrections (voir les US 7.3 et 7.4) pour vérifier qu'aucune fonction n'a été cassée.
 
+### Analyse finale (19/10/2026)
+
+La dernière analyse SonarQube signale **2 alertes de sécurité**, de même nature, dans `en_ligne/app.py` (lignes 154 et 172) :
+
+> *Using HTTP protocol is insecure. Use HTTPS instead.*
+
+Elles portent sur les deux requêtes envoyées au namenode par la page « Services » :
+
+```python
+# Ligne 154 : état des datanodes
+adresse = ("http://" + HOTE_NAMENODE + ":9870/jmx"
+           "?qry=Hadoop:service=NameNode,name=FSNamesystemState")
+
+# Ligne 172 : contenu des tables écrites par le streaming
+adresse = ("http://" + HOTE_NAMENODE + ":9870/webhdfs/v1/data/kafka/"
+           + table + "?op=LISTSTATUS")
+```
+
+**Pourquoi SonarQube les signale.** HTTP fait circuler les échanges en clair : quelqu'un placé sur le réseau pourrait les lire, comme une carte postale.
+
+**Pourquoi elles ne sont pas corrigées en passant à HTTPS.** Le namenode ne répond qu'en HTTP sur le port 9870. Écrire simplement `https://` ferait échouer la vérification à chaque fois. Passer Hadoop en HTTPS demanderait de créer des certificats, de les installer sur le namenode et les deux datanodes, et de modifier la configuration HDFS (`dfs.http.policy=HTTPS_ONLY`).
+
+**Pourquoi le risque est faible ici :**
+
+* les requêtes restent à l'intérieur du réseau Docker : le port 9870 n'est pas publié vers l'extérieur (voir `docker-compose.yaml`) ;
+* elles ne transportent aucune donnée client, seulement l'état technique de HDFS (nombre de datanodes, liste de fichiers) ;
+* dans la version en ligne, elles n'atteignent rien, puisque Hadoop n'existe pas sur Streamlit Community Cloud.
+
+**Décision.** Les deux alertes ont été examinées et marquées *Safe* dans SonarQube, avec cette justification. Elles ne sont pas masquées dans le code : elles restent visibles et justifiées.
+
+**En production**, HDFS serait configuré en HTTPS, avec une authentification Kerberos, pour que les échanges entre les services soient chiffrés et que seuls les services autorisés puissent interroger le namenode.
+
 ## US 7.3 : Écrire les tests unitaires
 
 ### 1. Objectif
@@ -2503,3 +2535,4 @@ Toute la plateforme (Kafka, Hadoop avec un namenode et deux datanodes, Spark, Ma
 Certaines fonctionnalités n'existent que dans la version complète, car elles ont besoin du pipeline : simulateur de fraude, règles de l'arbre de décision, alertes mail, journal des vérifications, mesures de performance. La page « État des services » est présente en ligne pour l'administrateur, mais ses voyants y sont rouges, car les services ne sont pas joignables hors du réseau Docker : c'est le comportement attendu.
 
 Le tableau complet des différences, la préparation de la démonstration et la mise à jour des données en ligne sont décrits dans [`MODE_DEMO.md`](./MODE_DEMO.md).
+
