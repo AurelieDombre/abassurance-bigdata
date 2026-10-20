@@ -94,9 +94,13 @@ Ont ensuite été relancés : `preparer_dataset_fraude.py`, `entrainer_modele_fr
 Si le bug réapparaît, la CI le signalera automatiquement.
 
 [Captures : CI rouge avant]
+
 ![test_gitAction_failed.png](images/test_gitAction_failed.png)
 ![test_gitAction_coverage.png](images/test_gitAction_coverage.png)
 
+[Captures : CI vert après]
+
+![gitAction_vert.png](images/gitAction_vert.png)
 
 ---
 
