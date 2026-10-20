@@ -53,6 +53,9 @@ FICHIERS_A_ENVOYER = [
     (r"src\pipeline\nettoyage_donnees_ia.py", "/app/src/pipeline/nettoyage_donnees_ia.py"),
     (r"tests\test_preparer_dataset_fraude.py", "/app/tests/test_preparer_dataset_fraude.py"),
     (r"tests\test_nettoyage_donnees_ia.py", "/app/tests/test_nettoyage_donnees_ia.py"),
+    # Modèle de fraude : le script et ses tests (preparer, evaluer)
+    (r"src\prediction\entrainer_modele_fraude.py", "/app/src/prediction/entrainer_modele_fraude.py"),
+    (r"tests\test_entrainer_modele_fraude.py", "/app/tests/test_entrainer_modele_fraude.py"),
     (".coveragerc", "/app/.coveragerc"),
 ]
 for local, distant in FICHIERS_A_ENVOYER:
@@ -62,9 +65,10 @@ for local, distant in FICHIERS_A_ENVOYER:
 # Étape 2 : tests du pipeline, dans le conteneur (là où Spark est installé)
 # ------------------------------------------------------------------
 lancer(
-    f'docker exec {CONTENEUR} sh -c "cd /app && PYTHONPATH=/app/src/pipeline '
+    f'docker exec {CONTENEUR} sh -c "cd /app && PYTHONPATH=/app/src/pipeline:/app/src/prediction '
     "python -m pytest /app/tests/test_preparer_dataset_fraude.py "
     "/app/tests/test_nettoyage_donnees_ia.py "
+    "/app/tests/test_entrainer_modele_fraude.py "
     "--cov=preparer_dataset_fraude --cov=nettoyage_donnees_ia "
     "--cov-report=term-missing "
     '--cov-report=xml:/app/coverage_fraude.xml -v"'
@@ -75,7 +79,7 @@ lancer(
 # ------------------------------------------------------------------
 lancer(
     f'"{sys.executable}" -m pytest tests/test_outils.py tests/test_outils_perf.py '
-    "tests/test_outils_auth.py tests/test_en_ligne.py "
+    "tests/test_outils_auth.py tests/test_en_ligne.py tests/test_donnees_fusion.py "
     "--cov=app --cov=en_ligne --cov-report=term-missing --cov-report=xml:coverage.xml -v"
 )
 

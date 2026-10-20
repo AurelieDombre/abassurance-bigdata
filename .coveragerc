@@ -1,3 +1,10 @@
+[run]
+# le pourcentage affiché par la CI GitHub se lit comme celui de SonarQube.
+omit =
+    app/app.py
+    app/pages/*
+    src/prediction/*
+
 [report]
 exclude_lines =
     if __name__ == .__main__.:
