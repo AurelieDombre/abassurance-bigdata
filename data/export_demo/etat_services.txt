@@ -1,0 +1,188 @@
+2026-10-06 13:14:04 | OK | Kafka | Kafka répond
+2026-10-06 13:14:04 | OK | Hadoop | 2 datanodes sur 2 vivants : données copiées en double
+2026-10-06 13:14:04 | OK | Streaming | les 4 tables contiennent des fichiers
+2026-10-06 13:14:04 | OK | Spark | Spark répond
+2026-10-06 13:14:44 | OK | Kafka | Kafka répond
+2026-10-06 13:14:44 | OK | Hadoop | 2 datanodes sur 2 vivants : données copiées en double
+2026-10-06 13:14:44 | OK | Streaming | les 4 tables contiennent des fichiers
+2026-10-06 13:14:44 | OK | Spark | Spark répond
+2026-10-06 13:14:52 | OK | Kafka | Kafka répond
+2026-10-06 13:14:52 | OK | Hadoop | 2 datanodes sur 2 vivants : données copiées en double
+2026-10-06 13:14:52 | OK | Streaming | les 4 tables contiennent des fichiers
+2026-10-06 13:14:52 | OK | Spark | Spark répond
+2026-10-06 13:14:54 | OK | Kafka | Kafka répond
+2026-10-06 13:14:54 | OK | Hadoop | 2 datanodes sur 2 vivants : données copiées en double
+2026-10-06 13:14:54 | OK | Streaming | les 4 tables contiennent des fichiers
+2026-10-06 13:14:54 | OK | Spark | Spark répond
+2026-10-06 13:15:05 | OK | Kafka | Kafka répond
+2026-10-06 13:15:05 | OK | Hadoop | 2 datanodes sur 2 vivants : données copiées en double
+2026-10-06 13:15:05 | OK | Streaming | les 4 tables contiennent des fichiers
+2026-10-06 13:15:05 | OK | Spark | Spark répond
+2026-10-06 13:15:16 | OK | Kafka | Kafka répond
+2026-10-06 13:15:16 | OK | Hadoop | 2 datanodes sur 2 vivants : données copiées en double
+2026-10-06 13:15:16 | OK | Streaming | les 4 tables contiennent des fichiers
+2026-10-06 13:15:16 | OK | Spark | Spark répond
+2026-10-06 13:15:22 | OK | Kafka | Kafka répond
+2026-10-06 13:15:22 | OK | Hadoop | 2 datanodes sur 2 vivants : données copiées en double
+2026-10-06 13:15:22 | OK | Streaming | les 4 tables contiennent des fichiers
+2026-10-06 13:15:22 | OK | Spark | Spark répond
+2026-10-06 13:15:24 | OK | Kafka | Kafka répond
+2026-10-06 13:15:24 | OK | Hadoop | 2 datanodes sur 2 vivants : données copiées en double
+2026-10-06 13:15:24 | OK | Streaming | les 4 tables contiennent des fichiers
+2026-10-06 13:15:24 | OK | Spark | Spark répond
+2026-10-06 13:18:55 | OK | Kafka | Kafka répond
+2026-10-06 13:18:55 | ALERTE | Hadoop | 1 datanode sur 2 : données lisibles grâce à l'autre, mais plus de copie de secours
+2026-10-06 13:18:55 | OK | Streaming | les 4 tables contiennent des fichiers
+2026-10-06 13:18:55 | OK | Spark | Spark répond
+2026-10-06 13:19:14 | OK | Kafka | Kafka répond
+2026-10-06 13:19:14 | ALERTE | Hadoop | 1 datanode sur 2 : données lisibles grâce à l'autre, mais plus de copie de secours
+2026-10-06 13:19:14 | OK | Streaming | les 4 tables contiennent des fichiers
+2026-10-06 13:19:14 | OK | Spark | Spark répond
+2026-10-06 13:19:53 | OK | Kafka | Kafka répond
+2026-10-06 13:19:53 | ALERTE | Hadoop | 1 datanode sur 2 : données lisibles grâce à l'autre, mais plus de copie de secours
+2026-10-06 13:19:53 | OK | Streaming | les 4 tables contiennent des fichiers
+2026-10-06 13:19:53 | OK | Spark | Spark répond
+2026-10-06 13:19:58 | OK | Kafka | Kafka répond
+2026-10-06 13:19:58 | ALERTE | Hadoop | 1 datanode sur 2 : données lisibles grâce à l'autre, mais plus de copie de secours
+2026-10-06 13:19:58 | OK | Streaming | les 4 tables contiennent des fichiers
+2026-10-06 13:19:58 | OK | Spark | Spark répond
+2026-10-06 13:20:00 | OK | Kafka | Kafka répond
+2026-10-06 13:20:00 | ALERTE | Hadoop | 1 datanode sur 2 : données lisibles grâce à l'autre, mais plus de copie de secours
+2026-10-06 13:20:00 | OK | Streaming | les 4 tables contiennent des fichiers
+2026-10-06 13:20:00 | OK | Spark | Spark répond
+2026-10-06 13:20:16 | OK | Kafka | Kafka répond
+2026-10-06 13:20:16 | ALERTE | Hadoop | 1 datanode sur 2 : données lisibles grâce à l'autre, mais plus de copie de secours
+2026-10-06 13:20:16 | OK | Streaming | les 4 tables contiennent des fichiers
+2026-10-06 13:20:16 | OK | Spark | Spark répond
+2026-10-06 13:20:18 | OK | Kafka | Kafka répond
+2026-10-06 13:20:18 | ALERTE | Hadoop | 1 datanode sur 2 : données lisibles grâce à l'autre, mais plus de copie de secours
+2026-10-06 13:20:18 | OK | Streaming | les 4 tables contiennent des fichiers
+2026-10-06 13:20:18 | OK | Spark | Spark répond
+2026-10-06 13:20:22 | OK | Kafka | Kafka répond
+2026-10-06 13:20:22 | ALERTE | Hadoop | 1 datanode sur 2 : données lisibles grâce à l'autre, mais plus de copie de secours
+2026-10-06 13:20:22 | OK | Streaming | les 4 tables contiennent des fichiers
+2026-10-06 13:20:22 | OK | Spark | Spark répond
+2026-10-06 13:20:25 | OK | Kafka | Kafka répond
+2026-10-06 13:20:25 | ALERTE | Hadoop | 1 datanode sur 2 : données lisibles grâce à l'autre, mais plus de copie de secours
+2026-10-06 13:20:25 | OK | Streaming | les 4 tables contiennent des fichiers
+2026-10-06 13:20:25 | OK | Spark | Spark répond
+2026-10-06 13:55:10 | OK | Kafka | Kafka répond
+2026-10-06 13:55:10 | OK | Hadoop | 2 datanodes sur 2 vivants : données copiées en double
+2026-10-06 13:55:10 | OK | Streaming | les 4 tables contiennent des fichiers
+2026-10-06 13:55:10 | OK | Spark | Spark répond
+2026-10-06 14:20:54 | OK | Kafka | Kafka répond
+2026-10-06 14:20:54 | OK | Hadoop | 2 datanodes sur 2 vivants : données copiées en double
+2026-10-06 14:20:54 | OK | Streaming | les 4 tables contiennent des fichiers
+2026-10-06 14:20:54 | OK | Spark | Spark répond
+2026-10-06 14:21:07 | OK | Kafka | Kafka répond
+2026-10-06 14:21:07 | OK | Hadoop | 2 datanodes sur 2 vivants : données copiées en double
+2026-10-06 14:21:07 | OK | Streaming | les 4 tables contiennent des fichiers
+2026-10-06 14:21:07 | OK | Spark | Spark répond
+2026-10-06 14:21:08 | OK | Kafka | Kafka répond
+2026-10-06 14:21:08 | OK | Hadoop | 2 datanodes sur 2 vivants : données copiées en double
+2026-10-06 14:21:08 | OK | Streaming | les 4 tables contiennent des fichiers
+2026-10-06 14:21:08 | OK | Spark | Spark répond
+2026-10-06 14:21:09 | OK | Kafka | Kafka répond
+2026-10-06 14:21:09 | OK | Hadoop | 2 datanodes sur 2 vivants : données copiées en double
+2026-10-06 14:21:09 | OK | Streaming | les 4 tables contiennent des fichiers
+2026-10-06 14:21:09 | OK | Spark | Spark répond
+2026-10-06 14:21:10 | OK | Kafka | Kafka répond
+2026-10-06 14:21:10 | OK | Hadoop | 2 datanodes sur 2 vivants : données copiées en double
+2026-10-06 14:21:10 | OK | Streaming | les 4 tables contiennent des fichiers
+2026-10-06 14:21:10 | OK | Spark | Spark répond
+2026-10-06 14:21:43 | OK | Kafka | Kafka répond
+2026-10-06 14:21:43 | OK | Hadoop | 2 datanodes sur 2 vivants : données copiées en double
+2026-10-06 14:21:43 | OK | Streaming | les 4 tables contiennent des fichiers
+2026-10-06 14:21:43 | OK | Spark | Spark répond
+2026-10-08 08:58:19 | ALERTE | Kafka | Kafka ne répond pas
+2026-10-08 08:58:19 | ALERTE | Hadoop | namenode injoignable : <urlopen error [Errno -2] Name or service not known>
+2026-10-08 08:58:19 | ALERTE | Streaming | table vide ou introuvable : clients, contrats, paiements, sinistres
+2026-10-08 08:58:19 | OK | Spark | Spark répond
+2026-10-08 13:33:19 | OK | Kafka | Kafka répond
+2026-10-08 13:33:19 | OK | Hadoop | 2 datanodes sur 2 vivants : données copiées en double
+2026-10-08 13:33:19 | OK | Streaming | les 4 tables contiennent des fichiers
+2026-10-08 13:33:19 | OK | Spark | Spark répond
+2026-10-08 13:33:19 | OK | Kafka | Kafka répond
+2026-10-08 13:33:19 | OK | Hadoop | 2 datanodes sur 2 vivants : données copiées en double
+2026-10-08 13:33:19 | OK | Streaming | les 4 tables contiennent des fichiers
+2026-10-08 13:33:19 | OK | Spark | Spark répond
+2026-10-08 13:33:29 | OK | Kafka | Kafka répond
+2026-10-08 13:33:29 | OK | Hadoop | 2 datanodes sur 2 vivants : données copiées en double
+2026-10-08 13:33:29 | OK | Streaming | les 4 tables contiennent des fichiers
+2026-10-08 13:33:29 | OK | Spark | Spark répond
+2026-10-08 15:03:58 | OK | Kafka | Kafka répond
+2026-10-08 15:03:58 | OK | Hadoop | 2 datanodes sur 2 vivants : données copiées en double
+2026-10-08 15:03:58 | OK | Streaming | les 4 tables contiennent des fichiers
+2026-10-08 15:03:58 | OK | Spark | Spark répond
+2026-10-08 15:04:00 | OK | Kafka | Kafka répond
+2026-10-08 15:04:00 | OK | Hadoop | 2 datanodes sur 2 vivants : données copiées en double
+2026-10-08 15:04:00 | OK | Streaming | les 4 tables contiennent des fichiers
+2026-10-08 15:04:00 | OK | Spark | Spark répond
+2026-10-08 15:04:02 | OK | Kafka | Kafka répond
+2026-10-08 15:04:02 | OK | Hadoop | 2 datanodes sur 2 vivants : données copiées en double
+2026-10-08 15:04:02 | OK | Streaming | les 4 tables contiennent des fichiers
+2026-10-08 15:04:02 | OK | Spark | Spark répond
+2026-10-08 16:29:07 | OK | Kafka | Kafka répond
+2026-10-08 16:29:07 | OK | Hadoop | 2 datanodes sur 2 vivants : données copiées en double
+2026-10-08 16:29:07 | OK | Streaming | les 4 tables contiennent des fichiers
+2026-10-08 16:29:07 | OK | Spark | Spark répond
+2026-10-08 16:29:16 | OK | Kafka | Kafka répond
+2026-10-08 16:29:16 | OK | Hadoop | 2 datanodes sur 2 vivants : données copiées en double
+2026-10-08 16:29:16 | OK | Streaming | les 4 tables contiennent des fichiers
+2026-10-08 16:29:16 | OK | Spark | Spark répond
+2026-10-08 16:29:17 | OK | Kafka | Kafka répond
+2026-10-08 16:29:17 | OK | Hadoop | 2 datanodes sur 2 vivants : données copiées en double
+2026-10-08 16:29:17 | OK | Streaming | les 4 tables contiennent des fichiers
+2026-10-08 16:29:17 | OK | Spark | Spark répond
+2026-10-08 16:29:18 | OK | Kafka | Kafka répond
+2026-10-08 16:29:18 | OK | Hadoop | 2 datanodes sur 2 vivants : données copiées en double
+2026-10-08 16:29:18 | OK | Streaming | les 4 tables contiennent des fichiers
+2026-10-08 16:29:18 | OK | Spark | Spark répond
+2026-10-12 09:23:18 | OK | Kafka | Kafka répond
+2026-10-12 09:23:18 | OK | Hadoop | 2 datanodes sur 2 vivants : données copiées en double
+2026-10-12 09:23:18 | OK | Streaming | les 4 tables contiennent des fichiers
+2026-10-12 09:23:18 | OK | Spark | Spark répond
+2026-10-12 09:34:59 | OK | Kafka | Kafka répond
+2026-10-12 09:34:59 | OK | Hadoop | 2 datanodes sur 2 vivants : données copiées en double
+2026-10-12 09:34:59 | OK | Streaming | les 4 tables contiennent des fichiers
+2026-10-12 09:34:59 | OK | Spark | Spark répond
+2026-10-12 09:35:10 | OK | Kafka | Kafka répond
+2026-10-12 09:35:10 | OK | Hadoop | 2 datanodes sur 2 vivants : données copiées en double
+2026-10-12 09:35:10 | OK | Streaming | les 4 tables contiennent des fichiers
+2026-10-12 09:35:10 | OK | Spark | Spark répond
+2026-10-12 09:35:11 | OK | Kafka | Kafka répond
+2026-10-12 09:35:11 | OK | Hadoop | 2 datanodes sur 2 vivants : données copiées en double
+2026-10-12 09:35:11 | OK | Streaming | les 4 tables contiennent des fichiers
+2026-10-12 09:35:11 | OK | Spark | Spark répond
+2026-10-15 12:51:40 | OK | Kafka | Kafka répond
+2026-10-15 12:51:40 | OK | Hadoop | 2 datanodes sur 2 vivants : données copiées en double
+2026-10-15 12:51:40 | OK | Streaming | les 4 tables contiennent des fichiers
+2026-10-15 12:51:40 | OK | Spark | Spark répond
+2026-10-15 12:51:51 | OK | Kafka | Kafka répond
+2026-10-15 12:51:51 | OK | Hadoop | 2 datanodes sur 2 vivants : données copiées en double
+2026-10-15 12:51:51 | OK | Streaming | les 4 tables contiennent des fichiers
+2026-10-15 12:51:51 | OK | Spark | Spark répond
+2026-10-15 12:51:58 | OK | Kafka | Kafka répond
+2026-10-15 12:51:58 | OK | Hadoop | 2 datanodes sur 2 vivants : données copiées en double
+2026-10-15 12:51:58 | OK | Streaming | les 4 tables contiennent des fichiers
+2026-10-15 12:51:58 | OK | Spark | Spark répond
+2026-10-15 12:52:03 | OK | Kafka | Kafka répond
+2026-10-15 12:52:03 | OK | Hadoop | 2 datanodes sur 2 vivants : données copiées en double
+2026-10-15 12:52:03 | OK | Streaming | les 4 tables contiennent des fichiers
+2026-10-15 12:52:03 | OK | Spark | Spark répond
+2026-10-15 12:52:07 | OK | Kafka | Kafka répond
+2026-10-15 12:52:07 | OK | Hadoop | 2 datanodes sur 2 vivants : données copiées en double
+2026-10-15 12:52:07 | OK | Streaming | les 4 tables contiennent des fichiers
+2026-10-15 12:52:07 | OK | Spark | Spark répond
+2026-10-15 12:52:12 | OK | Kafka | Kafka répond
+2026-10-15 12:52:12 | OK | Hadoop | 2 datanodes sur 2 vivants : données copiées en double
+2026-10-15 12:52:12 | OK | Streaming | les 4 tables contiennent des fichiers
+2026-10-15 12:52:12 | OK | Spark | Spark répond
+2026-10-16 12:01:26 | OK | Kafka | Kafka répond
+2026-10-16 12:01:26 | OK | Hadoop | 2 datanodes sur 2 vivants : données copiées en double
+2026-10-16 12:01:26 | OK | Streaming | les 4 tables contiennent des fichiers
+2026-10-16 12:01:26 | OK | Spark | Spark répond
+2026-10-16 12:03:07 | OK | Kafka | Kafka répond
+2026-10-16 12:03:07 | OK | Hadoop | 2 datanodes sur 2 vivants : données copiées en double
+2026-10-16 12:03:07 | OK | Streaming | les 4 tables contiennent des fichiers
+2026-10-16 12:03:07 | OK | Spark | Spark répond
