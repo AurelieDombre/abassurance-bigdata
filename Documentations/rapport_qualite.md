@@ -1,13 +1,13 @@
 # Rapport de qualité : abassurance-bigdata
 
-Date de l'analyse : [JJ/MM/2026 — date de la capture ci-dessous]
+Date de l'analyse : 20/10/2026
 Outil : SonarQube Community (analyse locale) + intégration continue GitHub Actions
 
 ## 1. Verdict global
 
 **Quality Gate :  Failed**
 
-La Quality Gate « Sonar way » échoue sur une seule condition : la couverture du *nouveau code* (55.1%) reste sous le seuil de 80 % exigé par défaut. Les conditions de fiabilité, sécurité et maintenabilité sont respectées, et la couverture de l'ensemble du projet est de **61%**. Choix assumé : les fichiers non couverts dépendent de HDFS, Kafka ou de l'affichage Streamlit ; ils se vérifient en conditions réelles (version Docker complète).
+La Quality Gate « Sonar way » échoue sur une seule condition : la couverture du *nouveau code* (55.1%) reste sous le seuil de 80 % exigé par défaut. Les conditions de fiabilité, sécurité et maintenabilité sont respectées, et la couverture de l'ensemble du projet est de **61%**. La couverture du nouveau code est sous-estimée : l’analyse du détail (Measures → Coverage) montre que en_ligne/app.py est compté à 0 % sur 144 lignes, alors que les tests le couvrent à 82 %. En cause, un conflit de nom : le rapport de couverture écrit app/app.py et en_ligne/app.py sous le même nom app.py, et SonarQube attribue les résultats au mauvais fichier. Correction identifiée : générer le rapport depuis la racine du projet (--cov=. et relative_files = True), pour que chaque fichier soit nommé avec son dossier..
 
 Les tests sont désormais relancés automatiquement à chaque `git push` par GitHub Actions (section 4).
 
@@ -17,7 +17,7 @@ Les tests sont désormais relancés automatiquement à chaque `git push` par Git
 
 | Indicateur | Première analyse | Dernière analyse |
 | --- | --- | --- |
-| Lignes de code | ~1 700 | [à relever sur la capture] |
+| Lignes de code | 1604 | 1604 |
 | Sécurité (issues) | 51 | 0 |
 | Fiabilité (issues) | 1 | 0 |
 | Maintenabilité (issues) | 8 | 0 |
@@ -56,7 +56,7 @@ Fichier : `.github/workflows/tests.yml`. À chaque `git push` (toutes branches) 
 
 Si un test échoue, le commit est marqué d'une croix rouge. Le contrôle de données (`test_donnees_fusion.py`) a été écrit pour l'anomalie « inversion statut_client / date_creation » : il échouait sur les 100 clients AssurePlus avant la correction du job Talaxie et passe après.
 
-**Pourquoi la CI n'affiche pas 61 %.** La CI ne mesure que les fichiers qu'elle reçoit dans `--cov` (`app`, `en_ligne`, `src`), avec l'outil `coverage.py`. SonarQube calcule sa couverture sur tous les fichiers sources qu'il analyse, avec sa propre méthode (lignes et conditions), et un fichier sans rapport de couverture compte pour 0 %. Les deux chiffres n'ont donc pas le même périmètre : [expliquer ici quel(s) fichier(s) tire(nt) le chiffre SonarQube vers le bas, d'après l'onglet Measures > Coverage]. Le chiffre de référence du rapport reste celui de SonarQube ; la CI sert d'alarme automatique (tests verts ou rouges à chaque push).
+**Pourquoi la CI n'affiche pas 61 %.** La CI ne mesure que les fichiers qu'elle reçoit dans `--cov` (`app`, `en_ligne`, `src`), avec l'outil `coverage.py`. SonarQube calcule sa couverture sur tous les fichiers sources qu'il analyse, avec sa propre méthode (lignes et conditions), et un fichier sans rapport de couverture compte pour 0 %. Les deux chiffres n'ont donc pas le même périmètre : La différence vient surtout de en_ligne/app.py, compté à 0 % par SonarQube à cause du conflit de nom expliqué en section 1. Le chiffre de référence du rapport reste celui de SonarQube ; la CI sert d'alarme automatique (tests verts ou rouges à chaque push).
 
 ![resultat_apres_ajout_test.png](images/resultat_apres_ajout_test.png)
 

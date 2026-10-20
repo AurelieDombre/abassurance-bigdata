@@ -120,9 +120,10 @@ Le premier test de `evaluer` est un « contrôle dont on connaît les réponses 
 
 `Documentations/rapport_qualite.md` a été complété : verdict de la Quality Gate, capture SonarQube à jour, nouvelle section sur l'intégration continue et nouveaux tests.
 
-- **Verdict :** Failed mais en analysant le détail, j’ai découvert que en_ligne/app.py était compté à 0 % à cause d’un conflit de nom entre deux fichiers app.py. Le 61 % est donc sous-estimé.
+- **Verdict :** Failed. Seule condition non tenue : la couverture du nouveau code (55,1 %, seuil 80 %). En analysant le détail, j’ai découvert que en_ligne/app.py était compté à 0 % à cause d’un conflit de nom entre deux fichiers app.py : le chiffre est donc sous-estimé.
 - **Couverture de l'ensemble du projet :** 61 %
 
+![sonarQube_20_10_2026.png](images/sonarQube_20_10_2026.png)
 ![resultat_apres_ajout_test.png](images/resultat_apres_ajout_test.png)
 
 **Écart avec la CI.** GitHub Actions affiche environ 88 % : elle ne mesure que les fichiers passés à `--cov`, avec `coverage.py`. SonarQube applique sa propre méthode à tous les fichiers sources analysés. Le chiffre de référence reste celui de SonarQube ; la CI sert d'alarme à chaque push.
