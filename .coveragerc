@@ -1,5 +1,6 @@
 [run]
 # le pourcentage affiché par la CI GitHub se lit comme celui de SonarQube.
+relative_files = True
 omit =
     app/app.py
     app/pages/*
