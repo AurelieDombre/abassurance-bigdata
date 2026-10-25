@@ -7,11 +7,12 @@ import pytest
 pytest.importorskip("pyspark")
 import os
 
-# Ces tests ont besoin de Spark : ils se lancent dans le conteneur Docker
-# (voir lancer_tests.py). Sur le PC, on les saute au lieu de les faire échouer.
+# Ces tests ont besoin de Spark (donc de Java). Ils tournent dans le conteneur
+# Docker (voir lancer_tests.py) et sur GitHub Actions (variable CI = "true").
+# Sur le PC sans Java, on les saute au lieu de les faire échouer.
 pytestmark = pytest.mark.skipif(
-    not os.path.exists("/.dockerenv"),
-    reason="Tests Spark : à lancer dans le conteneur pyspark-app",
+    not (os.path.exists("/.dockerenv") or os.environ.get("CI") == "true"),
+    reason="Tests Spark : à lancer dans le conteneur pyspark-app ou en CI",
 )
 
 from pyspark.sql import SparkSession

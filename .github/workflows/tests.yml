@@ -1,0 +1,83 @@
+# .github/workflows/tests.yml — Intégration continue (CI)
+#
+# lance TOUS les tests (y compris ceux qui ont besoin de Spark) et mesure la
+# couverture. Si un seul test échoue, le push apparaît avec une croix rouge ❌
+# dans l'onglet « Actions » ; sinon, une coche verte ✅.
+#
+# Doc : https://docs.github.com/fr/actions/use-cases-and-examples/building-and-testing/building-and-testing-python
+
+name: Tests et couverture
+
+on:
+  push:            # à chaque push, sur toutes les branches
+  pull_request:    # et à chaque pull request (ex : develop -> main)
+  workflow_dispatch:  # bouton « Run workflow » pour relancer à la main (pratique pour la démo)
+
+jobs:
+  tests:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30   # garde-fou : on coupe si quelque chose bloque
+
+    steps:
+      # 1. Récupérer le code du dépôt sur la machine GitHub
+      - name: Récupérer le code
+        uses: actions/checkout@v5
+
+      # 2. Installer Python 3.12, la même version que dans le conteneur Docker
+      #    (cache: pip = on garde les paquets téléchargés d'une fois sur l'autre)
+      - name: Installer Python 3.12
+        uses: actions/setup-python@v6
+        with:
+          python-version: "3.12"
+          cache: pip
+          cache-dependency-path: Docker/requirements.txt
+
+      # 3. Installer Java 21 : Spark est écrit en Java/Scala, il en a besoin
+      #    pour démarrer (comme dans le Dockerfile : openjdk-21)
+      - name: Installer Java 21 (pour Spark)
+        uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: "21"
+
+      # 4. Installer les mêmes bibliothèques que le conteneur (pyspark, pytest, streamlit...)
+      - name: Installer les dépendances
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r Docker/requirements.txt
+
+      # 5. Lancer tous les tests + mesurer la couverture
+      #    - CI=true est fourni automatiquement par GitHub : les tests Spark
+      #      le détectent et s'exécutent (au lieu d'être sautés comme sur le PC).
+      #    - --cov=... : les dossiers dont on mesure la couverture
+      #    - .coveragerc écarte les mêmes fichiers que SonarQube
+      #    - --junitxml : rapport des tests lisible par d'autres outils
+      - name: Lancer pytest avec la couverture
+        env:
+          SPARK_LOCAL_IP: 127.0.0.1
+        run: |
+          python -m pytest -v \
+            --cov=app --cov=en_ligne --cov=src \
+            --cov-report=term-missing \
+            --cov-report=xml:coverage.xml \
+            --junitxml=rapport_tests.xml
+
+      # 6. Afficher un résumé de la couverture directement sur la page de l'exécution
+      #    (onglet Actions > l'exécution > « Summary »)
+      - name: Résumé de la couverture
+        if: always()
+        run: |
+          echo "## Couverture du code" >> "$GITHUB_STEP_SUMMARY"
+          echo '```' >> "$GITHUB_STEP_SUMMARY"
+          python -m coverage report >> "$GITHUB_STEP_SUMMARY" || true
+          echo '```' >> "$GITHUB_STEP_SUMMARY"
+
+      # 7. Garder les rapports (téléchargeables depuis la page de l'exécution)
+      - name: Conserver les rapports
+        if: always()
+        uses: actions/upload-artifact@v5
+        with:
+          name: rapports-tests
+          path: |
+            coverage.xml
+            rapport_tests.xml
