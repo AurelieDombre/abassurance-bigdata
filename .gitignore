@@ -21,3 +21,4 @@ Docker/auth.env
 
 .sonar/
 rapport_tests.xml
+data/export_demo/
